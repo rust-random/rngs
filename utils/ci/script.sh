@@ -22,7 +22,7 @@ fi
 
 main() {
   if [ "0$NIGHTLY" -ge 1 ]; then
-    $CARGO test $TARGET --benches --features=nightly
+    $CARGO test $TARGET --benches
   fi
 
   $CARGO test $TARGET --manifest-path rand_isaac/Cargo.toml --features=serde1

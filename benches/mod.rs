@@ -55,16 +55,16 @@ gen_bytes!(gen_bytes_isaac, IsaacRng::from_entropy());
 gen_bytes!(gen_bytes_isaac64, Isaac64Rng::from_entropy());
 
 // Save a dependency on Rand:
-trait Generable {
+trait Generate {
     fn generate<R: RngCore>(rng: &mut R) -> Self;
 }
-impl Generable for u32 {
+impl Generate for u32 {
     #[inline]
     fn generate<R: RngCore>(rng: &mut R) -> Self {
         rng.next_u32()
     }
 }
-impl Generable for u64 {
+impl Generate for u64 {
     #[inline]
     fn generate<R: RngCore>(rng: &mut R) -> Self {
         rng.next_u64()
@@ -80,7 +80,7 @@ macro_rules! gen_uint {
             b.iter(|| {
                 let mut accum: $ty = 0;
                 for _ in 0..RAND_BENCH_N {
-                    accum = accum.wrapping_add(<$ty as Generable>::generate(&mut rng));
+                    accum = accum.wrapping_add(<$ty as Generate>::generate(&mut rng));
                 }
                 accum
             });
