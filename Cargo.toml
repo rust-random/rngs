@@ -22,7 +22,7 @@ members = [
 
 [dev-dependencies]
 # Only for benches:
-rand = "0.7"
+rand_core = { version = "0.5", features = ["getrandom"] }
 rand_xoshiro = { path = "rand_xoshiro", version = "0.4" }
 rand_isaac = { path = "rand_isaac", version = "0.2" }
 rand_xorshift = { path = "rand_xorshift", version = "0.2" }

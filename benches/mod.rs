@@ -17,7 +17,7 @@ const BYTES_LEN: usize = 1024;
 use std::mem::size_of;
 use test::{black_box, Bencher};
 
-use rand::prelude::*;
+use rand_core::{RngCore, SeedableRng};
 use rand_isaac::{IsaacRng, Isaac64Rng};
 use rand_xorshift::XorShiftRng;
 use rand_xoshiro::{Xoshiro256StarStar, Xoshiro256Plus, Xoshiro128StarStar,
@@ -54,6 +54,24 @@ gen_bytes!(gen_bytes_splitmix64, SplitMix64::from_entropy());
 gen_bytes!(gen_bytes_isaac, IsaacRng::from_entropy());
 gen_bytes!(gen_bytes_isaac64, Isaac64Rng::from_entropy());
 
+// Save a dependency on Rand:
+trait Generable {
+    fn generate<R: RngCore>(rng: &mut R) -> Self;
+}
+impl Generable for u32 {
+    #[inline]
+    fn generate<R: RngCore>(rng: &mut R) -> Self {
+        rng.next_u32()
+    }
+}
+impl Generable for u64 {
+    #[inline]
+    fn generate<R: RngCore>(rng: &mut R) -> Self {
+        rng.next_u64()
+    }
+}
+
+
 macro_rules! gen_uint {
     ($fnn:ident, $ty:ty, $gen:expr) => {
         #[bench]
@@ -62,7 +80,7 @@ macro_rules! gen_uint {
             b.iter(|| {
                 let mut accum: $ty = 0;
                 for _ in 0..RAND_BENCH_N {
-                    accum = accum.wrapping_add(rng.gen::<$ty>());
+                    accum = accum.wrapping_add(<$ty as Generable>::generate(&mut rng));
                 }
                 accum
             });
