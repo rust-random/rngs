@@ -129,7 +129,7 @@ pub struct JitterRng {
     // Number of rounds to run the entropy collector per 64 bits
     rounds: u8,
     // Timer used by `measure_jitter`
-    timer: Arc<dyn Fn() -> u64 + Send>,
+    timer: Arc<dyn Fn() -> u64 + Send + Sync>,
     // Memory for the Memory Access noise source
     mem_prev_index: u16,
     // Make `next_u32` not waste 32 bits
@@ -284,7 +284,7 @@ impl JitterRng {
     ///
     /// [`test_timer`]: JitterRng::test_timer
     /// [`set_rounds`]: JitterRng::set_rounds
-    pub fn new_with_timer(timer: impl Fn() -> u64 + Send + 'static) -> JitterRng {
+    pub fn new_with_timer(timer: impl Fn() -> u64 + Send + Sync + 'static) -> JitterRng {
         JitterRng {
             data: 0,
             rounds: 64,
