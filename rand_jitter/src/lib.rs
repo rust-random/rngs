@@ -56,6 +56,7 @@
 #![no_std]
 #[cfg(feature = "std")]
 extern crate std;
+extern crate alloc;
 
 pub use rand_core;
 
@@ -109,6 +110,7 @@ mod error;
 use rand_core::{RngCore, Error, impls};
 pub use crate::error::TimerError;
 
+use alloc::sync::Arc;
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -127,7 +129,7 @@ pub struct JitterRng {
     // Number of rounds to run the entropy collector per 64 bits
     rounds: u8,
     // Timer used by `measure_jitter`
-    timer: fn() -> u64,
+    timer: Arc<dyn Fn() -> u64 + Send>,
     // Memory for the Memory Access noise source
     mem_prev_index: u16,
     // Make `next_u32` not waste 32 bits
@@ -195,7 +197,7 @@ impl Clone for JitterRng {
         JitterRng {
             data: self.data,
             rounds: self.rounds,
-            timer: self.timer,
+            timer: self.timer.clone(),
             mem_prev_index: self.mem_prev_index,
             // The 32 bits that may still be unused from the previous round are
             // for the original to use, not for the clone.
@@ -282,11 +284,11 @@ impl JitterRng {
     ///
     /// [`test_timer`]: JitterRng::test_timer
     /// [`set_rounds`]: JitterRng::set_rounds
-    pub fn new_with_timer(timer: fn() -> u64) -> JitterRng {
+    pub fn new_with_timer(timer: impl Fn() -> u64 + Send + 'static) -> JitterRng {
         JitterRng {
             data: 0,
             rounds: 64,
-            timer,
+            timer: Arc::new(timer),
             mem_prev_index: 0,
             data_half_used: false,
         }
