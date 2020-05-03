@@ -88,7 +88,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///       https://eprint.iacr.org/2006/438)
 ///
 /// [`rand_hc`]: https://docs.rs/rand_hc
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct IsaacRng(BlockRng<IsaacCore>);
 
@@ -152,6 +152,20 @@ impl fmt::Debug for IsaacCore {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "IsaacCore {{}}")
     }
+}
+
+// Custom PartialEq implementation as it can't currently be derived from an array of size RAND_SIZE
+impl ::core::cmp::PartialEq for IsaacCore {
+    fn eq(&self, other: &IsaacCore) -> bool {
+        &self.mem[..] == &other.mem[..]
+            && self.a == other.a
+            && self.b == other.b
+            && self.c == other.c
+    }
+}
+
+// Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
+impl ::core::cmp::Eq for IsaacCore {
 }
 
 impl BlockRngCore for IsaacCore {

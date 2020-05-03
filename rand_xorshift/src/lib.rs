@@ -31,7 +31,7 @@ use rand_core::{RngCore, SeedableRng, Error, impls, le};
 /// [^1]: Marsaglia, George (July 2003).
 ///       ["Xorshift RNGs"](https://www.jstatsoft.org/v08/i14/paper).
 ///       *Journal of Statistical Software*. Vol. 8 (Issue 14).
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde1", derive(Serialize,Deserialize))]
 pub struct XorShiftRng {
     x: w<u32>,

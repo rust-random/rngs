@@ -65,6 +65,17 @@ impl<T> ::core::default::Default for IsaacArray<T> where T: Copy + Default {
     }
 }
 
+// Custom PartialEq implementation as it can't currently be derived from an array of size RAND_SIZE
+impl<T> ::core::cmp::PartialEq for IsaacArray<T> where T: PartialEq {
+    fn eq(&self, other: &IsaacArray<T>) -> bool {
+        &self.inner[..] == &other.inner[..]
+    }
+}
+
+// Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
+impl<T> ::core::cmp::Eq for IsaacArray<T> where T: Eq {
+}
+
 
 #[cfg(feature="serde")]
 pub(super) mod isaac_array_serde {

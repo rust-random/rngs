@@ -21,7 +21,7 @@ use rand_core::{RngCore, SeedableRng, Error};
 /// Sebastiano Vigna. For `next_u32`, a more efficient mixing function taken
 /// from [`dsiutils`](http://dsiutils.di.unimi.it/) is used.
 #[allow(missing_copy_implementations)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct SplitMix64 {
     x: u64,
