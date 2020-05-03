@@ -122,6 +122,7 @@ const MEMORY_SIZE: usize = MEMORY_BLOCKS * MEMORY_BLOCKSIZE;
 ///
 /// Note that this RNG is not suitable for use cases where cryptographic
 /// security is required.
+#[derive(PartialEq, Eq)]
 pub struct JitterRng {
     data: u64, // Actual random number
     // Number of rounds to run the entropy collector per 64 bits

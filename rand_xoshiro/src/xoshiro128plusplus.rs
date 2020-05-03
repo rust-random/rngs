@@ -19,7 +19,7 @@ use rand_core::{SeedableRng, RngCore, Error};
 /// The algorithm used here is translated from [the `xoshiro128plusplus.c`
 /// reference source code](http://xoshiro.di.unimi.it/xoshiro128plusplus.c) by
 /// David Blackman and Sebastiano Vigna.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct Xoshiro128PlusPlus {
     s: [u32; 4],
