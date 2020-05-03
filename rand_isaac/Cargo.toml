@@ -22,7 +22,7 @@ appveyor = { repository = "rust-random/rngs" }
 serde1 = ["serde", "rand_core/serde1"]
 
 [dependencies]
-rand_core = { version = "0.5" }
+rand_core = { version = "0.5.2" }
 serde = { version = "1.0.63", features = ["derive"], optional = true }
 # Not a direct dependency but required to boost the minimum version:
 serde_derive = { version = "1.0.63", optional = true }
