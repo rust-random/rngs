@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Xoroshiro128Plus, Xoroshiro128PlusPlus, Xoroshiro128StarStar,
   Xoshiro128Plus, Xoshiro128PlusPlus, Xoshiro128StarStar, Xoshiro256Plus,
   Xoshiro256PlusPlus, Xoshiro256StarStar, Xoshiro512Plus, Xoshiro512PlusPlus,
-  and Xoshiro512StarStar
+  and Xoshiro512StarStar (#6)
 
 ## [0.4.0] - 2019-09-03
 - Add xoshiro128++, 256++ and 512++ variants

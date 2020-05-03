@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Derive PartialEq+Eq for JitterRng
+- Derive PartialEq+Eq for JitterRng (#6)
 
 ## [0.2.1] - 2019-08-16
 ### Changed
