@@ -79,7 +79,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// [`IsaacRng`]: crate::isaac::IsaacRng
 /// [`rand_hc`]: https://docs.rs/rand_hc
 /// [`BlockRng64`]: rand_core::block::BlockRng64
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct Isaac64Rng(BlockRng64<Isaac64Core>);
 

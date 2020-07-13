@@ -88,7 +88,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///       https://eprint.iacr.org/2006/438)
 ///
 /// [`rand_hc`]: https://docs.rs/rand_hc
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct IsaacRng(BlockRng<IsaacCore>);
 
