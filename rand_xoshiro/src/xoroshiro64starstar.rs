@@ -21,7 +21,7 @@ use rand_core::{RngCore, SeedableRng};
 /// reference source code](http://xoshiro.di.unimi.it/xoroshiro64starstar.c) by
 /// David Blackman and Sebastiano Vigna.
 #[allow(missing_copy_implementations)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct Xoroshiro64StarStar {
     s0: u32,

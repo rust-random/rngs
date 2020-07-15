@@ -79,7 +79,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// [`IsaacRng`]: crate::isaac::IsaacRng
 /// [`rand_hc`]: https://docs.rs/rand_hc
 /// [`BlockRng64`]: rand_core::block::BlockRng64
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct Isaac64Rng(BlockRng64<Isaac64Core>);
 
@@ -143,6 +143,20 @@ impl fmt::Debug for Isaac64Core {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Isaac64Core {{}}")
     }
+}
+
+// Custom PartialEq implementation as it can't currently be derived from an array of size RAND_SIZE
+impl ::core::cmp::PartialEq for Isaac64Core {
+    fn eq(&self, other: &Isaac64Core) -> bool {
+        &self.mem[..] == &other.mem[..]
+            && self.a == other.a
+            && self.b == other.b
+            && self.c == other.c
+    }
+}
+
+// Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
+impl ::core::cmp::Eq for Isaac64Core {
 }
 
 impl BlockRngCore for Isaac64Core {

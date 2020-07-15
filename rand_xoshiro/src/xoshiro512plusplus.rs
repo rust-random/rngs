@@ -21,7 +21,7 @@ use crate::Seed512;
 /// The algorithm used here is translated from [the `xoshiro512plusplus.c`
 /// reference source code](http://xoshiro.di.unimi.it/xoshiro512plusplus.c) by
 /// David Blackman and Sebastiano Vigna.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct Xoshiro512PlusPlus {
     s: [u64; 8],
