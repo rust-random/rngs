@@ -20,7 +20,7 @@ Documentation:
 
 ### Rust version requirements
 
-Rand requires **Rustc version 1.32 or greater**.
+All crates in this repository require **Rustc version 1.32 or greater**.
 
 Travis CI always has a build with a pinned version of Rustc matching the oldest
 supported Rust release. The current policy is that this can be updated in any
