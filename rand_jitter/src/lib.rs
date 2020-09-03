@@ -600,7 +600,7 @@ impl JitterRng {
             if ec.stuck(delta) { count_stuck += 1; }
 
             // Test whether we have an increasing timer.
-            if !(time2 > time) { time_backwards += 1; }
+            if time2 <= time { time_backwards += 1; }
 
             // Count the number of times the counter increases in steps of 100ns
             // or greater.
@@ -745,6 +745,7 @@ impl RngCore for JitterRng {
     }
 
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        Ok(self.fill_bytes(dest))
+        self.fill_bytes(dest);
+        Ok(())
     }
 }
