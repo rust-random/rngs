@@ -7,7 +7,6 @@
 // except according to those terms.
 
 #[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
-use rand_core;
 use rand_core::le::read_u64_into;
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::{RngCore, SeedableRng};
