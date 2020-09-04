@@ -110,7 +110,6 @@ mod error;
 use rand_core::{RngCore, Error, impls};
 pub use crate::error::TimerError;
 
-use alloc::sync::Arc;
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -124,12 +123,12 @@ const MEMORY_SIZE: usize = MEMORY_BLOCKS * MEMORY_BLOCKSIZE;
 ///
 /// Note that this RNG is not suitable for use cases where cryptographic
 /// security is required.
-pub struct JitterRng {
+pub struct JitterRng<F> {
     data: u64, // Actual random number
     // Number of rounds to run the entropy collector per 64 bits
     rounds: u8,
     // Timer used by `measure_jitter`
-    timer: Arc<dyn Fn() -> u64 + Send + Sync>,
+    timer: F,
     // Memory for the Memory Access noise source
     mem_prev_index: u16,
     // Make `next_u32` not waste 32 bits
@@ -186,14 +185,15 @@ impl EcState {
 }
 
 // Custom Debug implementation that does not expose the internal state
-impl fmt::Debug for JitterRng {
+impl<F> fmt::Debug for JitterRng<F> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "JitterRng {{}}")
     }
 }
 
-impl Clone for JitterRng {
-    fn clone(&self) -> JitterRng {
+impl<F> Clone for JitterRng<F>
+where F: Clone {
+    fn clone(&self) -> JitterRng<F> {
         JitterRng {
             data: self.data,
             rounds: self.rounds,
@@ -210,7 +210,8 @@ impl Clone for JitterRng {
 #[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 static JITTER_ROUNDS: AtomicUsize = AtomicUsize::new(0);
 
-impl JitterRng {
+impl<F> JitterRng<F>
+where F: Fn() -> u64 + Send + Sync {
     /// Create a new `JitterRng`. Makes use of `std::time` for a timer, or a
     /// platform-specific function with higher accuracy if necessary and
     /// available.
@@ -284,11 +285,11 @@ impl JitterRng {
     ///
     /// [`test_timer`]: JitterRng::test_timer
     /// [`set_rounds`]: JitterRng::set_rounds
-    pub fn new_with_timer(timer: impl Fn() -> u64 + Send + Sync + 'static) -> JitterRng {
+    pub fn new_with_timer(timer: F) -> JitterRng<F> {
         JitterRng {
             data: 0,
             rounds: 64,
-            timer: Arc::new(timer),
+            timer,
             mem_prev_index: 0,
             data_half_used: false,
         }
@@ -719,7 +720,8 @@ fn black_box<T>(dummy: T) -> T {
     }
 }
 
-impl RngCore for JitterRng {
+impl<F> RngCore for JitterRng<F> 
+where F: Fn() -> u64 + Send + Sync {
     fn next_u32(&mut self) -> u32 {
         // We want to use both parts of the generated entropy
         if self.data_half_used {
