@@ -22,7 +22,7 @@ const ERROR_BASE: u32 = 0xAE53_0400;
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[repr(u32)]
 #[allow(clippy::manual_non_exhaustive)]
-//^ Replace with `#[non_exhaustive]` for Rust >= 1.40
+//^ TODO: Replace with `#[non_exhaustive]` for Rust >= 1.40
 pub enum TimerError {
     /// No timer available.
     NoTimer = ERROR_BASE + 1,
