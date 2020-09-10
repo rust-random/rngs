@@ -88,7 +88,9 @@ impl SeedableRng for Xoshiro512StarStar {
 impl RngCore for Xoshiro512StarStar {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        self.next_u64() as u32
+        // The lowest bits have some linear dependencies, so we use the
+        // upper bits instead.
+        (self.next_u64() >> 32) as u32
     }
 
     #[inline]
