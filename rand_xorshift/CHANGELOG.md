@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Derive PartialEq+Eq for XorShiftRng (#6)
+- Bump serde to 1.0.118 so that `serde1` feature can also be no-std (#12)
 
 ## [0.2.0] - 2019-06-12
 - Bump minor crate version since rand_core bump is a breaking change
