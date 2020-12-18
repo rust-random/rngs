@@ -211,6 +211,7 @@ static JITTER_ROUNDS: AtomicUsize = AtomicUsize::new(0);
 
 impl<F> JitterRng<F>
 where F: Fn() -> u64 + Send + Sync {
+    /* FIXME: this method is broken - see #16
     /// Create a new `JitterRng`. Makes use of `std::time` for a timer, or a
     /// platform-specific function with higher accuracy if necessary and
     /// available.
@@ -219,7 +220,7 @@ where F: Fn() -> u64 + Send + Sync {
     /// hundred times. If this does not pass basic quality tests, an error is
     /// returned. The test result is cached to make subsequent calls faster.
     #[cfg(all(feature = "std", not(target_arch = "wasm32")))]
-    pub fn new() -> Result<JitterRng, TimerError> {
+    pub fn new() -> Result<JitterRng<fn() -> u64>, TimerError> {
         if cfg!(target_arch = "wasm32") {
             return Err(TimerError::NoTimer);
         }
@@ -238,6 +239,7 @@ where F: Fn() -> u64 + Send + Sync {
         state.gen_entropy();
         Ok(state)
     }
+    */
 
     /// Create a new `JitterRng`.
     /// A custom timer can be supplied, making it possible to use `JitterRng` in
