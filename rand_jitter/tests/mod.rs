@@ -2,6 +2,7 @@ use rand_jitter::JitterRng;
 #[cfg(feature = "std")]
 use rand_core::RngCore;
 
+/* FIXME #16
 #[cfg(feature = "std")]
 #[test]
 fn test_jitter_init() {
@@ -18,6 +19,7 @@ fn test_jitter_init() {
         Err(_) => {},
     }
 }
+*/
 
 #[test]
 fn test_jitter_bad_timer() {
