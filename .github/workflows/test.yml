@@ -85,14 +85,12 @@ jobs:
           cargo test --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
 
   test-cross:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            target: mips-unknown-linux-gnu
-            toolchain: stable
+        target: [mips-unknown-linux-gnu]
+        toolchain: [stable]
 
     steps:
       - uses: actions/checkout@v2
