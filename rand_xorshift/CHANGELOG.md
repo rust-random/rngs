@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2020-12-18
+- Bump `rand_core` version to 0.6 (#17)
 - Derive PartialEq+Eq for XorShiftRng (#6)
 - Bump serde to 1.0.118 so that `serde1` feature can also be no-std (#12)
 

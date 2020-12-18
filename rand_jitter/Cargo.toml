@@ -10,12 +10,8 @@ description = "Random number generator based on timing jitter"
 keywords = ["random", "rng", "os"]
 edition = "2018"
 
-[badges]
-travis-ci = { repository = "rust-random/rngs" }
-appveyor = { repository = "rust-random/rngs" }
-
 [dependencies]
-rand_core = { version = "0.5" }
+rand_core = { version = "0.6" }
 log = { version = "0.4.4", optional = true }
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
