@@ -1,6 +1,6 @@
 [package]
 name = "rand_isaac"
-version = "0.2.1"
+version = "0.3.0" # NB: When modifying, also modify html_root_url in lib.rs
 authors = ["The Rand Project Developers", "The Rust Project Developers"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
@@ -14,15 +14,11 @@ keywords = ["random", "rng", "isaac"]
 categories = ["algorithms", "no-std"]
 edition = "2018"
 
-[badges]
-travis-ci = { repository = "rust-random/rngs" }
-appveyor = { repository = "rust-random/rngs" }
-
 [features]
 serde1 = ["serde", "rand_core/serde1"]
 
 [dependencies]
-rand_core = { version = "0.5" }
+rand_core = { version = "0.6" }
 serde = { version = "1.0.103", features = ["derive"], optional = true }
 # Not a direct dependency but required to boost the minimum version:
 serde_derive = { version = "1.0.103", optional = true }
