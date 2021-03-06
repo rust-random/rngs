@@ -758,5 +758,5 @@ where F: Fn() -> u64 + Send + Sync {
 }
 
 #[cfg(feature = "crypto")]
-impl CryptoRng for JitterRng {}
+impl<F> CryptoRng for JitterRng<F> {}
 
