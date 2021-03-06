@@ -15,6 +15,8 @@ use core::num::Wrapping as w;
 use rand_core::{RngCore, SeedableRng, Error, le};
 use rand_core::block::{BlockRngCore, BlockRng};
 use crate::isaac_array::IsaacArray;
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 
 #[allow(non_camel_case_types)]
 type w32 = w<u32>;
@@ -364,6 +366,9 @@ impl SeedableRng for IsaacCore {
         Ok(Self::init(seed, 2))
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for IsaacRng {}
 
 #[cfg(test)]
 mod test {

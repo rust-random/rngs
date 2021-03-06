@@ -10,6 +10,8 @@
 use rand_core::le::read_u64_into;
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::{RngCore, SeedableRng};
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 
 /// A xoroshiro128+ random number generator.
 ///
@@ -106,6 +108,9 @@ impl SeedableRng for Xoroshiro128Plus {
         from_splitmix!(seed)
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for Xoroshiro128Plus {}
 
 #[cfg(test)]
 mod tests {

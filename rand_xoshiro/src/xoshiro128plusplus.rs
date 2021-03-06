@@ -10,6 +10,8 @@
 use rand_core::impls::{next_u64_via_u32, fill_bytes_via_next};
 use rand_core::le::read_u32_into;
 use rand_core::{SeedableRng, RngCore, Error};
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 
 /// A xoshiro128++ random number generator.
 ///
@@ -98,6 +100,9 @@ impl RngCore for Xoshiro128PlusPlus {
         Ok(())
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for Xoshiro128PlusPlus {}
 
 #[cfg(test)]
 mod tests {

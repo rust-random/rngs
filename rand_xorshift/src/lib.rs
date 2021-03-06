@@ -19,6 +19,8 @@
 
 use core::num::Wrapping as w;
 use core::fmt;
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 use rand_core::{RngCore, SeedableRng, Error, impls, le};
 #[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
 
@@ -115,3 +117,6 @@ impl SeedableRng for XorShiftRng {
         })
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for XorShiftRng {} 

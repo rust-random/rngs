@@ -24,3 +24,4 @@ winapi = { version = "0.3", features = ["profileapi"] }
 
 [features]
 std = ["rand_core/std"]
+crypto = []

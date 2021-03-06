@@ -16,6 +16,7 @@ edition = "2018"
 
 [features]
 serde1 = ["serde", "rand_core/serde1"]
+crypto = []
 
 [dependencies]
 rand_core = { version = "0.6" }

@@ -10,6 +10,8 @@
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::le::read_u64_into;
 use rand_core::{SeedableRng, RngCore, Error};
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 
 use crate::Seed512;
 
@@ -111,6 +113,9 @@ impl RngCore for Xoshiro512StarStar {
         Ok(())
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for Xoshiro512StarStar {}
 
 #[cfg(test)]
 mod tests {

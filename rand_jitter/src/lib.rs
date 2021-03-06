@@ -106,6 +106,8 @@ macro_rules! error { ($($x:tt)*) => (
 mod platform;
 mod error;
 
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 use rand_core::{RngCore, Error, impls};
 pub use crate::error::TimerError;
 
@@ -754,3 +756,7 @@ where F: Fn() -> u64 + Send + Sync {
         Ok(())
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for JitterRng {}
+

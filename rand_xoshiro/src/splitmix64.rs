@@ -10,6 +10,8 @@
 use rand_core::le::read_u64_into;
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::{RngCore, SeedableRng, Error};
+#[cfg(feature = "crypto")]
+use rand_core::CryptoRng;
 
 /// A splitmix64 random number generator.
 ///
@@ -81,6 +83,9 @@ impl SeedableRng for SplitMix64 {
         SplitMix64::from_seed(seed.to_le_bytes())
     }
 }
+
+#[cfg(feature = "crypto")]
+impl CryptoRng for SplitMix64 {}
 
 #[cfg(test)]
 mod tests {
