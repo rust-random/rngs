@@ -113,7 +113,7 @@ pub(super) mod isaac_array_serde {
         use core::marker::PhantomData;
         struct ArrayVisitor<T> {
             _pd: PhantomData<T>,
-        };
+        }
         impl<'de,T> Visitor<'de> for ArrayVisitor<T>
         where
             T: Deserialize<'de>+Default+Copy

@@ -129,4 +129,4 @@ jobs:
           cargo miri test --manifest-path rand_isaac/Cargo.toml --all-features
           cargo miri test --manifest-path rand_xorshift/Cargo.toml --all-features
           cargo miri test --manifest-path rand_xoshiro/Cargo.toml --all-features
-          cargo miri test --manifest-path rand_jitter/Cargo.toml
+          cargo miri test --manifest-path rand_jitter/Cargo.toml -- -Zmiri-disable-isolation
