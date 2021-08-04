@@ -18,6 +18,7 @@ use std::mem::size_of;
 use test::{black_box, Bencher};
 
 use rand_core::{RngCore, SeedableRng};
+use rand_hc::Hc128Rng;
 use rand_isaac::{IsaacRng, Isaac64Rng};
 use rand_xorshift::XorShiftRng;
 use rand_xoshiro::{Xoshiro256StarStar, Xoshiro256Plus, Xoshiro128StarStar,
@@ -51,6 +52,7 @@ gen_bytes!(gen_bytes_xoroshiro128plus, Xoroshiro128Plus::from_entropy());
 gen_bytes!(gen_bytes_xoroshiro64starstar, Xoroshiro64StarStar::from_entropy());
 gen_bytes!(gen_bytes_xoroshiro64star, Xoroshiro64Star::from_entropy());
 gen_bytes!(gen_bytes_splitmix64, SplitMix64::from_entropy());
+gen_bytes!(gen_bytes_hc128, Hc128Rng::from_entropy());
 gen_bytes!(gen_bytes_isaac, IsaacRng::from_entropy());
 gen_bytes!(gen_bytes_isaac64, Isaac64Rng::from_entropy());
 
@@ -99,6 +101,7 @@ gen_uint!(gen_u32_xoroshiro128plus, u32, Xoroshiro128Plus::from_entropy());
 gen_uint!(gen_u32_xoroshiro64starstar, u32, Xoroshiro64StarStar::from_entropy());
 gen_uint!(gen_u32_xoroshiro64star, u32, Xoroshiro64Star::from_entropy());
 gen_uint!(gen_u32_splitmix64, u32, SplitMix64::from_entropy());
+gen_uint!(gen_u32_hc128, u32, Hc128Rng::from_entropy());
 gen_uint!(gen_u32_isaac, u32, IsaacRng::from_entropy());
 gen_uint!(gen_u32_isaac64, u32, Isaac64Rng::from_entropy());
 
@@ -112,6 +115,7 @@ gen_uint!(gen_u64_xoroshiro128plus, u64, Xoroshiro128Plus::from_entropy());
 gen_uint!(gen_u64_xoroshiro64starstar, u64, Xoroshiro64StarStar::from_entropy());
 gen_uint!(gen_u64_xoroshiro64star, u64, Xoroshiro64Star::from_entropy());
 gen_uint!(gen_u64_splitmix64, u64, SplitMix64::from_entropy());
+gen_uint!(gen_u64_hc128, u64, Hc128Rng::from_entropy());
 gen_uint!(gen_u64_isaac, u64, IsaacRng::from_entropy());
 gen_uint!(gen_u64_isaac64, u64, Isaac64Rng::from_entropy());
 
@@ -138,5 +142,6 @@ init_gen!(init_xoroshiro128plus, Xoroshiro128Plus);
 init_gen!(init_xoroshiro64starstar, Xoroshiro64StarStar);
 init_gen!(init_xoroshiro64star, Xoroshiro64Star);
 init_gen!(init_splitmix64, SplitMix64);
+init_gen!(init_hc128, Hc128Rng);
 init_gen!(init_isaac, IsaacRng);
 init_gen!(init_isaac64, Isaac64Rng);
