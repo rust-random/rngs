@@ -79,6 +79,7 @@ jobs:
           cargo test --target ${{ matrix.target }} --benches
       - name: Test
         run: |
+          cargo test --target ${{ matrix.target }} --manifest-path rand_hc/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_isaac/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_xorshift/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
@@ -110,6 +111,7 @@ jobs:
         run: cargo install cross || true
       - name: Test
         run: |
+          cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_hc/Cargo.toml --all-features
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_isaac/Cargo.toml --all-features
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_xorshift/Cargo.toml --all-features
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
@@ -126,6 +128,7 @@ jobs:
           rustup component add miri
       - name: Test rand
         run: |
+          cargo miri test --manifest-path rand_hc/Cargo.toml --all-features
           cargo miri test --manifest-path rand_isaac/Cargo.toml --all-features
           cargo miri test --manifest-path rand_xorshift/Cargo.toml --all-features
           cargo miri test --manifest-path rand_xoshiro/Cargo.toml --all-features

@@ -4,7 +4,7 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/rust-random/rngs?svg=true)](https://ci.appveyor.com/project/rust-random/rngs)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand)
-[![Minimum rustc version](https://img.shields.io/badge/rustc-1.32+-lightgray.svg)](https://github.com/rust-random/rngs#rust-version-requirements)
+[![Minimum rustc version](https://img.shields.io/badge/rustc-1.36+-lightgray.svg)](https://github.com/rust-random/rngs#rust-version-requirements)
 
 Extra random number generators provided by the Rust Random project.
 The main repository, [rust-random/rand](https://github.com/rust-random/rand),
@@ -20,7 +20,7 @@ Documentation:
 
 ### Rust version requirements
 
-All crates in this repository require **Rustc version 1.32 or greater**.
+All crates in this repository require **Rustc version 1.36 or greater**.
 
 Travis CI always has a build with a pinned version of Rustc matching the oldest
 supported Rust release. The current policy is that this can be updated in any
