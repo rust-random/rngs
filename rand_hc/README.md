@@ -1,6 +1,6 @@
 # rand_hc
 
-[![Test Status](https://github.com/rust-random/rand/workflows/Tests/badge.svg?event=push)](https://github.com/rust-random/rand/actions)
+[![Test Status](https://github.com/rust-random/rngs/workflows/Tests/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_hc.svg)](https://crates.io/crates/rand_hc)
 [[![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand/rand_hc)
@@ -18,7 +18,7 @@ Links:
 
 -   [API documentation (master)](https://rust-random.github.io/rand/rand_hc)
 -   [API documentation (docs.rs)](https://docs.rs/rand_hc)
--   [Changelog](https://github.com/rust-random/rand/blob/master/rand_hc/CHANGELOG.md)
+-   [Changelog](https://github.com/rust-random/rngs/blob/master/rand_hc/CHANGELOG.md)
 
 [rand]: https://crates.io/crates/rand
 [^1]: Hongjun Wu (2008). ["The Stream Cipher HC-128"](
