@@ -123,7 +123,7 @@ impl SeedableRng for Isaac64Rng {
 
     #[inline]
     fn from_rng<S: RngCore>(rng: S) -> Result<Self, Error> {
-        BlockRng64::<Isaac64Core>::from_rng(rng).map(|rng| Isaac64Rng(rng))
+        BlockRng64::<Isaac64Core>::from_rng(rng).map(Isaac64Rng)
     }
 }
 
@@ -131,7 +131,7 @@ impl SeedableRng for Isaac64Rng {
 #[derive(Clone)]
 #[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 pub struct Isaac64Core {
-    #[cfg_attr(feature="serde1",serde(with="super::isaac_array::isaac_array_serde"))]
+    #[cfg_attr(feature="serde1", serde(with="super::isaac_array::isaac_array_serde"))]
     mem: [w64; RAND_SIZE],
     a: w64,
     b: w64,
@@ -148,7 +148,7 @@ impl fmt::Debug for Isaac64Core {
 // Custom PartialEq implementation as it can't currently be derived from an array of size RAND_SIZE
 impl ::core::cmp::PartialEq for Isaac64Core {
     fn eq(&self, other: &Isaac64Core) -> bool {
-        &self.mem[..] == &other.mem[..]
+        self.mem[..] == other.mem[..]
             && self.a == other.a
             && self.b == other.b
             && self.c == other.c
@@ -206,9 +206,9 @@ impl BlockRngCore for Isaac64Core {
                    m2: usize) {
             let x = mem[base + m];
             *a = mix + mem[base + m2];
-            let y = *a + *b + ind(&mem, x, 3);
+            let y = *a + *b + ind(mem, x, 3);
             mem[base + m] = y;
-            *b = x + ind(&mem, y, 3 + RAND_SIZE_LEN);
+            *b = x + ind(mem, y, 3 + RAND_SIZE_LEN);
             results[RAND_SIZE - 1 - base - m] = (*b).0;
         }
 
