@@ -15,6 +15,11 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
+#![allow(
+    clippy::too_many_arguments,
+    clippy::many_single_char_names,
+    clippy::identity_op,
+)]
 
 #![cfg_attr(not(all(feature="serde", test)), no_std)]
 
