@@ -21,8 +21,8 @@ use rand_core::{RngCore, SeedableRng};
 use rand_hc::Hc128Rng;
 use rand_isaac::{IsaacRng, Isaac64Rng};
 use rand_xorshift::XorShiftRng;
-use rand_xoshiro::{Xoshiro256StarStar, Xoshiro256Plus, Xoshiro128StarStar,
-    Xoshiro128Plus, Xoroshiro128StarStar, Xoroshiro128Plus, SplitMix64,
+use rand_xoshiro::{Xoshiro256StarStar, Xoshiro256Plus, Xoshiro256PlusPlus, Xoshiro128StarStar,
+    Xoshiro128Plus, Xoshiro128PlusPlus, Xoroshiro128StarStar, Xoroshiro128Plus, SplitMix64,
     Xoroshiro64StarStar, Xoroshiro64Star};
 
 macro_rules! gen_bytes {
@@ -45,8 +45,10 @@ macro_rules! gen_bytes {
 gen_bytes!(gen_bytes_xorshift, XorShiftRng::from_entropy());
 gen_bytes!(gen_bytes_xoshiro256starstar, Xoshiro256StarStar::from_entropy());
 gen_bytes!(gen_bytes_xoshiro256plus, Xoshiro256Plus::from_entropy());
+gen_bytes!(gen_bytes_xoshiro256plusplus, Xoshiro256PlusPlus::from_entropy());
 gen_bytes!(gen_bytes_xoshiro128starstar, Xoshiro128StarStar::from_entropy());
 gen_bytes!(gen_bytes_xoshiro128plus, Xoshiro128Plus::from_entropy());
+gen_bytes!(gen_bytes_xoshiro128plusplus, Xoshiro128PlusPlus::from_entropy());
 gen_bytes!(gen_bytes_xoroshiro128starstar, Xoroshiro128StarStar::from_entropy());
 gen_bytes!(gen_bytes_xoroshiro128plus, Xoroshiro128Plus::from_entropy());
 gen_bytes!(gen_bytes_xoroshiro64starstar, Xoroshiro64StarStar::from_entropy());
@@ -94,8 +96,10 @@ macro_rules! gen_uint {
 gen_uint!(gen_u32_xorshift, u32, XorShiftRng::from_entropy());
 gen_uint!(gen_u32_xoshiro256starstar, u32, Xoshiro256StarStar::from_entropy());
 gen_uint!(gen_u32_xoshiro256plus, u32, Xoshiro256Plus::from_entropy());
+gen_uint!(gen_u32_xoshiro256plusplus, u32, Xoshiro256PlusPlus::from_entropy());
 gen_uint!(gen_u32_xoshiro128starstar, u32, Xoshiro128StarStar::from_entropy());
 gen_uint!(gen_u32_xoshiro128plus, u32, Xoshiro128Plus::from_entropy());
+gen_uint!(gen_u32_xoshiro128plusplus, u32, Xoshiro128PlusPlus::from_entropy());
 gen_uint!(gen_u32_xoroshiro128starstar, u32, Xoroshiro128StarStar::from_entropy());
 gen_uint!(gen_u32_xoroshiro128plus, u32, Xoroshiro128Plus::from_entropy());
 gen_uint!(gen_u32_xoroshiro64starstar, u32, Xoroshiro64StarStar::from_entropy());
@@ -108,8 +112,10 @@ gen_uint!(gen_u32_isaac64, u32, Isaac64Rng::from_entropy());
 gen_uint!(gen_u64_xorshift, u64, XorShiftRng::from_entropy());
 gen_uint!(gen_u64_xoshiro256starstar, u64, Xoshiro256StarStar::from_entropy());
 gen_uint!(gen_u64_xoshiro256plus, u64, Xoshiro256Plus::from_entropy());
+gen_uint!(gen_u64_xoshiro256plusplus, u64, Xoshiro256PlusPlus::from_entropy());
 gen_uint!(gen_u64_xoshiro128starstar, u64, Xoshiro128StarStar::from_entropy());
 gen_uint!(gen_u64_xoshiro128plus, u64, Xoshiro128Plus::from_entropy());
+gen_uint!(gen_u64_xoshiro128plusplus, u64, Xoshiro128PlusPlus::from_entropy());
 gen_uint!(gen_u64_xoroshiro128starstar, u64, Xoroshiro128StarStar::from_entropy());
 gen_uint!(gen_u64_xoroshiro128plus, u64, Xoroshiro128Plus::from_entropy());
 gen_uint!(gen_u64_xoroshiro64starstar, u64, Xoroshiro64StarStar::from_entropy());
@@ -135,8 +141,10 @@ macro_rules! init_gen {
 init_gen!(init_xorshift, XorShiftRng);
 init_gen!(init_xoshiro256starstar, Xoshiro256StarStar);
 init_gen!(init_xoshiro256plus, Xoshiro256Plus);
+init_gen!(init_xoshiro256plusplus, Xoshiro256PlusPlus);
 init_gen!(init_xoshiro128starstar, Xoshiro128StarStar);
 init_gen!(init_xoshiro128plus, Xoshiro128Plus);
+init_gen!(init_xoshiro128plusplus, Xoshiro128PlusPlus);
 init_gen!(init_xoroshiro128starstar, Xoroshiro128StarStar);
 init_gen!(init_xoroshiro128plus, Xoroshiro128Plus);
 init_gen!(init_xoroshiro64starstar, Xoroshiro64StarStar);
