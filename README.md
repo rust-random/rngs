@@ -21,9 +21,9 @@ Documentation:
 
 All crates in this repository require **Rustc version 1.36 or greater**.
 
-Travis CI always has a build with a pinned version of Rustc matching the oldest
-supported Rust release. The current policy is that this can be updated in any
-Rand release if required, but the change must be noted in the changelog.
+GitHub Actions always has a build with a pinned version of Rustc matching the
+oldest supported Rust release. The current policy is that this can be updated in
+any Rand release if required, but the change must be noted in the changelog.
 
 # License
 
