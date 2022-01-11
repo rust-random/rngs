@@ -55,6 +55,8 @@ impl fmt::Debug for XorShiftRng {
 impl RngCore for XorShiftRng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
+        // These shifts are taken from the example in the Summary section of
+        // the paper 'Xorshift RNGs'. (On the bottom of page 5.)
         let x = self.x;
         let t = x ^ (x << 11);
         self.x = self.y;
