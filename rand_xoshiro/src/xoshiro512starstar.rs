@@ -65,7 +65,6 @@ impl Xoshiro512StarStar {
     }
 }
 
-
 impl SeedableRng for Xoshiro512StarStar {
     type Seed = Seed512;
 
@@ -73,7 +72,7 @@ impl SeedableRng for Xoshiro512StarStar {
     /// mapped to a different seed.
     #[inline]
     fn from_seed(seed: Seed512) -> Xoshiro512StarStar {
-        deal_with_zero_seed!(seed, Self);
+        deal_with_zero_seed_large!(seed, Self);
         let mut state = [0; 8];
         read_u64_into(&seed.0, &mut state);
         Xoshiro512StarStar { s: state }

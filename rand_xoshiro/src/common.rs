@@ -224,6 +224,14 @@ macro_rules! impl_xoshiro_large {
 
 /// Map an all-zero seed to a different one.
 macro_rules! deal_with_zero_seed {
+    ($seed:expr, $Self:ident, $bytes:expr) => {
+        if $seed == [0; $bytes] {
+            return $Self::seed_from_u64(0);
+        }
+    }
+}
+
+macro_rules! deal_with_zero_seed_large {
     ($seed:expr, $Self:ident) => {
         if $seed.iter().all(|&x| x == 0) {
             return $Self::seed_from_u64(0);
@@ -262,4 +270,3 @@ impl AsMut<[u8]> for Seed512 {
         &mut self.0
     }
 }
-
