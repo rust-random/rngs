@@ -151,7 +151,7 @@ fn init(c: &mut Criterion) {
         ($fnn:expr, $gen:ident) => {
             g.bench_function($fnn, |b| {
                 let mut rng = XorShiftRng::from_entropy();
-                b.iter(|| XorShiftRng::from_rng(black_box(&mut rng)).unwrap())
+                b.iter(|| $gen::from_rng(black_box(&mut rng)).unwrap())
             });
         };
     }
