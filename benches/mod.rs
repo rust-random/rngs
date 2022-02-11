@@ -31,7 +31,7 @@ const RAND_BENCH_N: u64 = 1000;
 const BYTES_LEN: usize = 1024;
 
 fn gen_bytes(c: &mut Criterion<CyclesPerByte>) {
-    let mut g = c.benchmark_group("init");
+    let mut g = c.benchmark_group("gen_bytes");
     g.throughput(Throughput::Bytes(BYTES_LEN as u64 * RAND_BENCH_N));
 
     macro_rules! gen_bytes {
