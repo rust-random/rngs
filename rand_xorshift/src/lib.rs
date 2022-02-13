@@ -93,7 +93,7 @@ impl SeedableRng for XorShiftRng {
         // Xorshift cannot be seeded with 0 and we cannot return an Error, but
         // also do not wish to panic (because a random seed can legitimately be
         // 0); our only option is therefore to use a preset value.
-        if seed_u32.iter().all(|&x| x == 0) {
+        if seed_u32 == [0; 4] {
             seed_u32 = [0xBAD_5EED, 0xBAD_5EED, 0xBAD_5EED, 0xBAD_5EED];
         }
 
@@ -109,7 +109,7 @@ impl SeedableRng for XorShiftRng {
         let mut b = [0u8; 16];
         loop {
             rng.try_fill_bytes(&mut b[..])?;
-            if !b.iter().all(|&x| x == 0) {
+            if b != [0; 16] {
                 break;
             }
         }

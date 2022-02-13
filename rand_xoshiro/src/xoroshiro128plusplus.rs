@@ -88,7 +88,7 @@ impl SeedableRng for Xoroshiro128PlusPlus {
     /// Create a new `Xoroshiro128PlusPlus`.  If `seed` is entirely 0, it will be
     /// mapped to a different seed.
     fn from_seed(seed: [u8; 16]) -> Xoroshiro128PlusPlus {
-        deal_with_zero_seed!(seed, Self);
+        deal_with_zero_seed!(seed, Self, 16);
         let mut s = [0; 2];
         read_u64_into(&seed, &mut s);
 

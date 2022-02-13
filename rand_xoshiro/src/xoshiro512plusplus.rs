@@ -65,7 +65,6 @@ impl Xoshiro512PlusPlus {
     }
 }
 
-
 impl SeedableRng for Xoshiro512PlusPlus {
     type Seed = Seed512;
 
