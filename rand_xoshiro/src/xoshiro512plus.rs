@@ -73,7 +73,7 @@ impl SeedableRng for Xoshiro512Plus {
     /// mapped to a different seed.
     #[inline]
     fn from_seed(seed: Seed512) -> Xoshiro512Plus {
-        deal_with_zero_seed_large!(seed, Self);
+        deal_with_zero_seed!(seed, Self);
         let mut state = [0; 8];
         read_u64_into(&seed.0, &mut state);
         Xoshiro512Plus { s: state }

@@ -228,15 +228,13 @@ macro_rules! deal_with_zero_seed {
         if $seed == [0; $bytes] {
             return $Self::seed_from_u64(0);
         }
-    }
-}
+    };
 
-macro_rules! deal_with_zero_seed_large {
     ($seed:expr, $Self:ident) => {
         if $seed.iter().all(|&x| x == 0) {
             return $Self::seed_from_u64(0);
         }
-    }
+    };
 }
 
 /// 512-bit seed for a generator.

@@ -68,7 +68,7 @@ impl SeedableRng for Xoshiro256StarStar {
     /// mapped to a different seed.
     #[inline]
     fn from_seed(seed: [u8; 32]) -> Xoshiro256StarStar {
-        deal_with_zero_seed_large!(seed, Self);
+        deal_with_zero_seed!(seed, Self);
         let mut state = [0; 4];
         read_u64_into(&seed, &mut state);
         Xoshiro256StarStar { s: state }
