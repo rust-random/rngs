@@ -9,7 +9,7 @@
 //! This crate implements the [xoshiro] family of pseudorandom number generators
 //! designed by David Blackman and Sebastiano Vigna. They feature high
 //! perfomance and a small state and superseed the previous xorshift-based
-//! generators. However, they are no cryptographically secure and their output
+//! generators. However, they are not cryptographically secure and their output
 //! can be predicted by observing a few samples.
 //!
 //! The following generators are implemented:
