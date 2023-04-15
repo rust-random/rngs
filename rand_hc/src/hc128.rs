@@ -299,7 +299,8 @@ impl Hc128Core {
             x.rotate_right(17) ^ x.rotate_right(19) ^ (x >> 10)
         }
 
-        let mut t = [0u32; 1024];
+        let mut core = Self { t: [0u32; 1024], counter1024: 0 };
+        let t = &mut core.t;
 
         // Expand the key and iv into P and Q
         let (key, iv) = seed.split_at(4);
@@ -330,8 +331,6 @@ impl Hc128Core {
                 .wrapping_add(t[i - 16])
                 .wrapping_add(256 + i as u32);
         }
-
-        let mut core = Self { t, counter1024: 0 };
 
         // run the cipher 1024 steps
         for _ in 0..64 {
