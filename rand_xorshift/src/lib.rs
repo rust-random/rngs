@@ -1,4 +1,4 @@
-// Copyright 2018 Developers of the Rand project.
+// Copyright 2018-2023 Developers of the Rand project.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,18 @@
 // except according to those terms.
 
 //! The xorshift random number generator.
+//!
+//! # Example
+//!
+//! To initialize a generator, use the [`SeedableRng`][rand_core::SeedableRng] trait:
+//!
+//! ```
+//! use rand_core::{SeedableRng, RngCore};
+//! use rand_xorshift::XorShiftRng;
+//!
+//! let mut rng = XorShiftRng::seed_from_u64(0);
+//! let x = rng.next_u32();
+//! ```
 
 #![doc(html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
        html_favicon_url = "https://www.rust-lang.org/favicon.ico",

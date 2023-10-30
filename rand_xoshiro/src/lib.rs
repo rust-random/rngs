@@ -1,4 +1,4 @@
-// Copyright 2018 Developers of the Rand project.
+// Copyright 2018-2023 Developers of the Rand project.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,7 +8,7 @@
 
 //! This crate implements the [xoshiro] family of pseudorandom number generators
 //! designed by David Blackman and Sebastiano Vigna. They feature high
-//! perfomance and a small state and supersede the previous xorshift-based
+//! performance and a small state and supersede the previous xorshift-based
 //! generators. However, they are not cryptographically secure and their output
 //! can be predicted by observing a few samples.
 //!
@@ -61,8 +61,20 @@
 //!   lowest bits (which are discarded when generating floats), making it fail
 //!   linearity tests. This is unlikely to have any impact in practise.
 //!
-//! The `*PlusPlus` generators perform similarily to the `*StarStar` generators.
+//! The `*PlusPlus` generators perform similarly to the `*StarStar` generators.
 //! See the [xoshiro paper], where the differences are discussed in detail.
+//!
+//! # Example
+//!
+//! To initialize a generator, use the [`SeedableRng`][rand_core::SeedableRng] trait:
+//!
+//! ```
+//! use rand_core::{SeedableRng, RngCore};
+//! use rand_xoshiro::Xoshiro256PlusPlus;
+//!
+//! let mut rng = Xoshiro256PlusPlus::seed_from_u64(0);
+//! let x = rng.next_u64();
+//! ```
 //!
 //! [xoshiro]: http://xoshiro.di.unimi.it/
 //! [xoshiro paper]: http://vigna.di.unimi.it/ftp/papers/ScrambledLinear.pdf
