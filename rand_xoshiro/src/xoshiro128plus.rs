@@ -45,6 +45,15 @@ impl Xoshiro128Plus {
     pub fn jump(&mut self) {
         impl_jump!(u32, self, [0x8764000b, 0xf542d2d3, 0x6fa035c3, 0x77f2db5b]);
     }
+
+    /// Jump forward, equivalently to 2^96 calls to `next_u32()`.
+    ///
+    /// This can be used to generate 2^32 starting points, from each of which
+    /// `jump()` will generate 2^32 non-overlapping subsequences for parallel
+    /// distributed computations.
+    pub fn long_jump(&mut self) {
+        impl_jump!(u32, self, [0xb523952e, 0x0b6f099f, 0xccf5a0ef, 0x1c580662]);
+    }
 }
 
 impl SeedableRng for Xoshiro128Plus {
@@ -108,5 +117,31 @@ mod tests {
         for &e in &expected {
             assert_eq!(rng.next_u32(), e);
         }
+    }
+
+    #[test]
+    fn test_jump() {
+        let mut rng = Xoshiro128Plus::from_seed(
+            [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
+        rng.jump();
+        // These values were produced by instrumenting the reference implementation:
+        // http://xoshiro.di.unimi.it/xoshiro128plus.c
+        assert_eq!(rng.s[0], 2843103750);
+        assert_eq!(rng.s[1], 2038079848);
+        assert_eq!(rng.s[2], 1533207345);
+        assert_eq!(rng.s[3], 44816753);
+    }
+
+    #[test]
+    fn test_long_jump() {
+        let mut rng = Xoshiro128Plus::from_seed(
+            [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
+        rng.long_jump();
+        // These values were produced by instrumenting the reference implementation:
+        // http://xoshiro.di.unimi.it/xoshiro128plus.c
+        assert_eq!(rng.s[0], 1611968294);
+        assert_eq!(rng.s[1], 2125834322);
+        assert_eq!(rng.s[2], 966769569);
+        assert_eq!(rng.s[3], 3193880526);
     }
 }
