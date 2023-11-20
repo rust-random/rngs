@@ -83,17 +83,24 @@ jobs:
           cargo test --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
 
   msrv:
-    name: MSRV for rand_hc / rand_isaac / rand_xorshift / rand_xoshiro
+    name: MSRV for rand_isaac / rand_xorshift / rand_xoshiro
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.56.0 # older versions may work (untested)
+      - run: cd rand_isaac && cargo test --all-features
+      - run: cd rand_xorshift && cargo test --all-features
+      - run: cd rand_xoshiro && cargo test --all-features
+
+  msrv_hc:
+    name: MSRV for rand_hc
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.36.0
       - run: cd rand_hc && cargo test --all-features
-      - run: cd rand_isaac && cargo test --all-features
-      - run: cd rand_xorshift && cargo test --all-features
-      - run: cd rand_xoshiro && cargo test --all-features
 
-  jitter:
+  msrv_jitter:
     name: MSRV for rand_jitter
     runs-on: ubuntu-latest
     steps:
