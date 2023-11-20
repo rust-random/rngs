@@ -7,14 +7,14 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rand_core::Error;
 use core::fmt;
+use rand_core::Error;
 
 /// Base code for all `JitterRng` errors
 const ERROR_BASE: u32 = 0xAE53_0400;
 
 /// An error that can occur when [`JitterRng::test_timer`] fails.
-/// 
+///
 /// All variants have a value of 0xAE530400 = 2924676096 plus a small
 /// increment (1 through 5).
 ///
@@ -68,12 +68,13 @@ impl From<TimerError> for Error {
     fn from(err: TimerError) -> Error {
         // Timer check is already quite permissive of failures so we don't
         // expect false-positive failures, i.e. any error is irrecoverable.
-        #[cfg(feature = "std")] {
+        #[cfg(feature = "std")]
+        {
             Error::new(err)
         }
-        #[cfg(not(feature = "std"))] {
+        #[cfg(not(feature = "std"))]
+        {
             Error::from(core::num::NonZeroU32::new(err as u32).unwrap())
         }
     }
 }
-

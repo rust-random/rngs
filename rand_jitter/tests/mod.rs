@@ -14,21 +14,25 @@ fn test_jitter_init() {
         Ok(ref mut rng) => {
             // false positives are possible, but extremely unlikely
             assert!(rng.next_u32() | rng.next_u32() != 0);
-        },
-        Err(_) => {},
+        }
+        Err(_) => {}
     }
 }
 
 #[test]
 fn test_jitter_bad_timer() {
-    fn bad_timer() -> u64 { 0 }
+    fn bad_timer() -> u64 {
+        0
+    }
     let mut rng = JitterRng::new_with_timer(bad_timer);
     assert!(rng.test_timer().is_err());
 }
 
 #[test]
 fn test_jitter_closure() {
-    fn bad_timer() -> u64 { 0 }
+    fn bad_timer() -> u64 {
+        0
+    }
     let at_start = bad_timer();
-    let _ = JitterRng::new_with_timer(move || { bad_timer() - at_start });
+    let _ = JitterRng::new_with_timer(move || bad_timer() - at_start);
 }
