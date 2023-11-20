@@ -64,7 +64,7 @@ pub use rand_core;
 macro_rules! doc_comment {
     ($x:expr) => {
         #[doc = $x]
-        extern {}
+        fn _doc_comment() {}
     };
 }
 
