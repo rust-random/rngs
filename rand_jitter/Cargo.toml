@@ -9,6 +9,7 @@ documentation = "https://docs.rs/rand_jitter"
 description = "Random number generator based on timing jitter"
 keywords = ["random", "rng", "os"]
 edition = "2018"
+rust-version = "1.51"
 
 [dependencies]
 rand_core = { version = "0.6" }

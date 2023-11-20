@@ -631,7 +631,7 @@ where
             // Ensure that we have a varying delta timer which is necessary for
             // the calculation of entropy -- perform this check only after the
             // first loop is executed as we need to prime the old_delta value
-            delta_sum += (delta - old_delta).abs() as u64;
+            delta_sum += (delta - old_delta).unsigned_abs() as u64;
             old_delta = delta;
         }
 
