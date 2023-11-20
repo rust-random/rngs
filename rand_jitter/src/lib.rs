@@ -49,6 +49,7 @@
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 
+
 // Note: the C implementation of `Jitterentropy` relies on being compiled
 // without optimizations. This implementation goes through lengths to make the
 // compiler not optimize out code which does influence timing jitter, but is
@@ -209,9 +210,7 @@ where F: Clone {
 #[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 static JITTER_ROUNDS: AtomicUsize = AtomicUsize::new(0);
 
-impl<F> JitterRng<F>
-where F: Fn() -> u64 + Send + Sync {
-    /* FIXME: this method is broken - see #16
+impl JitterRng<()> {
     /// Create a new `JitterRng`. Makes use of `std::time` for a timer, or a
     /// platform-specific function with higher accuracy if necessary and
     /// available.
@@ -220,7 +219,7 @@ where F: Fn() -> u64 + Send + Sync {
     /// hundred times. If this does not pass basic quality tests, an error is
     /// returned. The test result is cached to make subsequent calls faster.
     #[cfg(all(feature = "std", not(target_arch = "wasm32")))]
-    pub fn new() -> Result<JitterRng<fn() -> u64>, TimerError> {
+    pub fn new() -> Result<JitterRng<impl Fn() -> u64 + Send + Sync>, TimerError> {
         if cfg!(target_arch = "wasm32") {
             return Err(TimerError::NoTimer);
         }
@@ -239,8 +238,10 @@ where F: Fn() -> u64 + Send + Sync {
         state.gen_entropy();
         Ok(state)
     }
-    */
+}
 
+impl<F> JitterRng<F>
+where F: Fn() -> u64 + Send + Sync {
     /// Create a new `JitterRng`.
     /// A custom timer can be supplied, making it possible to use `JitterRng` in
     /// `no_std` environments.

@@ -1,11 +1,10 @@
 use rand_jitter::JitterRng;
-#[cfg(feature = "std")]
-use rand_core::RngCore;
 
-/* FIXME #16
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 #[test]
 fn test_jitter_init() {
+    use rand_core::RngCore;
+
     // Because this is a debug build, measurements here are not representive
     // of the final release build.
     // Don't fail this test if initializing `JitterRng` fails because of a
@@ -19,7 +18,6 @@ fn test_jitter_init() {
         Err(_) => {},
     }
 }
-*/
 
 #[test]
 fn test_jitter_bad_timer() {
