@@ -7,12 +7,15 @@
 // except according to those terms.
 
 //! The HC128 random number generator.
+//!
+//! To initialize a generator, use the [`SeedableRng`][rand_core::SeedableRng] trait.
 
 #![doc(
     html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
     html_favicon_url = "https://www.rust-lang.org/favicon.ico",
     html_root_url = "https://rust-random.github.io/rand/"
 )]
+#![forbid(unsafe_code)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
