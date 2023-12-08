@@ -4,9 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2023-11-20
+### Changed
+- Update to `rand_core` v0.6
+- Bump MSRV to 1.51
+- Use return-position impl trait to fix `JitterRng::new` (#16)
+
 ## [0.3.0] - 2020-09-07
 ### Changed
-- `JitterRng::new_with_timer` accepts closures
+- `JitterRng::new_with_timer` accepts closures (this breaks `JitterRng::new`)
 
 ## [0.2.1] - 2019-08-16
 ### Changed

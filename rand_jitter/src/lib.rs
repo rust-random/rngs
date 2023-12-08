@@ -41,14 +41,14 @@
 //! [Jitterentropy]: http://www.chronox.de/jent.html
 //! [discussion]: https://github.com/rust-random/rand/issues/699
 
-#![doc(html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
-       html_favicon_url = "https://www.rust-lang.org/favicon.ico",
-       html_root_url = "https://rust-random.github.io/rand/")]
-
+#![doc(
+    html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
+    html_favicon_url = "https://www.rust-lang.org/favicon.ico",
+    html_root_url = "https://rust-random.github.io/rand/"
+)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
-
 // Note: the C implementation of `Jitterentropy` relies on being compiled
 // without optimizations. This implementation goes through lengths to make the
 // compiler not optimize out code which does influence timing jitter, but is
@@ -64,7 +64,7 @@ pub use rand_core;
 macro_rules! doc_comment {
     ($x:expr) => {
         #[doc = $x]
-        extern {}
+        fn _doc_comment() {}
     };
 }
 
@@ -102,12 +102,12 @@ macro_rules! error { ($($x:tt)*) => (
     }
 ) }
 
+mod error;
 #[cfg(feature = "std")]
 mod platform;
-mod error;
 
-use rand_core::{RngCore, Error, impls};
 pub use crate::error::TimerError;
+use rand_core::{impls, Error, RngCore};
 
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
@@ -191,7 +191,9 @@ impl<F> fmt::Debug for JitterRng<F> {
 }
 
 impl<F> Clone for JitterRng<F>
-where F: Clone {
+where
+    F: Clone,
+{
     fn clone(&self) -> JitterRng<F> {
         JitterRng {
             data: self.data,
@@ -209,9 +211,7 @@ where F: Clone {
 #[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 static JITTER_ROUNDS: AtomicUsize = AtomicUsize::new(0);
 
-impl<F> JitterRng<F>
-where F: Fn() -> u64 + Send + Sync {
-    /* FIXME: this method is broken - see #16
+impl JitterRng<()> {
     /// Create a new `JitterRng`. Makes use of `std::time` for a timer, or a
     /// platform-specific function with higher accuracy if necessary and
     /// available.
@@ -220,7 +220,7 @@ where F: Fn() -> u64 + Send + Sync {
     /// hundred times. If this does not pass basic quality tests, an error is
     /// returned. The test result is cached to make subsequent calls faster.
     #[cfg(all(feature = "std", not(target_arch = "wasm32")))]
-    pub fn new() -> Result<JitterRng<fn() -> u64>, TimerError> {
+    pub fn new() -> Result<JitterRng<impl Fn() -> u64 + Send + Sync>, TimerError> {
         if cfg!(target_arch = "wasm32") {
             return Err(TimerError::NoTimer);
         }
@@ -239,8 +239,12 @@ where F: Fn() -> u64 + Send + Sync {
         state.gen_entropy();
         Ok(state)
     }
-    */
+}
 
+impl<F> JitterRng<F>
+where
+    F: Fn() -> u64 + Send + Sync,
+{
     /// Create a new `JitterRng`.
     /// A custom timer can be supplied, making it possible to use `JitterRng` in
     /// `no_std` environments.
@@ -352,7 +356,7 @@ where F: Fn() -> u64 + Send + Sync {
     // the loop in this function implies that careful retesting must be done.
     #[inline(never)]
     fn lfsr_time(&mut self, time: u64, var_rounds: bool) {
-        fn lfsr(mut data: u64, time: u64) -> u64{
+        fn lfsr(mut data: u64, time: u64) -> u64 {
             for i in 1..65 {
                 let mut tmp = time << (64 - i);
                 tmp >>= 64 - 1;
@@ -382,7 +386,9 @@ where F: Fn() -> u64 + Send + Sync {
         // other rounds are not optimised out, we first run all but the last
         // round on a throw-away value instead of the real `self.data`.
         let mut lfsr_loop_cnt = 0;
-        if var_rounds { lfsr_loop_cnt = self.random_loop_cnt(4) };
+        if var_rounds {
+            lfsr_loop_cnt = self.random_loop_cnt(4)
+        };
 
         let mut throw_away: u64 = 0;
         for _ in 0..lfsr_loop_cnt {
@@ -412,7 +418,9 @@ where F: Fn() -> u64 + Send + Sync {
     #[inline(never)]
     fn memaccess(&mut self, mem: &mut [u8; MEMORY_SIZE], var_rounds: bool) {
         let mut acc_loop_cnt = 128;
-        if var_rounds { acc_loop_cnt += self.random_loop_cnt(4) };
+        if var_rounds {
+            acc_loop_cnt += self.random_loop_cnt(4)
+        };
 
         let mut index = self.mem_prev_index as usize;
         for _ in 0..acc_loop_cnt {
@@ -454,7 +462,9 @@ where F: Fn() -> u64 + Send + Sync {
 
         // Check whether we have a stuck measurement (i.e. does the last
         // measurement holds entropy?).
-        if ec.stuck(current_delta) { return None };
+        if ec.stuck(current_delta) {
+            return None;
+        };
 
         // Rotate the data buffer by a prime number (any odd number would
         // do) to ensure that every bit position of the input time stamp
@@ -599,21 +609,29 @@ where F: Fn() -> u64 + Send + Sync {
             // already have had an impact on the caches, branch prediction,
             // etc. with the goal to clear it to get the worst case
             // measurements.
-            if i < CLEARCACHE { continue; }
+            if i < CLEARCACHE {
+                continue;
+            }
 
-            if ec.stuck(delta) { count_stuck += 1; }
+            if ec.stuck(delta) {
+                count_stuck += 1;
+            }
 
             // Test whether we have an increasing timer.
-            if time2 <= time { time_backwards += 1; }
+            if time2 <= time {
+                time_backwards += 1;
+            }
 
             // Count the number of times the counter increases in steps of 100ns
             // or greater.
-            if (delta % 100) == 0 { count_mod += 1; }
+            if (delta % 100) == 0 {
+                count_mod += 1;
+            }
 
             // Ensure that we have a varying delta timer which is necessary for
             // the calculation of entropy -- perform this check only after the
             // first loop is executed as we need to prime the old_delta value
-            delta_sum += (delta - old_delta).abs() as u64;
+            delta_sum += (delta - old_delta).unsigned_abs() as u64;
             old_delta = delta;
         }
 
@@ -674,14 +692,15 @@ where F: Fn() -> u64 + Send + Sync {
         if delta_average >= 16 {
             let log2 = 64 - delta_average.leading_zeros();
             // Do something similar to roundup(64/(log2/2)):
-            Ok( ((64u32 * 2 + log2 - 1) / log2) as u8)
+            Ok(((64u32 * 2 + log2 - 1) / log2) as u8)
         } else {
             // For values < 16 the rounding error becomes too large, use a
             // lookup table.
             // Values 0 and 1 are invalid, and filtered out by the
             // `delta_sum < TESTLOOPCOUNT` test above.
-            let log2_lookup = [0,  0, 128, 81, 64, 56, 50, 46,
-                               43, 41, 39, 38, 36, 35, 34, 33];
+            let log2_lookup = [
+                0, 0, 128, 81, 64, 56, 50, 46, 43, 41, 39, 38, 36, 35, 34, 33,
+            ];
             Ok(log2_lookup[delta_average as usize])
         }
     }
@@ -721,8 +740,10 @@ fn black_box<T>(dummy: T) -> T {
     }
 }
 
-impl<F> RngCore for JitterRng<F> 
-where F: Fn() -> u64 + Send + Sync {
+impl<F> RngCore for JitterRng<F>
+where
+    F: Fn() -> u64 + Send + Sync,
+{
     fn next_u32(&mut self) -> u32 {
         // We want to use both parts of the generated entropy
         if self.data_half_used {
@@ -736,8 +757,8 @@ where F: Fn() -> u64 + Send + Sync {
     }
 
     fn next_u64(&mut self) -> u64 {
-       self.data_half_used = false;
-       self.gen_entropy()
+        self.data_half_used = false;
+        self.gen_entropy()
     }
 
     fn fill_bytes(&mut self, dest: &mut [u8]) {

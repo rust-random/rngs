@@ -1,11 +1,10 @@
 use rand_jitter::JitterRng;
-#[cfg(feature = "std")]
-use rand_core::RngCore;
 
-/* FIXME #16
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 #[test]
 fn test_jitter_init() {
+    use rand_core::RngCore;
+
     // Because this is a debug build, measurements here are not representive
     // of the final release build.
     // Don't fail this test if initializing `JitterRng` fails because of a
@@ -15,22 +14,25 @@ fn test_jitter_init() {
         Ok(ref mut rng) => {
             // false positives are possible, but extremely unlikely
             assert!(rng.next_u32() | rng.next_u32() != 0);
-        },
-        Err(_) => {},
+        }
+        Err(_) => {}
     }
 }
-*/
 
 #[test]
 fn test_jitter_bad_timer() {
-    fn bad_timer() -> u64 { 0 }
+    fn bad_timer() -> u64 {
+        0
+    }
     let mut rng = JitterRng::new_with_timer(bad_timer);
     assert!(rng.test_timer().is_err());
 }
 
 #[test]
 fn test_jitter_closure() {
-    fn bad_timer() -> u64 { 0 }
+    fn bad_timer() -> u64 {
+        0
+    }
     let at_start = bad_timer();
-    let _ = JitterRng::new_with_timer(move || { bad_timer() - at_start });
+    let _ = JitterRng::new_with_timer(move || bad_timer() - at_start);
 }
