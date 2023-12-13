@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - unreleased
+- Correctly document MSRV as 1.36
+- Fix compiler and clippy warnings
+- Add examples for initializing the RNGs
+
 ## [0.3.0] - 2020-12-18
 - Bump `rand_core` version to 0.6 (#17)
 - Derive PartialEq+Eq for IsaacCore, Isaac64Core, and IsaacArray (#6)

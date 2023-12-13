@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - unreleased
+- Add `Xoshiro128Plus::long_jump`
+- Add examples for initializing the RNGs
+- Speed up `from_seed` implementation for 128-bit seeds
+- Correctly document MSRV as 1.36
+- Fix a few typos in the docs
+
 ## [0.6.0] - 2020-12-18
 - Bump `rand_core` version to 0.6 (#17)
 
