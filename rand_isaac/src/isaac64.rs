@@ -182,6 +182,7 @@ impl BlockRngCore for Isaac64Core {
     ///   from `results` in reverse. We read them in the normal direction, to
     ///   make `fill_bytes` a memcopy. To maintain compatibility we fill in
     ///   reverse.
+    #[rustfmt::skip]
     fn generate(&mut self, results: &mut IsaacArray<Self::Item>) {
         self.c += w(1);
         // abbreviations
@@ -455,6 +456,7 @@ mod test {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_isaac64_true_bytes() {
         let seed = [
             1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 200, 1, 0, 0, 0, 0, 0, 0, 210, 30, 0,

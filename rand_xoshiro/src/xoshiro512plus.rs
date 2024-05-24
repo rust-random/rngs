@@ -137,6 +137,7 @@ mod tests {
 
     #[test]
     fn reference() {
+        #[rustfmt::skip]
         let mut rng = Xoshiro512Plus::from_seed(Seed512(
             [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
              3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0,

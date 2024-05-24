@@ -135,6 +135,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[rustfmt::skip]
     fn reference() {
         let mut rng = Xoshiro512StarStar::from_seed(Seed512(
             [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
