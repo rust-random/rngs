@@ -8,14 +8,3 @@ members = [
     "rand_hc",
 ]
 resolver = "2"
-
-[workspace.package]
-authors = ["The Rand Project Developers", "The Rust Project Developers"]
-license = "MIT OR Apache-2.0"
-readme = "README.md"
-repository = "https://github.com/rust-random/rngs"
-description = """
-Extra random number generators
-"""
-edition = "2021"
-rust-version = "1.61"
