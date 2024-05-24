@@ -1,10 +1,12 @@
 [workspace]
 members = [
-    "benches",
     "rand_jitter",
     "rand_isaac",
     "rand_xorshift",
     "rand_xoshiro",
     "rand_hc",
+]
+exclude = [
+    "benches",
 ]
 resolver = "2"
