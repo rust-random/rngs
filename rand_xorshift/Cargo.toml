@@ -12,8 +12,8 @@ Xorshift random number generator
 """
 keywords = ["random", "rng", "xorshift"]
 categories = ["algorithms", "no-std"]
-edition = "2018"
-rust-version = "1.56"
+edition.workspace = true
+rust-version.workspace = true
 
 [features]
 serde1 = ["serde"]

@@ -12,8 +12,8 @@ ISAAC random number generator
 """
 keywords = ["random", "rng", "isaac"]
 categories = ["algorithms", "no-std"]
-edition = "2018"
-rust-version = "1.56"
+edition.workspace = true
+rust-version.workspace = true
 
 [features]
 serde1 = ["serde", "rand_core/serde1"]

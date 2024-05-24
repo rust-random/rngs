@@ -12,8 +12,8 @@ HC128 random number generator
 """
 keywords = ["random", "rng", "hc128"]
 categories = ["algorithms", "no-std"]
-edition = "2018"
-rust-version = "1.36"
+edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 rand_core = "0.6"

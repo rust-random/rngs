@@ -45,6 +45,10 @@ jobs:
             toolchain: beta
             # Test both windows-gnu and windows-msvc; use beta rust on one
           - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            variant: MSRV
+            toolchain: 1.61.0
+          - os: ubuntu-latest
             deps: sudo apt-get update ; sudo apt install gcc-multilib
             target: i686-unknown-linux-gnu
             toolchain: nightly
@@ -75,32 +79,6 @@ jobs:
           cargo test --target ${{ matrix.target }} --manifest-path rand_xorshift/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
-
-  msrv:
-    name: MSRV for rand_isaac / rand_xorshift / rand_xoshiro
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.56.0 # older versions may work (untested)
-      - run: cd rand_isaac && cargo test --all-features
-      - run: cd rand_xorshift && cargo test --all-features
-      - run: cd rand_xoshiro && cargo test --all-features
-
-  msrv_hc:
-    name: MSRV for rand_hc
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.36.0
-      - run: cd rand_hc && cargo test --all-features
-
-  msrv_jitter:
-    name: MSRV for rand_jitter
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.51.0
-      - run: cd rand_jitter && cargo test --features std
 
   test-cross:
     runs-on: ubuntu-latest
