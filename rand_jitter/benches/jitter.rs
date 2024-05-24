@@ -1,6 +1,4 @@
-#![feature(test)]
-#![cfg(std)]
-
+/*
 use rand_jitter::rand_core::RngCore;
 use test::Bencher;
 
@@ -14,3 +12,4 @@ fn bench_add_two(b: &mut Bencher) {
     });
     b.bytes = buf.len() as u64;
 }
+*/
