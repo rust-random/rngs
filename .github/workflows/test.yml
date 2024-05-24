@@ -72,7 +72,6 @@ jobs:
         if: ${{ matrix.variant == 'minimal_versions' }}
         run: |
           cargo generate-lockfile -Z minimal-versions
-          cargo update regex --precise 1.5.1 # insufficient minimal version of criterion
       - name: Maybe nightly
         if: ${{ matrix.toolchain == 'nightly' }}
         run: |
