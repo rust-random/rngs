@@ -14,13 +14,9 @@ jobs:
     name: Check doc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
-          override: true
+        uses: dtolnay/rust-toolchain@nightly
       - run: cargo install cargo-deadlinks
       - name: doc (rand)
         env:
@@ -49,6 +45,10 @@ jobs:
             toolchain: beta
             # Test both windows-gnu and windows-msvc; use beta rust on one
           - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            variant: MSRV
+            toolchain: 1.61.0
+          - os: ubuntu-latest
             deps: sudo apt-get update ; sudo apt install gcc-multilib
             target: i686-unknown-linux-gnu
             toolchain: nightly
@@ -58,18 +58,20 @@ jobs:
             variant: minimal_versions
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - name: MSRV
+        if: ${{ matrix.variant == 'MSRV' }}
+        run: cp Cargo.lock.msrv Cargo.lock
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
           toolchain: ${{ matrix.toolchain }}
-          override: true
       - run: ${{ matrix.deps }}
       - name: Maybe minimal versions
         if: ${{ matrix.variant == 'minimal_versions' }}
-        run: cargo generate-lockfile -Z minimal-versions
+        run: |
+          cargo generate-lockfile -Z minimal-versions
       - name: Maybe nightly
         if: ${{ matrix.toolchain == 'nightly' }}
         run: |
@@ -82,32 +84,6 @@ jobs:
           cargo test --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
 
-  msrv:
-    name: MSRV for rand_isaac / rand_xorshift / rand_xoshiro
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.56.0 # older versions may work (untested)
-      - run: cd rand_isaac && cargo test --all-features
-      - run: cd rand_xorshift && cargo test --all-features
-      - run: cd rand_xoshiro && cargo test --all-features
-
-  msrv_hc:
-    name: MSRV for rand_hc
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.36.0
-      - run: cd rand_hc && cargo test --all-features
-
-  msrv_jitter:
-    name: MSRV for rand_jitter
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.51.0
-      - run: cd rand_jitter && cargo test --features std
-
   test-cross:
     runs-on: ubuntu-latest
     strategy:
@@ -117,14 +93,12 @@ jobs:
         toolchain: [stable]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
           toolchain: ${{ matrix.toolchain }}
-          override: true
       - name: Cache cargo plugins
         uses: actions/cache@v1
         with:
@@ -143,7 +117,7 @@ jobs:
   test-miri:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install toolchain
         run: |
           MIRI_NIGHTLY=nightly-$(curl -s https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/miri)
