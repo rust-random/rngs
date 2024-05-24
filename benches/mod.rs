@@ -106,15 +106,45 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         g.throughput(Throughput::Bytes(size_of::<u32>() as u64 * RAND_BENCH_N));
 
         gen_uint!(g, "xorshift", u32, XorShiftRng::from_entropy());
-        gen_uint!(g, "xoshiro256starstar", u32, Xoshiro256StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoshiro256starstar",
+            u32,
+            Xoshiro256StarStar::from_entropy()
+        );
         gen_uint!(g, "xoshiro256plus", u32, Xoshiro256Plus::from_entropy());
-        gen_uint!(g, "xoshiro256plusplus", u32, Xoshiro256PlusPlus::from_entropy());
-        gen_uint!(g, "xoshiro128starstar", u32, Xoshiro128StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoshiro256plusplus",
+            u32,
+            Xoshiro256PlusPlus::from_entropy()
+        );
+        gen_uint!(
+            g,
+            "xoshiro128starstar",
+            u32,
+            Xoshiro128StarStar::from_entropy()
+        );
         gen_uint!(g, "xoshiro128plus", u32, Xoshiro128Plus::from_entropy());
-        gen_uint!(g, "xoshiro128plusplus", u32, Xoshiro128PlusPlus::from_entropy());
-        gen_uint!(g, "xoroshiro128starstar", u32, Xoroshiro128StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoshiro128plusplus",
+            u32,
+            Xoshiro128PlusPlus::from_entropy()
+        );
+        gen_uint!(
+            g,
+            "xoroshiro128starstar",
+            u32,
+            Xoroshiro128StarStar::from_entropy()
+        );
         gen_uint!(g, "xoroshiro128plus", u32, Xoroshiro128Plus::from_entropy());
-        gen_uint!(g, "xoroshiro64starstar", u32, Xoroshiro64StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoroshiro64starstar",
+            u32,
+            Xoroshiro64StarStar::from_entropy()
+        );
         gen_uint!(g, "xoroshiro64star", u32, Xoroshiro64Star::from_entropy());
         gen_uint!(g, "splitmix64", u32, SplitMix64::from_entropy());
         gen_uint!(g, "hc128", u32, Hc128Rng::from_entropy());
@@ -127,15 +157,45 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         g.throughput(Throughput::Bytes(size_of::<u64>() as u64 * RAND_BENCH_N));
 
         gen_uint!(g, "xorshift", u64, XorShiftRng::from_entropy());
-        gen_uint!(g, "xoshiro256starstar", u64, Xoshiro256StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoshiro256starstar",
+            u64,
+            Xoshiro256StarStar::from_entropy()
+        );
         gen_uint!(g, "xoshiro256plus", u64, Xoshiro256Plus::from_entropy());
-        gen_uint!(g, "xoshiro256plusplus", u64, Xoshiro256PlusPlus::from_entropy());
-        gen_uint!(g, "xoshiro128starstar", u64, Xoshiro128StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoshiro256plusplus",
+            u64,
+            Xoshiro256PlusPlus::from_entropy()
+        );
+        gen_uint!(
+            g,
+            "xoshiro128starstar",
+            u64,
+            Xoshiro128StarStar::from_entropy()
+        );
         gen_uint!(g, "xoshiro128plus", u64, Xoshiro128Plus::from_entropy());
-        gen_uint!(g, "xoshiro128plusplus", u64, Xoshiro128PlusPlus::from_entropy());
-        gen_uint!(g, "xoroshiro128starstar", u64, Xoroshiro128StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoshiro128plusplus",
+            u64,
+            Xoshiro128PlusPlus::from_entropy()
+        );
+        gen_uint!(
+            g,
+            "xoroshiro128starstar",
+            u64,
+            Xoroshiro128StarStar::from_entropy()
+        );
         gen_uint!(g, "xoroshiro128plus", u64, Xoroshiro128Plus::from_entropy());
-        gen_uint!(g, "xoroshiro64starstar", u64, Xoroshiro64StarStar::from_entropy());
+        gen_uint!(
+            g,
+            "xoroshiro64starstar",
+            u64,
+            Xoroshiro64StarStar::from_entropy()
+        );
         gen_uint!(g, "xoroshiro64star", u64, Xoroshiro64Star::from_entropy());
         gen_uint!(g, "splitmix64", u64, SplitMix64::from_entropy());
         gen_uint!(g, "hc128", u64, Hc128Rng::from_entropy());
