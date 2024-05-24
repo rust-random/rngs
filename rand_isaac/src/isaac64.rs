@@ -209,7 +209,7 @@ impl BlockRngCore for Isaac64Core {
             let y = *a + *b + ind(mem, x, 3);
             mem[base + m] = y;
             *b = x + ind(mem, y, 3 + RAND_SIZE_LEN);
-            results[RAND_SIZE - 1 - base - m] = (*b).0;
+            results[RAND_SIZE - 1 - base - m] = b.0;
         }
 
         let mut m = 0;
