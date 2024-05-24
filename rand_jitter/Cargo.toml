@@ -8,8 +8,8 @@ repository = "https://github.com/rust-random/rngs"
 documentation = "https://docs.rs/rand_jitter"
 description = "Random number generator based on timing jitter"
 keywords = ["random", "rng", "os"]
-edition.workspace = true
-rust-version.workspace = true
+edition = "2021"
+rust-version = "1.61"
 
 [features]
 std = ["rand_core/std"]
