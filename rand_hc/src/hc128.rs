@@ -150,40 +150,40 @@ impl BlockRngCore for Hc128Core {
 
         if self.counter1024 & 512 == 0 {
             // P block
-            results[0]  = self.step_p(cc+0,  cc+1,  ee+13, ee+6,  ee+4);
-            results[1]  = self.step_p(cc+1,  cc+2,  ee+14, ee+7,  ee+5);
-            results[2]  = self.step_p(cc+2,  cc+3,  ee+15, ee+8,  ee+6);
-            results[3]  = self.step_p(cc+3,  cc+4,  cc+0,  ee+9,  ee+7);
-            results[4]  = self.step_p(cc+4,  cc+5,  cc+1,  ee+10, ee+8);
-            results[5]  = self.step_p(cc+5,  cc+6,  cc+2,  ee+11, ee+9);
-            results[6]  = self.step_p(cc+6,  cc+7,  cc+3,  ee+12, ee+10);
-            results[7]  = self.step_p(cc+7,  cc+8,  cc+4,  ee+13, ee+11);
-            results[8]  = self.step_p(cc+8,  cc+9,  cc+5,  ee+14, ee+12);
-            results[9]  = self.step_p(cc+9,  cc+10, cc+6,  ee+15, ee+13);
-            results[10] = self.step_p(cc+10, cc+11, cc+7,  cc+0,  ee+14);
-            results[11] = self.step_p(cc+11, cc+12, cc+8,  cc+1,  ee+15);
-            results[12] = self.step_p(cc+12, cc+13, cc+9,  cc+2,  cc+0);
-            results[13] = self.step_p(cc+13, cc+14, cc+10, cc+3,  cc+1);
-            results[14] = self.step_p(cc+14, cc+15, cc+11, cc+4,  cc+2);
-            results[15] = self.step_p(cc+15, dd+0,  cc+12, cc+5,  cc+3);
+            results[0] = self.step_p(cc + 0, cc + 1, ee + 13, ee + 6, ee + 4);
+            results[1] = self.step_p(cc + 1, cc + 2, ee + 14, ee + 7, ee + 5);
+            results[2] = self.step_p(cc + 2, cc + 3, ee + 15, ee + 8, ee + 6);
+            results[3] = self.step_p(cc + 3, cc + 4, cc + 0, ee + 9, ee + 7);
+            results[4] = self.step_p(cc + 4, cc + 5, cc + 1, ee + 10, ee + 8);
+            results[5] = self.step_p(cc + 5, cc + 6, cc + 2, ee + 11, ee + 9);
+            results[6] = self.step_p(cc + 6, cc + 7, cc + 3, ee + 12, ee + 10);
+            results[7] = self.step_p(cc + 7, cc + 8, cc + 4, ee + 13, ee + 11);
+            results[8] = self.step_p(cc + 8, cc + 9, cc + 5, ee + 14, ee + 12);
+            results[9] = self.step_p(cc + 9, cc + 10, cc + 6, ee + 15, ee + 13);
+            results[10] = self.step_p(cc + 10, cc + 11, cc + 7, cc + 0, ee + 14);
+            results[11] = self.step_p(cc + 11, cc + 12, cc + 8, cc + 1, ee + 15);
+            results[12] = self.step_p(cc + 12, cc + 13, cc + 9, cc + 2, cc + 0);
+            results[13] = self.step_p(cc + 13, cc + 14, cc + 10, cc + 3, cc + 1);
+            results[14] = self.step_p(cc + 14, cc + 15, cc + 11, cc + 4, cc + 2);
+            results[15] = self.step_p(cc + 15, dd + 0, cc + 12, cc + 5, cc + 3);
         } else {
             // Q block
-            results[0]  = self.step_q(cc+0,  cc+1,  ee+13, ee+6,  ee+4);
-            results[1]  = self.step_q(cc+1,  cc+2,  ee+14, ee+7,  ee+5);
-            results[2]  = self.step_q(cc+2,  cc+3,  ee+15, ee+8,  ee+6);
-            results[3]  = self.step_q(cc+3,  cc+4,  cc+0,  ee+9,  ee+7);
-            results[4]  = self.step_q(cc+4,  cc+5,  cc+1,  ee+10, ee+8);
-            results[5]  = self.step_q(cc+5,  cc+6,  cc+2,  ee+11, ee+9);
-            results[6]  = self.step_q(cc+6,  cc+7,  cc+3,  ee+12, ee+10);
-            results[7]  = self.step_q(cc+7,  cc+8,  cc+4,  ee+13, ee+11);
-            results[8]  = self.step_q(cc+8,  cc+9,  cc+5,  ee+14, ee+12);
-            results[9]  = self.step_q(cc+9,  cc+10, cc+6,  ee+15, ee+13);
-            results[10] = self.step_q(cc+10, cc+11, cc+7,  cc+0,  ee+14);
-            results[11] = self.step_q(cc+11, cc+12, cc+8,  cc+1,  ee+15);
-            results[12] = self.step_q(cc+12, cc+13, cc+9,  cc+2,  cc+0);
-            results[13] = self.step_q(cc+13, cc+14, cc+10, cc+3,  cc+1);
-            results[14] = self.step_q(cc+14, cc+15, cc+11, cc+4,  cc+2);
-            results[15] = self.step_q(cc+15, dd+0,  cc+12, cc+5,  cc+3);
+            results[0] = self.step_q(cc + 0, cc + 1, ee + 13, ee + 6, ee + 4);
+            results[1] = self.step_q(cc + 1, cc + 2, ee + 14, ee + 7, ee + 5);
+            results[2] = self.step_q(cc + 2, cc + 3, ee + 15, ee + 8, ee + 6);
+            results[3] = self.step_q(cc + 3, cc + 4, cc + 0, ee + 9, ee + 7);
+            results[4] = self.step_q(cc + 4, cc + 5, cc + 1, ee + 10, ee + 8);
+            results[5] = self.step_q(cc + 5, cc + 6, cc + 2, ee + 11, ee + 9);
+            results[6] = self.step_q(cc + 6, cc + 7, cc + 3, ee + 12, ee + 10);
+            results[7] = self.step_q(cc + 7, cc + 8, cc + 4, ee + 13, ee + 11);
+            results[8] = self.step_q(cc + 8, cc + 9, cc + 5, ee + 14, ee + 12);
+            results[9] = self.step_q(cc + 9, cc + 10, cc + 6, ee + 15, ee + 13);
+            results[10] = self.step_q(cc + 10, cc + 11, cc + 7, cc + 0, ee + 14);
+            results[11] = self.step_q(cc + 11, cc + 12, cc + 8, cc + 1, ee + 15);
+            results[12] = self.step_q(cc + 12, cc + 13, cc + 9, cc + 2, cc + 0);
+            results[13] = self.step_q(cc + 13, cc + 14, cc + 10, cc + 3, cc + 1);
+            results[14] = self.step_q(cc + 14, cc + 15, cc + 11, cc + 4, cc + 2);
+            results[15] = self.step_q(cc + 15, dd + 0, cc + 12, cc + 5, cc + 3);
         }
         self.counter1024 = self.counter1024.wrapping_add(16);
     }
@@ -197,9 +197,7 @@ impl Hc128Core {
         let temp0 = p[i511].rotate_right(23);
         let temp1 = p[i3].rotate_right(10);
         let temp2 = p[i10].rotate_right(8);
-        p[i] = p[i]
-            .wrapping_add(temp2)
-            .wrapping_add(temp0 ^ temp1);
+        p[i] = p[i].wrapping_add(temp2).wrapping_add(temp0 ^ temp1);
         let temp3 = {
             // The h1 function in HC-128
             let a = p[i12] as u8;
@@ -218,10 +216,7 @@ impl Hc128Core {
         let temp0 = q[i511].rotate_left(23);
         let temp1 = q[i3].rotate_left(10);
         let temp2 = q[i10].rotate_left(8);
-        q[i] = q
-            [i]
-            .wrapping_add(temp2)
-            .wrapping_add(temp0 ^ temp1);
+        q[i] = q[i].wrapping_add(temp2).wrapping_add(temp0 ^ temp1);
         let temp3 = {
             // The h2 function in HC-128
             let a = q[i12] as u8;
@@ -246,40 +241,40 @@ impl Hc128Core {
 
         if self.counter1024 < 512 {
             // P block
-            self.t[cc+0]  = self.step_p(cc+0,  cc+1,  ee+13, ee+6,  ee+4);
-            self.t[cc+1]  = self.step_p(cc+1,  cc+2,  ee+14, ee+7,  ee+5);
-            self.t[cc+2]  = self.step_p(cc+2,  cc+3,  ee+15, ee+8,  ee+6);
-            self.t[cc+3]  = self.step_p(cc+3,  cc+4,  cc+0,  ee+9,  ee+7);
-            self.t[cc+4]  = self.step_p(cc+4,  cc+5,  cc+1,  ee+10, ee+8);
-            self.t[cc+5]  = self.step_p(cc+5,  cc+6,  cc+2,  ee+11, ee+9);
-            self.t[cc+6]  = self.step_p(cc+6,  cc+7,  cc+3,  ee+12, ee+10);
-            self.t[cc+7]  = self.step_p(cc+7,  cc+8,  cc+4,  ee+13, ee+11);
-            self.t[cc+8]  = self.step_p(cc+8,  cc+9,  cc+5,  ee+14, ee+12);
-            self.t[cc+9]  = self.step_p(cc+9,  cc+10, cc+6,  ee+15, ee+13);
-            self.t[cc+10] = self.step_p(cc+10, cc+11, cc+7,  cc+0,  ee+14);
-            self.t[cc+11] = self.step_p(cc+11, cc+12, cc+8,  cc+1,  ee+15);
-            self.t[cc+12] = self.step_p(cc+12, cc+13, cc+9,  cc+2,  cc+0);
-            self.t[cc+13] = self.step_p(cc+13, cc+14, cc+10, cc+3,  cc+1);
-            self.t[cc+14] = self.step_p(cc+14, cc+15, cc+11, cc+4,  cc+2);
-            self.t[cc+15] = self.step_p(cc+15, dd+0,  cc+12, cc+5,  cc+3);
+            self.t[cc + 0] = self.step_p(cc + 0, cc + 1, ee + 13, ee + 6, ee + 4);
+            self.t[cc + 1] = self.step_p(cc + 1, cc + 2, ee + 14, ee + 7, ee + 5);
+            self.t[cc + 2] = self.step_p(cc + 2, cc + 3, ee + 15, ee + 8, ee + 6);
+            self.t[cc + 3] = self.step_p(cc + 3, cc + 4, cc + 0, ee + 9, ee + 7);
+            self.t[cc + 4] = self.step_p(cc + 4, cc + 5, cc + 1, ee + 10, ee + 8);
+            self.t[cc + 5] = self.step_p(cc + 5, cc + 6, cc + 2, ee + 11, ee + 9);
+            self.t[cc + 6] = self.step_p(cc + 6, cc + 7, cc + 3, ee + 12, ee + 10);
+            self.t[cc + 7] = self.step_p(cc + 7, cc + 8, cc + 4, ee + 13, ee + 11);
+            self.t[cc + 8] = self.step_p(cc + 8, cc + 9, cc + 5, ee + 14, ee + 12);
+            self.t[cc + 9] = self.step_p(cc + 9, cc + 10, cc + 6, ee + 15, ee + 13);
+            self.t[cc + 10] = self.step_p(cc + 10, cc + 11, cc + 7, cc + 0, ee + 14);
+            self.t[cc + 11] = self.step_p(cc + 11, cc + 12, cc + 8, cc + 1, ee + 15);
+            self.t[cc + 12] = self.step_p(cc + 12, cc + 13, cc + 9, cc + 2, cc + 0);
+            self.t[cc + 13] = self.step_p(cc + 13, cc + 14, cc + 10, cc + 3, cc + 1);
+            self.t[cc + 14] = self.step_p(cc + 14, cc + 15, cc + 11, cc + 4, cc + 2);
+            self.t[cc + 15] = self.step_p(cc + 15, dd + 0, cc + 12, cc + 5, cc + 3);
         } else {
             // Q block
-            self.t[cc+512+0]  = self.step_q(cc+0,  cc+1,  ee+13, ee+6,  ee+4);
-            self.t[cc+512+1]  = self.step_q(cc+1,  cc+2,  ee+14, ee+7,  ee+5);
-            self.t[cc+512+2]  = self.step_q(cc+2,  cc+3,  ee+15, ee+8,  ee+6);
-            self.t[cc+512+3]  = self.step_q(cc+3,  cc+4,  cc+0,  ee+9,  ee+7);
-            self.t[cc+512+4]  = self.step_q(cc+4,  cc+5,  cc+1,  ee+10, ee+8);
-            self.t[cc+512+5]  = self.step_q(cc+5,  cc+6,  cc+2,  ee+11, ee+9);
-            self.t[cc+512+6]  = self.step_q(cc+6,  cc+7,  cc+3,  ee+12, ee+10);
-            self.t[cc+512+7]  = self.step_q(cc+7,  cc+8,  cc+4,  ee+13, ee+11);
-            self.t[cc+512+8]  = self.step_q(cc+8,  cc+9,  cc+5,  ee+14, ee+12);
-            self.t[cc+512+9]  = self.step_q(cc+9,  cc+10, cc+6,  ee+15, ee+13);
-            self.t[cc+512+10] = self.step_q(cc+10, cc+11, cc+7,  cc+0,  ee+14);
-            self.t[cc+512+11] = self.step_q(cc+11, cc+12, cc+8,  cc+1,  ee+15);
-            self.t[cc+512+12] = self.step_q(cc+12, cc+13, cc+9,  cc+2,  cc+0);
-            self.t[cc+512+13] = self.step_q(cc+13, cc+14, cc+10, cc+3,  cc+1);
-            self.t[cc+512+14] = self.step_q(cc+14, cc+15, cc+11, cc+4,  cc+2);
-            self.t[cc+512+15] = self.step_q(cc+15, dd+0,  cc+12, cc+5,  cc+3);
+            self.t[cc + 512 + 0] = self.step_q(cc + 0, cc + 1, ee + 13, ee + 6, ee + 4);
+            self.t[cc + 512 + 1] = self.step_q(cc + 1, cc + 2, ee + 14, ee + 7, ee + 5);
+            self.t[cc + 512 + 2] = self.step_q(cc + 2, cc + 3, ee + 15, ee + 8, ee + 6);
+            self.t[cc + 512 + 3] = self.step_q(cc + 3, cc + 4, cc + 0, ee + 9, ee + 7);
+            self.t[cc + 512 + 4] = self.step_q(cc + 4, cc + 5, cc + 1, ee + 10, ee + 8);
+            self.t[cc + 512 + 5] = self.step_q(cc + 5, cc + 6, cc + 2, ee + 11, ee + 9);
+            self.t[cc + 512 + 6] = self.step_q(cc + 6, cc + 7, cc + 3, ee + 12, ee + 10);
+            self.t[cc + 512 + 7] = self.step_q(cc + 7, cc + 8, cc + 4, ee + 13, ee + 11);
+            self.t[cc + 512 + 8] = self.step_q(cc + 8, cc + 9, cc + 5, ee + 14, ee + 12);
+            self.t[cc + 512 + 9] = self.step_q(cc + 9, cc + 10, cc + 6, ee + 15, ee + 13);
+            self.t[cc + 512 + 10] = self.step_q(cc + 10, cc + 11, cc + 7, cc + 0, ee + 14);
+            self.t[cc + 512 + 11] = self.step_q(cc + 11, cc + 12, cc + 8, cc + 1, ee + 15);
+            self.t[cc + 512 + 12] = self.step_q(cc + 12, cc + 13, cc + 9, cc + 2, cc + 0);
+            self.t[cc + 512 + 13] = self.step_q(cc + 13, cc + 14, cc + 10, cc + 3, cc + 1);
+            self.t[cc + 512 + 14] = self.step_q(cc + 14, cc + 15, cc + 11, cc + 4, cc + 2);
+            self.t[cc + 512 + 15] = self.step_q(cc + 15, dd + 0, cc + 12, cc + 5, cc + 3);
         }
         self.counter1024 += 16;
     }
@@ -299,7 +294,10 @@ impl Hc128Core {
             x.rotate_right(17) ^ x.rotate_right(19) ^ (x >> 10)
         }
 
-        let mut core = Self { t: [0u32; 1024], counter1024: 0 };
+        let mut core = Self {
+            t: [0u32; 1024],
+            counter1024: 0,
+        };
         let t = &mut core.t;
 
         // Expand the key and iv into P and Q

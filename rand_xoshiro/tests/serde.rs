@@ -1,14 +1,16 @@
-#![cfg(feature="serde1")]
+#![cfg(feature = "serde1")]
 
 use rand_core::{RngCore, SeedableRng};
-use rand_xoshiro::{SplitMix64, Xoroshiro64StarStar, Xoroshiro64Star,
-    Xoroshiro128Plus, Xoroshiro128StarStar, Xoshiro128StarStar, Xoshiro128Plus,
-    Xoshiro256StarStar, Xoshiro256Plus, Xoshiro512StarStar, Xoshiro512Plus};
+use rand_xoshiro::{
+    SplitMix64, Xoroshiro128Plus, Xoroshiro128StarStar, Xoroshiro64Star, Xoroshiro64StarStar,
+    Xoshiro128Plus, Xoshiro128StarStar, Xoshiro256Plus, Xoshiro256StarStar, Xoshiro512Plus,
+    Xoshiro512StarStar,
+};
 
 macro_rules! serde_rng {
     ($rng:ident) => {
         use bincode;
-        use std::io::{BufWriter, BufReader};
+        use std::io::{BufReader, BufWriter};
 
         let mut rng = $rng::seed_from_u64(0);
 
@@ -18,13 +20,13 @@ macro_rules! serde_rng {
 
         let buf = buf.into_inner().unwrap();
         let mut read = BufReader::new(&buf[..]);
-        let mut deserialized: $rng = bincode::deserialize_from(&mut read)
-            .expect("Could not deserialize");
+        let mut deserialized: $rng =
+            bincode::deserialize_from(&mut read).expect("Could not deserialize");
 
         for _ in 0..16 {
             assert_eq!(rng.next_u64(), deserialized.next_u64());
         }
-    }
+    };
 }
 
 #[test]

@@ -6,10 +6,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
-use rand_core::le::read_u32_into;
 use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
+use rand_core::le::read_u32_into;
 use rand_core::{RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 /// A xoroshiro64* random number generator.
 ///
@@ -22,7 +23,7 @@ use rand_core::{RngCore, SeedableRng};
 /// David Blackman and Sebastiano Vigna.
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Xoroshiro64Star {
     s0: u32,
     s1: u32,
@@ -63,10 +64,7 @@ impl SeedableRng for Xoroshiro64Star {
         let mut s = [0; 2];
         read_u32_into(&seed, &mut s);
 
-        Xoroshiro64Star {
-            s0: s[0],
-            s1: s[1],
-        }
+        Xoroshiro64Star { s0: s[0], s1: s[1] }
     }
 
     /// Seed a `Xoroshiro64Star` from a `u64` using `SplitMix64`.
@@ -85,8 +83,8 @@ mod tests {
         // These values were produced with the reference implementation:
         // http://xoshiro.di.unimi.it/xoshiro64star.c
         let expected = [
-            2654435771, 327208753, 4063491769, 4259754937, 261922412, 168123673,
-            552743735, 1672597395, 1031040050, 2755315674,
+            2654435771, 327208753, 4063491769, 4259754937, 261922412, 168123673, 552743735,
+            1672597395, 1031040050, 2755315674,
         ];
         for &e in &expected {
             assert_eq!(rng.next_u32(), e);

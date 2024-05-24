@@ -13,21 +13,25 @@
 // implement `AsRef`, `Default`, `Serialize`, `Deserialize`, or any other
 // traits for that matter.
 
-#[cfg(feature="serde")] use serde::{Serialize, Deserialize};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 const RAND_SIZE_LEN: usize = 8;
 const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 
-
 #[derive(Copy, Clone)]
 #[allow(missing_debug_implementations)]
-#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacArray<T> {
-    #[cfg_attr(feature="serde",serde(with="isaac_array_serde"))]
-    #[cfg_attr(feature="serde", serde(bound(
-        serialize = "T: Serialize",
-        deserialize = "T: Deserialize<'de> + Copy + Default")))]
-    inner: [T; RAND_SIZE]
+    #[cfg_attr(feature = "serde", serde(with = "isaac_array_serde"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(bound(
+            serialize = "T: Serialize",
+            deserialize = "T: Deserialize<'de> + Copy + Default"
+        ))
+    )]
+    inner: [T; RAND_SIZE],
 }
 
 impl<T> ::core::convert::AsRef<[T]> for IsaacArray<T> {
@@ -59,39 +63,45 @@ impl<T> ::core::ops::DerefMut for IsaacArray<T> {
     }
 }
 
-impl<T> ::core::default::Default for IsaacArray<T> where T: Copy + Default {
+impl<T> ::core::default::Default for IsaacArray<T>
+where
+    T: Copy + Default,
+{
     fn default() -> IsaacArray<T> {
-        IsaacArray { inner: [T::default(); RAND_SIZE] }
+        IsaacArray {
+            inner: [T::default(); RAND_SIZE],
+        }
     }
 }
 
 // Custom PartialEq implementation as it can't currently be derived from an array of size RAND_SIZE
-impl<T> ::core::cmp::PartialEq for IsaacArray<T> where T: PartialEq {
+impl<T> ::core::cmp::PartialEq for IsaacArray<T>
+where
+    T: PartialEq,
+{
     fn eq(&self, other: &IsaacArray<T>) -> bool {
         self.inner[..] == other.inner[..]
     }
 }
 
 // Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
-impl<T> ::core::cmp::Eq for IsaacArray<T> where T: Eq {
-}
+impl<T> ::core::cmp::Eq for IsaacArray<T> where T: Eq {}
 
-
-#[cfg(feature="serde")]
+#[cfg(feature = "serde")]
 pub(super) mod isaac_array_serde {
     const RAND_SIZE_LEN: usize = 8;
     const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 
-    use serde::{Deserialize, Deserializer, Serialize, Serializer};
-    use serde::de::{Visitor,SeqAccess};
     use serde::de;
+    use serde::de::{SeqAccess, Visitor};
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
     use core::fmt;
 
-    pub fn serialize<T, S>(arr: &[T;RAND_SIZE], ser: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<T, S>(arr: &[T; RAND_SIZE], ser: S) -> Result<S::Ok, S::Error>
     where
         T: Serialize,
-        S: Serializer
+        S: Serializer,
     {
         use serde::ser::SerializeTuple;
 
@@ -105,18 +115,18 @@ pub(super) mod isaac_array_serde {
     }
 
     #[inline]
-    pub fn deserialize<'de, T, D>(de: D) -> Result<[T;RAND_SIZE], D::Error>
+    pub fn deserialize<'de, T, D>(de: D) -> Result<[T; RAND_SIZE], D::Error>
     where
-        T: Deserialize<'de>+Default+Copy,
+        T: Deserialize<'de> + Default + Copy,
         D: Deserializer<'de>,
     {
         use core::marker::PhantomData;
         struct ArrayVisitor<T> {
             _pd: PhantomData<T>,
         }
-        impl<'de,T> Visitor<'de> for ArrayVisitor<T>
+        impl<'de, T> Visitor<'de> for ArrayVisitor<T>
         where
-            T: Deserialize<'de>+Default+Copy
+            T: Deserialize<'de> + Default + Copy,
         {
             type Value = [T; RAND_SIZE];
 
@@ -129,7 +139,7 @@ pub(super) mod isaac_array_serde {
             where
                 A: SeqAccess<'de>,
             {
-                let mut out = [Default::default();RAND_SIZE];
+                let mut out = [Default::default(); RAND_SIZE];
 
                 for i in 0..RAND_SIZE {
                     match seq.next_element()? {
@@ -142,6 +152,6 @@ pub(super) mod isaac_array_serde {
             }
         }
 
-        de.deserialize_tuple(RAND_SIZE, ArrayVisitor{_pd: PhantomData})
+        de.deserialize_tuple(RAND_SIZE, ArrayVisitor { _pd: PhantomData })
     }
 }

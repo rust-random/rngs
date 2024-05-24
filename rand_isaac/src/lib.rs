@@ -10,20 +10,20 @@
 //!
 //! To initialize a generator, use the [`SeedableRng`][rand_core::SeedableRng] trait.
 
-#![doc(html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
-       html_favicon_url = "https://www.rust-lang.org/favicon.ico",
-       html_root_url = "https://docs.rs/rand_isaac/0.3.0")]
-
+#![doc(
+    html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
+    html_favicon_url = "https://www.rust-lang.org/favicon.ico",
+    html_root_url = "https://docs.rs/rand_isaac/0.3.0"
+)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 #![allow(
     clippy::too_many_arguments,
     clippy::many_single_char_names,
-    clippy::identity_op,
+    clippy::identity_op
 )]
-
-#![cfg_attr(not(all(feature="serde", test)), no_std)]
+#![cfg_attr(not(all(feature = "serde", test)), no_std)]
 
 pub mod isaac;
 pub mod isaac64;

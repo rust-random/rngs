@@ -6,10 +6,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
-use rand_core::impls::{next_u64_via_u32, fill_bytes_via_next};
+use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
 use rand_core::le::read_u32_into;
-use rand_core::{SeedableRng, RngCore, Error};
+use rand_core::{Error, RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 /// A xoshiro128** random number generator.
 ///
@@ -20,7 +21,7 @@ use rand_core::{SeedableRng, RngCore, Error};
 /// reference source code](http://xoshiro.di.unimi.it/xoshiro128starstar.c) by
 /// David Blackman and Sebastiano Vigna.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Xoshiro128StarStar {
     s: [u32; 4],
 }
@@ -105,13 +106,13 @@ mod tests {
 
     #[test]
     fn reference() {
-        let mut rng = Xoshiro128StarStar::from_seed(
-            [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
+        let mut rng =
+            Xoshiro128StarStar::from_seed([1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
         // These values were produced with the reference implementation (v1.1):
         // http://xoshiro.di.unimi.it/xoshiro128starstar.c
         let expected = [
-            11520, 0, 5927040, 70819200, 2031721883, 1637235492, 1287239034,
-            3734860849, 3729100597, 4258142804,
+            11520, 0, 5927040, 70819200, 2031721883, 1637235492, 1287239034, 3734860849,
+            3729100597, 4258142804,
         ];
         for &e in &expected {
             assert_eq!(rng.next_u32(), e);
@@ -120,8 +121,8 @@ mod tests {
 
     #[test]
     fn test_jump() {
-        let mut rng = Xoshiro128StarStar::from_seed(
-            [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
+        let mut rng =
+            Xoshiro128StarStar::from_seed([1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
         rng.jump();
         // These values were produced by instrumenting the reference implementation:
         // http://xoshiro.di.unimi.it/xoshiro128plus.c
@@ -133,8 +134,8 @@ mod tests {
 
     #[test]
     fn test_long_jump() {
-        let mut rng = Xoshiro128StarStar::from_seed(
-            [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
+        let mut rng =
+            Xoshiro128StarStar::from_seed([1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]);
         rng.long_jump();
         // These values were produced by instrumenting the reference implementation:
         // http://xoshiro.di.unimi.it/xoshiro128plus.c
