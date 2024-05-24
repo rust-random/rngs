@@ -7,10 +7,9 @@ members = [
     "rand_xoshiro",
     "rand_hc",
 ]
+resolver = "2"
 
 [workspace.package]
-name = "rngs"
-version = "0.0.0"
 authors = ["The Rand Project Developers", "The Rust Project Developers"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
