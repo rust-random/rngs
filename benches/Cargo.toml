@@ -1,0 +1,21 @@
+[package]
+name = "benches"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+
+[dev-dependencies]
+criterion = "0.5"
+criterion-cycles-per-byte = "0.6"
+rand_core = { version = "0.6", features = ["getrandom"] }
+rand_xoshiro = { path = "../rand_xoshiro", version = "0.6" }
+rand_isaac = { path = "../rand_isaac", version = "0.3" }
+rand_xorshift = { path = "../rand_xorshift", version = "0.3" }
+rand_hc = { path = "../rand_hc", version = "0.3" }
+
+[[bench]]
+name = "mod"
+path = "mod.rs"
+harness = false
