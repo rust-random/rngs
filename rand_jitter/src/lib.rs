@@ -260,7 +260,6 @@ where
     /// # Example
     ///
     /// ```
-    /// use rand_jitter::rand_core::RngCore;
     /// use rand_jitter::{JitterRng, TimerError};
     ///
     /// fn make_jitter_rng() -> Result<JitterRng<impl Fn() -> u64 + Send + Sync>, TimerError> {
