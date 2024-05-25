@@ -107,7 +107,7 @@ mod error;
 mod platform;
 
 pub use crate::error::TimerError;
-use rand_core::{impls, Error, RngCore};
+use rand_core::{impls, RngCore};
 
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
@@ -260,32 +260,28 @@ where
     /// # Example
     ///
     /// ```
-    /// # use rand_jitter::rand_core::{RngCore, Error};
-    /// use rand_jitter::JitterRng;
+    /// use rand_jitter::rand_core::RngCore;
+    /// use rand_jitter::{JitterRng, TimerError};
     ///
-    /// # fn try_inner() -> Result<(), Error> {
-    /// fn get_nstime() -> u64 {
-    ///     use std::time::{SystemTime, UNIX_EPOCH};
+    /// fn make_jitter_rng() -> Result<JitterRng<impl Fn() -> u64 + Send + Sync>, TimerError> {
+    ///     fn get_nstime() -> u64 {
+    ///         use std::time::{SystemTime, UNIX_EPOCH};
     ///
-    ///     let dur = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    ///     // The correct way to calculate the current time is
-    ///     // `dur.as_secs() * 1_000_000_000 + dur.subsec_nanos() as u64`
-    ///     // But this is faster, and the difference in terms of entropy is
-    ///     // negligible (log2(10^9) == 29.9).
-    ///     dur.as_secs() << 30 | dur.subsec_nanos() as u64
+    ///         let dur = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    ///         // The correct way to calculate the current time is
+    ///         // `dur.as_secs() * 1_000_000_000 + dur.subsec_nanos() as u64`
+    ///         // But this is faster, and the difference in terms of entropy is
+    ///         // negligible (log2(10^9) == 29.9).
+    ///         dur.as_secs() << 30 | dur.subsec_nanos() as u64
+    ///     }
+    ///
+    ///     let mut rng = JitterRng::new_with_timer(get_nstime);
+    ///     let rounds = rng.test_timer()?;
+    ///     rng.set_rounds(rounds); // optional
+    ///     Ok(rng)
     /// }
-    ///
-    /// let mut rng = JitterRng::new_with_timer(get_nstime);
-    /// let rounds = rng.test_timer()?;
-    /// rng.set_rounds(rounds); // optional
-    /// let _ = rng.next_u64();
-    ///
-    /// // Ready for use
-    /// let v: u64 = rng.next_u64();
-    /// # Ok(())
-    /// # }
-    ///
-    /// # let _ = try_inner();
+    /// # let mut rng = make_jitter_rng().unwrap();
+    /// # let _ = rng.next_u64();
     /// ```
     ///
     /// [`test_timer`]: JitterRng::test_timer
@@ -769,9 +765,27 @@ where
         // themselves via `fill_bytes`.
         impls::fill_bytes_via_next(self, dest)
     }
+}
 
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        self.fill_bytes(dest);
+impl<F> rand_core::TryRngCore for JitterRng<F>
+where
+    F: Fn() -> u64 + Send + Sync,
+{
+    type Error = core::convert::Infallible;
+
+    #[inline]
+    fn try_next_u32(&mut self) -> Result<u32, Self::Error> {
+        Ok(rand_core::RngCore::next_u32(self))
+    }
+
+    #[inline]
+    fn try_next_u64(&mut self) -> Result<u64, Self::Error> {
+        Ok(rand_core::RngCore::next_u64(self))
+    }
+
+    #[inline]
+    fn try_fill_bytes(&mut self, dst: &mut [u8]) -> Result<(), Self::Error> {
+        rand_core::RngCore::fill_bytes(self, dst);
         Ok(())
     }
 }
