@@ -20,20 +20,21 @@
 //! let x = rng.next_u32();
 //! ```
 
-#![doc(html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
-       html_favicon_url = "https://www.rust-lang.org/favicon.ico",
-       html_root_url = "https://docs.rs/rand_xorshift/0.3.0")]
-
+#![doc(
+    html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
+    html_favicon_url = "https://www.rust-lang.org/favicon.ico",
+    html_root_url = "https://docs.rs/rand_xorshift/0.3.0"
+)]
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
-
 #![no_std]
 
-use core::num::Wrapping as w;
 use core::fmt;
-use rand_core::{RngCore, SeedableRng, Error, impls, le};
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
+use core::num::Wrapping as w;
+use rand_core::{impls, le, Error, RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 /// An Xorshift random number generator.
 ///
@@ -50,7 +51,7 @@ use rand_core::{RngCore, SeedableRng, Error, impls, le};
 ///       ["Xorshift RNGs"](https://www.jstatsoft.org/v08/i14/paper).
 ///       *Journal of Statistical Software*. Vol. 8 (Issue 14).
 #[derive(Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize,Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct XorShiftRng {
     x: w<u32>,
     y: w<u32>,

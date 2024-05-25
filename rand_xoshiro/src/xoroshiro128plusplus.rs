@@ -6,10 +6,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
-use rand_core::le::read_u64_into;
 use rand_core::impls::fill_bytes_via_next;
+use rand_core::le::read_u64_into;
 use rand_core::{RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 /// A xoroshiro128++ random number generator.
 ///
@@ -21,7 +22,7 @@ use rand_core::{RngCore, SeedableRng};
 /// David Blackman and Sebastiano Vigna.
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Xoroshiro128PlusPlus {
     s0: u64,
     s1: u64,
@@ -92,10 +93,7 @@ impl SeedableRng for Xoroshiro128PlusPlus {
         let mut s = [0; 2];
         read_u64_into(&seed, &mut s);
 
-        Xoroshiro128PlusPlus {
-            s0: s[0],
-            s1: s[1],
-        }
+        Xoroshiro128PlusPlus { s0: s[0], s1: s[1] }
     }
 
     /// Seed a `Xoroshiro128PlusPlus` from a `u64` using `SplitMix64`.
@@ -110,14 +108,21 @@ mod tests {
 
     #[test]
     fn reference() {
-        let mut rng = Xoroshiro128PlusPlus::from_seed(
-            [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0]);
+        let mut rng =
+            Xoroshiro128PlusPlus::from_seed([1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0]);
         // These values were produced with the reference implementation:
         // http://xoshiro.di.unimi.it/xoshiro128plusplus.c
         let expected = [
-            393217, 669327710093319, 1732421326133921491, 11394790081659126983,
-            9555452776773192676, 3586421180005889563, 1691397964866707553,
-            10735626796753111697, 15216282715349408991, 14247243556711267923,
+            393217,
+            669327710093319,
+            1732421326133921491,
+            11394790081659126983,
+            9555452776773192676,
+            3586421180005889563,
+            1691397964866707553,
+            10735626796753111697,
+            15216282715349408991,
+            14247243556711267923,
         ];
         for &e in &expected {
             assert_eq!(rng.next_u64(), e);

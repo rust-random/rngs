@@ -9,12 +9,13 @@
 
 //! The ISAAC-64 random number generator.
 
-use core::{fmt, slice};
-use core::num::Wrapping as w;
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
-use rand_core::{RngCore, SeedableRng, Error, le};
-use rand_core::block::{BlockRngCore, BlockRng64};
 use crate::isaac_array::IsaacArray;
+use core::num::Wrapping as w;
+use core::{fmt, slice};
+use rand_core::block::{BlockRng64, BlockRngCore};
+use rand_core::{le, Error, RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 #[allow(non_camel_case_types)]
 type w64 = w<u64>;
@@ -80,7 +81,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// [`rand_hc`]: https://docs.rs/rand_hc
 /// [`BlockRng64`]: rand_core::block::BlockRng64
 #[derive(Debug, Clone)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Isaac64Rng(BlockRng64<Isaac64Core>);
 
 impl RngCore for Isaac64Rng {
@@ -129,9 +130,12 @@ impl SeedableRng for Isaac64Rng {
 
 /// The core of `Isaac64Rng`, used with `BlockRng`.
 #[derive(Clone)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Isaac64Core {
-    #[cfg_attr(feature="serde1", serde(with="super::isaac_array::isaac_array_serde"))]
+    #[cfg_attr(
+        feature = "serde1",
+        serde(with = "super::isaac_array::isaac_array_serde")
+    )]
     mem: [w64; RAND_SIZE],
     a: w64,
     b: w64,
@@ -148,16 +152,12 @@ impl fmt::Debug for Isaac64Core {
 // Custom PartialEq implementation as it can't currently be derived from an array of size RAND_SIZE
 impl ::core::cmp::PartialEq for Isaac64Core {
     fn eq(&self, other: &Isaac64Core) -> bool {
-        self.mem[..] == other.mem[..]
-            && self.a == other.a
-            && self.b == other.b
-            && self.c == other.c
+        self.mem[..] == other.mem[..] && self.a == other.a && self.b == other.b && self.c == other.c
     }
 }
 
 // Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
-impl ::core::cmp::Eq for Isaac64Core {
-}
+impl ::core::cmp::Eq for Isaac64Core {}
 
 impl BlockRngCore for Isaac64Core {
     type Item = u64;
@@ -182,6 +182,7 @@ impl BlockRngCore for Isaac64Core {
     ///   from `results` in reverse. We read them in the normal direction, to
     ///   make `fill_bytes` a memcopy. To maintain compatibility we fill in
     ///   reverse.
+    #[rustfmt::skip]
     fn generate(&mut self, results: &mut IsaacArray<Self::Item>) {
         self.c += w(1);
         // abbreviations
@@ -190,20 +191,22 @@ impl BlockRngCore for Isaac64Core {
         const MIDPOINT: usize = RAND_SIZE / 2;
 
         #[inline]
-        fn ind(mem:&[w64; RAND_SIZE], v: w64, amount: usize) -> w64 {
+        fn ind(mem: &[w64; RAND_SIZE], v: w64, amount: usize) -> w64 {
             let index = (v >> amount).0 as usize % RAND_SIZE;
             mem[index]
         }
 
         #[inline]
-        fn rngstep(mem: &mut [w64; RAND_SIZE],
-                   results: &mut [u64; RAND_SIZE],
-                   mix: w64,
-                   a: &mut w64,
-                   b: &mut w64,
-                   base: usize,
-                   m: usize,
-                   m2: usize) {
+        fn rngstep(
+            mem: &mut [w64; RAND_SIZE],
+            results: &mut [u64; RAND_SIZE],
+            mix: w64,
+            a: &mut w64,
+            b: &mut w64,
+            base: usize,
+            m: usize,
+            m2: usize,
+        ) {
             let x = mem[base + m];
             *a = mix + mem[base + m2];
             let y = *a + *b + ind(mem, x, 3);
@@ -214,7 +217,7 @@ impl BlockRngCore for Isaac64Core {
 
         let mut m = 0;
         let mut m2 = MIDPOINT;
-        for i in (0..MIDPOINT/4).map(|i| i * 4) {
+        for i in (0..MIDPOINT / 4).map(|i| i * 4) {
             rngstep(&mut self.mem, results, !(a ^ (a << 21)), &mut a, &mut b, i + 0, m, m2);
             rngstep(&mut self.mem, results,   a ^ (a >> 5 ),  &mut a, &mut b, i + 1, m, m2);
             rngstep(&mut self.mem, results,   a ^ (a << 12),  &mut a, &mut b, i + 2, m, m2);
@@ -223,7 +226,7 @@ impl BlockRngCore for Isaac64Core {
 
         m = MIDPOINT;
         m2 = 0;
-        for i in (0..MIDPOINT/4).map(|i| i * 4) {
+        for i in (0..MIDPOINT / 4).map(|i| i * 4) {
             rngstep(&mut self.mem, results, !(a ^ (a << 21)), &mut a, &mut b, i + 0, m, m2);
             rngstep(&mut self.mem, results,   a ^ (a >> 5 ),  &mut a, &mut b, i + 1, m, m2);
             rngstep(&mut self.mem, results,   a ^ (a << 12),  &mut a, &mut b, i + 2, m, m2);
@@ -238,6 +241,7 @@ impl BlockRngCore for Isaac64Core {
 impl Isaac64Core {
     /// Create a new ISAAC-64 random number generator.
     fn init(mut mem: [w64; RAND_SIZE], rounds: u32) -> Self {
+        #[rustfmt::skip]
         fn mix(a: &mut w64, b: &mut w64, c: &mut w64, d: &mut w64,
                e: &mut w64, f: &mut w64, g: &mut w64, h: &mut w64) {
             *a -= *e; *f ^= *h >> 9;  *h += *a;
@@ -265,21 +269,35 @@ impl Isaac64Core {
         // Normally this should do two passes, to make all of the seed effect
         // all of `mem`
         for _ in 0..rounds {
-            for i in (0..RAND_SIZE/8).map(|i| i * 8) {
-                a += mem[i  ]; b += mem[i+1];
-                c += mem[i+2]; d += mem[i+3];
-                e += mem[i+4]; f += mem[i+5];
-                g += mem[i+6]; h += mem[i+7];
-                mix(&mut a, &mut b, &mut c, &mut d,
-                    &mut e, &mut f, &mut g, &mut h);
-                mem[i  ] = a; mem[i+1] = b;
-                mem[i+2] = c; mem[i+3] = d;
-                mem[i+4] = e; mem[i+5] = f;
-                mem[i+6] = g; mem[i+7] = h;
+            for i in (0..RAND_SIZE / 8).map(|i| i * 8) {
+                a += mem[i];
+                b += mem[i + 1];
+                c += mem[i + 2];
+                d += mem[i + 3];
+                e += mem[i + 4];
+                f += mem[i + 5];
+                g += mem[i + 6];
+                h += mem[i + 7];
+                mix(
+                    &mut a, &mut b, &mut c, &mut d, &mut e, &mut f, &mut g, &mut h,
+                );
+                mem[i] = a;
+                mem[i + 1] = b;
+                mem[i + 2] = c;
+                mem[i + 3] = d;
+                mem[i + 4] = e;
+                mem[i + 5] = f;
+                mem[i + 6] = g;
+                mem[i + 7] = h;
             }
         }
 
-        Self { mem, a: w(0), b: w(0), c: w(0) }
+        Self {
+            mem,
+            a: w(0),
+            b: w(0),
+            c: w(0),
+        }
     }
 }
 
@@ -328,14 +346,16 @@ impl SeedableRng for Isaac64Core {
 
 #[cfg(test)]
 mod test {
-    use rand_core::{RngCore, SeedableRng};
     use super::Isaac64Rng;
+    use rand_core::{RngCore, SeedableRng};
 
     #[test]
     fn test_isaac64_construction() {
         // Test that various construction techniques produce a working RNG.
-        let seed = [1,0,0,0, 23,0,0,0, 200,1,0,0, 210,30,0,0,
-                    0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 23, 0, 0, 0, 200, 1, 0, 0, 210, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+        ];
         let mut rng1 = Isaac64Rng::from_seed(seed);
         assert_eq!(rng1.next_u64(), 14964555543728284049);
 
@@ -345,56 +365,82 @@ mod test {
 
     #[test]
     fn test_isaac64_true_values_64() {
-        let seed = [1,0,0,0, 0,0,0,0, 23,0,0,0, 0,0,0,0,
-                    200,1,0,0, 0,0,0,0, 210,30,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 200, 1, 0, 0, 0, 0, 0, 0, 210, 30, 0,
+            0, 0, 0, 0, 0,
+        ];
         let mut rng1 = Isaac64Rng::from_seed(seed);
         let mut results = [0u64; 10];
-        for i in results.iter_mut() { *i = rng1.next_u64(); }
+        for i in results.iter_mut() {
+            *i = rng1.next_u64();
+        }
         let expected = [
-                   15071495833797886820, 7720185633435529318,
-                   10836773366498097981, 5414053799617603544,
-                   12890513357046278984, 17001051845652595546,
-                   9240803642279356310, 12558996012687158051,
-                   14673053937227185542, 1677046725350116783];
+            15071495833797886820,
+            7720185633435529318,
+            10836773366498097981,
+            5414053799617603544,
+            12890513357046278984,
+            17001051845652595546,
+            9240803642279356310,
+            12558996012687158051,
+            14673053937227185542,
+            1677046725350116783,
+        ];
         assert_eq!(results, expected);
 
-        let seed = [57,48,0,0, 0,0,0,0, 50,9,1,0, 0,0,0,0,
-                    49,212,0,0, 0,0,0,0, 148,38,0,0, 0,0,0,0];
+        let seed = [
+            57, 48, 0, 0, 0, 0, 0, 0, 50, 9, 1, 0, 0, 0, 0, 0, 49, 212, 0, 0, 0, 0, 0, 0, 148, 38,
+            0, 0, 0, 0, 0, 0,
+        ];
         let mut rng2 = Isaac64Rng::from_seed(seed);
         // skip forward to the 10000th number
-        for _ in 0..10000 { rng2.next_u64(); }
+        for _ in 0..10000 {
+            rng2.next_u64();
+        }
 
-        for i in results.iter_mut() { *i = rng2.next_u64(); }
+        for i in results.iter_mut() {
+            *i = rng2.next_u64();
+        }
         let expected = [
-            18143823860592706164, 8491801882678285927, 2699425367717515619,
-            17196852593171130876, 2606123525235546165, 15790932315217671084,
-            596345674630742204, 9947027391921273664, 11788097613744130851,
-            10391409374914919106];
+            18143823860592706164,
+            8491801882678285927,
+            2699425367717515619,
+            17196852593171130876,
+            2606123525235546165,
+            15790932315217671084,
+            596345674630742204,
+            9947027391921273664,
+            11788097613744130851,
+            10391409374914919106,
+        ];
         assert_eq!(results, expected);
     }
 
     #[test]
     fn test_isaac64_true_values_32() {
-        let seed = [1,0,0,0, 0,0,0,0, 23,0,0,0, 0,0,0,0,
-                    200,1,0,0, 0,0,0,0, 210,30,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 200, 1, 0, 0, 0, 0, 0, 0, 210, 30, 0,
+            0, 0, 0, 0, 0,
+        ];
         let mut rng = Isaac64Rng::from_seed(seed);
         let mut results = [0u32; 12];
-        for i in results.iter_mut() { *i = rng.next_u32(); }
+        for i in results.iter_mut() {
+            *i = rng.next_u32();
+        }
         // Subset of above values, as an LE u32 sequence
         let expected = [
-                    3477963620, 3509106075,
-                    687845478, 1797495790,
-                    227048253, 2523132918,
-                    4044335064, 1260557630,
-                    4079741768, 3001306521,
-                    69157722, 3958365844];
+            3477963620, 3509106075, 687845478, 1797495790, 227048253, 2523132918, 4044335064,
+            1260557630, 4079741768, 3001306521, 69157722, 3958365844,
+        ];
         assert_eq!(results, expected);
     }
 
     #[test]
     fn test_isaac64_true_values_mixed() {
-        let seed = [1,0,0,0, 0,0,0,0, 23,0,0,0, 0,0,0,0,
-                    200,1,0,0, 0,0,0,0, 210,30,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 200, 1, 0, 0, 0, 0, 0, 0, 210, 30, 0,
+            0, 0, 0, 0, 0,
+        ];
         let mut rng = Isaac64Rng::from_seed(seed);
         // Test alternating between `next_u64` and `next_u32` works as expected.
         // Values are the same as `test_isaac64_true_values` and
@@ -410,9 +456,12 @@ mod test {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_isaac64_true_bytes() {
-        let seed = [1,0,0,0, 0,0,0,0, 23,0,0,0, 0,0,0,0,
-                    200,1,0,0, 0,0,0,0, 210,30,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 200, 1, 0, 0, 0, 0, 0, 0, 210, 30, 0,
+            0, 0, 0, 0, 0,
+        ];
         let mut rng = Isaac64Rng::from_seed(seed);
         let mut results = [0u8; 32];
         rng.fill_bytes(&mut results);
@@ -433,21 +482,36 @@ mod test {
         // first block.
         let mut rng = Isaac64Rng::seed_from_u64(0);
         let mut results = [0u64; 16];
-        for i in results.iter_mut() { *i = rng.next_u64(); }
+        for i in results.iter_mut() {
+            *i = rng.next_u64();
+        }
         let expected: [u64; 16] = [
-            0xF67DFBA498E4937C, 0x84A5066A9204F380, 0xFEE34BD5F5514DBB,
-            0x4D1664739B8F80D6, 0x8607459AB52A14AA, 0x0E78BC5A98529E49,
-            0xFE5332822AD13777, 0x556C27525E33D01A, 0x08643CA615F3149F,
-            0xD0771FAF3CB04714, 0x30E86F68A37B008D, 0x3074EBC0488A3ADF,
-            0x270645EA7A2790BC, 0x5601A0A8D3763C6A, 0x2F83071F53F325DD,
-            0xB9090F3D42D2D2EA];
+            0xF67DFBA498E4937C,
+            0x84A5066A9204F380,
+            0xFEE34BD5F5514DBB,
+            0x4D1664739B8F80D6,
+            0x8607459AB52A14AA,
+            0x0E78BC5A98529E49,
+            0xFE5332822AD13777,
+            0x556C27525E33D01A,
+            0x08643CA615F3149F,
+            0xD0771FAF3CB04714,
+            0x30E86F68A37B008D,
+            0x3074EBC0488A3ADF,
+            0x270645EA7A2790BC,
+            0x5601A0A8D3763C6A,
+            0x2F83071F53F325DD,
+            0xB9090F3D42D2D2EA,
+        ];
         assert_eq!(results, expected);
     }
 
     #[test]
     fn test_isaac64_clone() {
-        let seed = [1,0,0,0, 0,0,0,0, 23,0,0,0, 0,0,0,0,
-                    200,1,0,0, 0,0,0,0, 210,30,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 200, 1, 0, 0, 0, 0, 0, 0, 210, 30, 0,
+            0, 0, 0, 0, 0,
+        ];
         let mut rng1 = Isaac64Rng::from_seed(seed);
         let mut rng2 = rng1.clone();
         for _ in 0..16 {
@@ -456,13 +520,15 @@ mod test {
     }
 
     #[test]
-    #[cfg(feature="serde1")]
+    #[cfg(feature = "serde1")]
     fn test_isaac64_serde() {
         use bincode;
-        use std::io::{BufWriter, BufReader};
+        use std::io::{BufReader, BufWriter};
 
-        let seed = [1,0,0,0, 23,0,0,0, 200,1,0,0, 210,30,0,0,
-                     57,48,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+        let seed = [
+            1, 0, 0, 0, 23, 0, 0, 0, 200, 1, 0, 0, 210, 30, 0, 0, 57, 48, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
         let mut rng = Isaac64Rng::from_seed(seed);
 
         let buf: Vec<u8> = Vec::new();
@@ -471,9 +537,11 @@ mod test {
 
         let buf = buf.into_inner().unwrap();
         let mut read = BufReader::new(&buf[..]);
-        let mut deserialized: Isaac64Rng = bincode::deserialize_from(&mut read).expect("Could not deserialize");
+        let mut deserialized: Isaac64Rng =
+            bincode::deserialize_from(&mut read).expect("Could not deserialize");
 
-        for _ in 0..300 { // more than the 256 buffered results
+        // more than the 256 buffered results
+        for _ in 0..300 {
             assert_eq!(rng.next_u64(), deserialized.next_u64());
         }
     }

@@ -6,10 +6,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::le::read_u64_into;
-use rand_core::{SeedableRng, RngCore, Error};
+use rand_core::{Error, RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 /// A xoshiro256++ random number generator.
 ///
@@ -20,7 +21,7 @@ use rand_core::{SeedableRng, RngCore, Error};
 /// reference source code](http://xoshiro.di.unimi.it/xoshiro256plusplus.c) by
 /// David Blackman and Sebastiano Vigna.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Xoshiro256PlusPlus {
     s: [u64; 4],
 }
@@ -42,10 +43,16 @@ impl Xoshiro256PlusPlus {
     /// rng3.jump();
     /// ```
     pub fn jump(&mut self) {
-        impl_jump!(u64, self, [
-            0x180ec6d33cfd0aba, 0xd5a61266f0c9392c,
-            0xa9582618e03fc9aa, 0x39abdc4529b1661c
-        ]);
+        impl_jump!(
+            u64,
+            self,
+            [
+                0x180ec6d33cfd0aba,
+                0xd5a61266f0c9392c,
+                0xa9582618e03fc9aa,
+                0x39abdc4529b1661c
+            ]
+        );
     }
 
     /// Jump forward, equivalently to 2^192 calls to `next_u64()`.
@@ -54,10 +61,16 @@ impl Xoshiro256PlusPlus {
     /// `jump()` will generate 2^64 non-overlapping subsequences for parallel
     /// distributed computations.
     pub fn long_jump(&mut self) {
-        impl_jump!(u64, self, [
-            0x76e15d3efefdcbbf, 0xc5004e441c522fb3,
-            0x77710069854ee241, 0x39109bb02acbe635
-        ]);
+        impl_jump!(
+            u64,
+            self,
+            [
+                0x76e15d3efefdcbbf,
+                0xc5004e441c522fb3,
+                0x77710069854ee241,
+                0x39109bb02acbe635
+            ]
+        );
     }
 }
 
@@ -113,15 +126,23 @@ mod tests {
 
     #[test]
     fn reference() {
-        let mut rng = Xoshiro256PlusPlus::from_seed(
-            [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
-             3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0]);
+        let mut rng = Xoshiro256PlusPlus::from_seed([
+            1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0,
+            0, 0, 0,
+        ]);
         // These values were produced with the reference implementation:
         // http://xoshiro.di.unimi.it/xoshiro256plusplus.c
         let expected = [
-            41943041, 58720359, 3588806011781223, 3591011842654386,
-            9228616714210784205, 9973669472204895162, 14011001112246962877,
-            12406186145184390807, 15849039046786891736, 10450023813501588000,
+            41943041,
+            58720359,
+            3588806011781223,
+            3591011842654386,
+            9228616714210784205,
+            9973669472204895162,
+            14011001112246962877,
+            12406186145184390807,
+            15849039046786891736,
+            10450023813501588000,
         ];
         for &e in &expected {
             assert_eq!(rng.next_u64(), e);

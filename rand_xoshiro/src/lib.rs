@@ -80,10 +80,11 @@
 //! [xoshiro paper]: http://vigna.di.unimi.it/ftp/papers/ScrambledLinear.pdf
 //! [low linear complexity]: http://xoshiro.di.unimi.it/lowcomp.php
 
-#![doc(html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
-       html_favicon_url = "https://www.rust-lang.org/favicon.ico",
-       html_root_url = "https://docs.rs/rand_xoshiro/0.6.0")]
-
+#![doc(
+    html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
+    html_favicon_url = "https://www.rust-lang.org/favicon.ico",
+    html_root_url = "https://docs.rs/rand_xoshiro/0.6.0"
+)]
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
@@ -93,35 +94,35 @@
 #[macro_use]
 mod common;
 mod splitmix64;
-mod xoshiro128starstar;
-mod xoshiro128plusplus;
-mod xoshiro128plus;
-mod xoshiro256starstar;
-mod xoshiro256plusplus;
-mod xoshiro256plus;
-mod xoshiro512starstar;
-mod xoshiro512plusplus;
-mod xoshiro512plus;
 mod xoroshiro128plus;
 mod xoroshiro128plusplus;
 mod xoroshiro128starstar;
-mod xoroshiro64starstar;
 mod xoroshiro64star;
+mod xoroshiro64starstar;
+mod xoshiro128plus;
+mod xoshiro128plusplus;
+mod xoshiro128starstar;
+mod xoshiro256plus;
+mod xoshiro256plusplus;
+mod xoshiro256starstar;
+mod xoshiro512plus;
+mod xoshiro512plusplus;
+mod xoshiro512starstar;
 
+pub use common::Seed512;
 pub use rand_core;
 pub use splitmix64::SplitMix64;
-pub use xoshiro128starstar::Xoshiro128StarStar;
-pub use xoshiro128plusplus::Xoshiro128PlusPlus;
-pub use xoshiro128plus::Xoshiro128Plus;
-pub use xoshiro256starstar::Xoshiro256StarStar;
-pub use xoshiro256plusplus::Xoshiro256PlusPlus;
-pub use xoshiro256plus::Xoshiro256Plus;
-pub use common::Seed512;
-pub use xoshiro512starstar::Xoshiro512StarStar;
-pub use xoshiro512plusplus::Xoshiro512PlusPlus;
-pub use xoshiro512plus::Xoshiro512Plus;
 pub use xoroshiro128plus::Xoroshiro128Plus;
-pub use xoroshiro128starstar::Xoroshiro128StarStar;
 pub use xoroshiro128plusplus::Xoroshiro128PlusPlus;
-pub use xoroshiro64starstar::Xoroshiro64StarStar;
+pub use xoroshiro128starstar::Xoroshiro128StarStar;
 pub use xoroshiro64star::Xoroshiro64Star;
+pub use xoroshiro64starstar::Xoroshiro64StarStar;
+pub use xoshiro128plus::Xoshiro128Plus;
+pub use xoshiro128plusplus::Xoshiro128PlusPlus;
+pub use xoshiro128starstar::Xoshiro128StarStar;
+pub use xoshiro256plus::Xoshiro256Plus;
+pub use xoshiro256plusplus::Xoshiro256PlusPlus;
+pub use xoshiro256starstar::Xoshiro256StarStar;
+pub use xoshiro512plus::Xoshiro512Plus;
+pub use xoshiro512plusplus::Xoshiro512PlusPlus;
+pub use xoshiro512starstar::Xoshiro512StarStar;

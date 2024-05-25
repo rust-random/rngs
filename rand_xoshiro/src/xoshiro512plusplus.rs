@@ -6,10 +6,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[cfg(feature="serde1")] use serde::{Serialize, Deserialize};
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::le::read_u64_into;
-use rand_core::{SeedableRng, RngCore, Error};
+use rand_core::{Error, RngCore, SeedableRng};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 use crate::Seed512;
 
@@ -22,7 +23,7 @@ use crate::Seed512;
 /// reference source code](http://xoshiro.di.unimi.it/xoshiro512plusplus.c) by
 /// David Blackman and Sebastiano Vigna.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Xoshiro512PlusPlus {
     s: [u64; 8],
 }
@@ -44,11 +45,20 @@ impl Xoshiro512PlusPlus {
     /// rng3.jump();
     /// ```
     pub fn jump(&mut self) {
-        impl_jump!(u64, self, [
-            0x33ed89b6e7a353f9, 0x760083d7955323be, 0x2837f2fbb5f22fae,
-            0x4b8c5674d309511c, 0xb11ac47a7ba28c25, 0xf1be7667092bcc1c,
-            0x53851efdb6df0aaf, 0x1ebbc8b23eaf25db
-        ]);
+        impl_jump!(
+            u64,
+            self,
+            [
+                0x33ed89b6e7a353f9,
+                0x760083d7955323be,
+                0x2837f2fbb5f22fae,
+                0x4b8c5674d309511c,
+                0xb11ac47a7ba28c25,
+                0xf1be7667092bcc1c,
+                0x53851efdb6df0aaf,
+                0x1ebbc8b23eaf25db
+            ]
+        );
     }
 
     /// Jump forward, equivalently to 2^384 calls to `next_u64()`.
@@ -57,11 +67,20 @@ impl Xoshiro512PlusPlus {
     /// `jump()` will generate 2^128 non-overlapping subsequences for parallel
     /// distributed computations.
     pub fn long_jump(&mut self) {
-        impl_jump!(u64, self, [
-            0x11467fef8f921d28, 0xa2a819f2e79c8ea8, 0xa8299fc284b3959a,
-            0xb4d347340ca63ee1, 0x1cb0940bedbff6ce, 0xd956c5c4fa1f8e17,
-            0x915e38fd4eda93bc, 0x5b3ccdfa5d7daca5
-        ]);
+        impl_jump!(
+            u64,
+            self,
+            [
+                0x11467fef8f921d28,
+                0xa2a819f2e79c8ea8,
+                0xa8299fc284b3959a,
+                0xb4d347340ca63ee1,
+                0x1cb0940bedbff6ce,
+                0xd956c5c4fa1f8e17,
+                0x915e38fd4eda93bc,
+                0x5b3ccdfa5d7daca5
+            ]
+        );
     }
 }
 
@@ -117,17 +136,24 @@ mod tests {
 
     #[test]
     fn reference() {
-        let mut rng = Xoshiro512PlusPlus::from_seed(Seed512(
-            [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
-             3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0,
-             5, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0,
-             7, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0]));
+        let mut rng = Xoshiro512PlusPlus::from_seed(Seed512([
+            1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0,
+            0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 8, 0,
+            0, 0, 0, 0, 0, 0,
+        ]));
         // These values were produced with the reference implementation:
         // http://xoshiro.di.unimi.it/xoshiro512plusplus.c
         let expected = [
-            524291, 1048578, 539099140, 3299073855497, 6917532603230064654,
-            7494048333530275843, 14418333309547923463, 10960079161595355914,
-            18279570946505382726, 10209173166699159237,
+            524291,
+            1048578,
+            539099140,
+            3299073855497,
+            6917532603230064654,
+            7494048333530275843,
+            14418333309547923463,
+            10960079161595355914,
+            18279570946505382726,
+            10209173166699159237,
         ];
         for &e in &expected {
             assert_eq!(rng.next_u64(), e);
