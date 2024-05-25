@@ -8,7 +8,7 @@
 
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::le::read_u64_into;
-use rand_core::{Error, RngCore, SeedableRng};
+use rand_core::{RngCore, SeedableRng};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -122,13 +122,9 @@ impl RngCore for Xoshiro512PlusPlus {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         fill_bytes_via_next(self, dest);
     }
-
-    #[inline]
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        self.fill_bytes(dest);
-        Ok(())
-    }
 }
+
+rand_core::impl_try_rng_from_rng_core!(Xoshiro512PlusPlus);
 
 #[cfg(test)]
 mod tests {
