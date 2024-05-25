@@ -280,8 +280,7 @@ where
     ///     rng.set_rounds(rounds); // optional
     ///     Ok(rng)
     /// }
-    /// # let mut rng = make_jitter_rng().unwrap();
-    /// # let _ = rng.next_u64();
+    /// # let _rng = make_jitter_rng();
     /// ```
     ///
     /// [`test_timer`]: JitterRng::test_timer
