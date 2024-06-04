@@ -8,7 +8,7 @@ fn test_xorshift_construction() {
     let mut rng1 = XorShiftRng::from_seed(seed);
     assert_eq!(rng1.next_u64(), 4325440999699518727);
 
-    let mut rng2 = XorShiftRng::from_rng(&mut rng1).unwrap();
+    let mut rng2 = XorShiftRng::from_rng(&mut rng1);
     // Yes, this makes rng2 a clone of rng1!
     assert_eq!(rng1.next_u64(), 15614385950550801700);
     assert_eq!(rng2.next_u64(), 15614385950550801700);

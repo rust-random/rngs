@@ -13,7 +13,7 @@ use crate::isaac_array::IsaacArray;
 use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng, BlockRngCore};
-use rand_core::{le, Error, RngCore, SeedableRng};
+use rand_core::{le, RngCore, SeedableRng, TryRngCore};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -108,12 +108,9 @@ impl RngCore for IsaacRng {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         self.0.fill_bytes(dest)
     }
-
-    #[inline]
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        self.0.try_fill_bytes(dest)
-    }
 }
+
+rand_core::impl_try_rng_from_rng_core!(IsaacRng);
 
 impl SeedableRng for IsaacRng {
     type Seed = <IsaacCore as SeedableRng>::Seed;
@@ -132,8 +129,13 @@ impl SeedableRng for IsaacRng {
     }
 
     #[inline]
-    fn from_rng<S: RngCore>(rng: S) -> Result<Self, Error> {
-        BlockRng::<IsaacCore>::from_rng(rng).map(IsaacRng)
+    fn from_rng(rng: impl RngCore) -> Self {
+        IsaacRng(BlockRng::<IsaacCore>::from_rng(rng))
+    }
+
+    #[inline]
+    fn try_from_rng<S: TryRngCore>(rng: S) -> Result<Self, S::Error> {
+        BlockRng::<IsaacCore>::try_from_rng(rng).map(IsaacRng)
     }
 }
 
@@ -365,7 +367,24 @@ impl SeedableRng for IsaacCore {
         Self::init(key, 1)
     }
 
-    fn from_rng<R: RngCore>(mut rng: R) -> Result<Self, Error> {
+    fn from_rng(mut rng: impl RngCore) -> Self {
+        // Custom `from_rng` implementation that fills a seed with the same size
+        // as the entire state.
+        let mut seed = [w(0u32); RAND_SIZE];
+        unsafe {
+            let ptr = seed.as_mut_ptr() as *mut u8;
+
+            let slice = slice::from_raw_parts_mut(ptr, RAND_SIZE * 4);
+            rng.fill_bytes(slice);
+        }
+        for i in seed.iter_mut() {
+            *i = w(i.0.to_le());
+        }
+
+        Self::init(seed, 2)
+    }
+
+    fn try_from_rng<R: TryRngCore>(mut rng: R) -> Result<Self, R::Error> {
         // Custom `from_rng` implementation that fills a seed with the same size
         // as the entire state.
         let mut seed = [w(0u32); RAND_SIZE];
@@ -398,7 +417,7 @@ mod test {
         let mut rng1 = IsaacRng::from_seed(seed);
         assert_eq!(rng1.next_u32(), 2869442790);
 
-        let mut rng2 = IsaacRng::from_rng(rng1).unwrap();
+        let mut rng2 = IsaacRng::from_rng(rng1);
         assert_eq!(rng2.next_u32(), 3094074039);
     }
 

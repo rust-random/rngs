@@ -15,8 +15,8 @@
 //! The HC-128 random number generator.
 
 use core::fmt;
-use rand_core::block::{BlockRng, BlockRngCore};
-use rand_core::{le, CryptoRng, Error, RngCore, SeedableRng};
+use rand_core::block::{BlockRng, BlockRngCore, CryptoBlockRng};
+use rand_core::{le, CryptoRng, RngCore, SeedableRng, TryRngCore};
 
 const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 
@@ -87,12 +87,9 @@ impl RngCore for Hc128Rng {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         self.0.fill_bytes(dest)
     }
-
-    #[inline]
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        self.0.try_fill_bytes(dest)
-    }
 }
+
+rand_core::impl_try_crypto_rng_from_crypto_rng!(Hc128Rng);
 
 impl SeedableRng for Hc128Rng {
     type Seed = <Hc128Core as SeedableRng>::Seed;
@@ -103,8 +100,13 @@ impl SeedableRng for Hc128Rng {
     }
 
     #[inline]
-    fn from_rng<R: RngCore>(rng: R) -> Result<Self, Error> {
-        BlockRng::<Hc128Core>::from_rng(rng).map(Hc128Rng)
+    fn from_rng(rng: impl RngCore) -> Self {
+        Hc128Rng(BlockRng::<Hc128Core>::from_rng(rng))
+    }
+
+    #[inline]
+    fn try_from_rng<R: TryRngCore>(rng: R) -> Result<Self, R::Error> {
+        BlockRng::<Hc128Core>::try_from_rng(rng).map(Hc128Rng)
     }
 }
 
@@ -352,7 +354,7 @@ impl SeedableRng for Hc128Core {
     }
 }
 
-impl CryptoRng for Hc128Core {}
+impl CryptoBlockRng for Hc128Core {}
 
 // Custom PartialEq implementation as it can't currently be derived from an array of size 1024
 impl PartialEq for Hc128Core {

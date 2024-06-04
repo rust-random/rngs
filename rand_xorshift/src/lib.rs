@@ -32,7 +32,7 @@
 
 use core::fmt;
 use core::num::Wrapping as w;
-use rand_core::{impls, le, Error, RngCore, SeedableRng};
+use rand_core::{impls, le, RngCore, SeedableRng, TryRngCore};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -90,12 +90,9 @@ impl RngCore for XorShiftRng {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         impls::fill_bytes_via_next(self, dest)
     }
-
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        self.fill_bytes(dest);
-        Ok(())
-    }
 }
+
+rand_core::impl_try_rng_from_rng_core!(XorShiftRng);
 
 impl SeedableRng for XorShiftRng {
     type Seed = [u8; 16];
@@ -119,10 +116,27 @@ impl SeedableRng for XorShiftRng {
         }
     }
 
-    fn from_rng<R: RngCore>(mut rng: R) -> Result<Self, Error> {
+    fn from_rng(mut rng: impl RngCore) -> Self {
         let mut b = [0u8; 16];
         loop {
-            rng.try_fill_bytes(&mut b[..])?;
+            rng.fill_bytes(b.as_mut());
+            if b != [0; 16] {
+                break;
+            }
+        }
+
+        XorShiftRng {
+            x: w(u32::from_le_bytes([b[0], b[1], b[2], b[3]])),
+            y: w(u32::from_le_bytes([b[4], b[5], b[6], b[7]])),
+            z: w(u32::from_le_bytes([b[8], b[9], b[10], b[11]])),
+            w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
+        }
+    }
+
+    fn try_from_rng<R: TryRngCore>(mut rng: R) -> Result<Self, R::Error> {
+        let mut b = [0u8; 16];
+        loop {
+            rng.try_fill_bytes(b.as_mut())?;
             if b != [0; 16] {
                 break;
             }
