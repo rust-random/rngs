@@ -5,7 +5,7 @@ use rand_jitter::JitterRng;
 fn test_jitter_init() {
     use rand_core::RngCore;
 
-    // Because this is a debug build, measurements here are not representive
+    // Because this is a debug build, measurements here are not representative
     // of the final release build.
     // Don't fail this test if initializing `JitterRng` fails because of a
     // bad timer (the timer from the standard library may not have enough

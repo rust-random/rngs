@@ -522,7 +522,7 @@ where
     fn gen_entropy(&mut self) -> u64 {
         trace!("JitterRng: collecting entropy");
 
-        // Prime `ec.prev_time`, and run the noice sources to make sure the
+        // Prime `ec.prev_time`, and run the noise sources to make sure the
         // first loop round collects the expected entropy.
         let mut ec = EcState {
             prev_time: (self.timer)(),
@@ -650,7 +650,7 @@ where
         // `assert!(delta_sum / TESTLOOPCOUNT >= 1)`
         // `assert!(delta_sum >= TESTLOOPCOUNT)`
         if delta_sum < TESTLOOPCOUNT {
-            return Err(TimerError::TinyVariantions);
+            return Err(TimerError::TinyVariations);
         }
 
         // Ensure that we have variations in the time stamp below 100 for at
@@ -673,7 +673,7 @@ where
         // available bits of entropy per round here for two reasons:
         // 1. Simple estimates of the available bits (like Shannon entropy) are
         //    too optimistic.
-        // 2. Unless we want to waste a lot of time during intialization, there
+        // 2. Unless we want to waste a lot of time during initialization, there
         //    only a small number of samples are available.
         //
         // Therefore we use a very simple and conservative estimate:
@@ -703,10 +703,10 @@ where
     /// `JitterRng` entropy collector.
     ///
     /// Setting `var_rounds` to `true` will execute the memory access and the
-    /// CPU jitter noice sources a variable amount of times (just like a real
+    /// CPU jitter noise sources a variable amount of times (just like a real
     /// `JitterRng` round).
     ///
-    /// Setting `var_rounds` to `false` will execute the noice sources the
+    /// Setting `var_rounds` to `false` will execute the noise sources the
     /// minimal number of times. This can be used to measure the minimum amount
     /// of entropy one round of the entropy collector can collect in the worst
     /// case.

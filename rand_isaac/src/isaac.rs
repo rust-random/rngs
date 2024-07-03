@@ -174,7 +174,7 @@ impl BlockRngCore for IsaacCore {
     type Item = u32;
     type Results = IsaacArray<Self::Item>;
 
-    /// Refills the output buffer, `results`. See also the pseudocode desciption
+    /// Refills the output buffer, `results`. See also the pseudocode description
     /// of the algorithm in the `IsaacRng` documentation.
     ///
     /// Optimisations used (similar to the reference implementation):

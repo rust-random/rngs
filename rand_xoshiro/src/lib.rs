@@ -44,7 +44,7 @@
 //!   (which are discarded when generating floats), making it fail linearity
 //!   tests. This is unlikely to have any impact in practise.
 //! - [`SplitMix64`]: Recommended for initializing generators of the xoshiro
-//!   familiy from a 64-bit seed. Used for implementing `seed_from_u64`.
+//!   family from a 64-bit seed. Used for implementing `seed_from_u64`.
 //!
 //! # 32-bit generators
 //! - [`Xoshiro128StarStar`]: Recommended for all purposes. Excellent speed.
