@@ -33,10 +33,10 @@ without `std` support a timer must be supplied via `JitterRng::new_with_timer`.
 
 ## Quality testing
 
-`JitterRng::new()` has build-in, but limited, quality testing, however
+`JitterRng::new()` has built-in, but limited, quality testing, however
 before using `JitterRng` on untested hardware, or after changes that could
-effect how the code is optimized (such as a new LLVM version), it is
-recommend to run the much more stringent
+affect how the code is optimized (such as a new LLVM version), it is
+recommended to run the much more stringent
 [NIST SP 800-90B Entropy Estimation Suite](https://github.com/usnistgov/SP800-90B_EntropyAssessment).
 
 Use the following code using `timer_stats` to collect the data:
@@ -94,7 +94,7 @@ validate the estimation.
    restart.py -v jitter_rng_var.bin 8 <min-entropy>
    ```
 2. Estimate the expected amount of entropy that is available in the last 4
-   bits of the timer delta after running noice sources. Note that a value of
+   bits of the timer delta after running noise sources. Note that a value of
    `3.70` is the minimum estimated entropy for true randomness.
    ```sh
    python noniid_main.py -v -u 4 jitter_rng_var.bin 4

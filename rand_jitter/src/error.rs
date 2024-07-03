@@ -30,7 +30,7 @@ pub enum TimerError {
     /// Timer is not monotonically increasing.
     NotMonotonic = ERROR_BASE + 3,
     /// Variations of deltas of time too small.
-    TinyVariantions = ERROR_BASE + 4,
+    TinyVariations = ERROR_BASE + 4,
     /// Too many stuck results (indicating no added entropy).
     TooManyStuck = ERROR_BASE + 5,
     #[doc(hidden)]
@@ -43,7 +43,7 @@ impl TimerError {
             TimerError::NoTimer => "no timer available",
             TimerError::CoarseTimer => "coarse timer",
             TimerError::NotMonotonic => "timer not monotonic",
-            TimerError::TinyVariantions => "time delta variations too small",
+            TimerError::TinyVariations => "time delta variations too small",
             TimerError::TooManyStuck => "too many stuck results",
             TimerError::__Nonexhaustive => unreachable!(),
         }
