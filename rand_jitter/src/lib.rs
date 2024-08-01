@@ -115,9 +115,11 @@ mod platform;
 pub use crate::error::TimerError;
 use rand_core::{impls, RngCore};
 
-use core::{fmt, mem, ptr};
+use core::{fmt, hash, mem, ptr};
 #[cfg(feature = "std")]
 use std::sync::atomic::{AtomicUsize, Ordering};
+
+use sha3::{Digest, Sha3_256};
 
 const MEMORY_BLOCKS: usize = 64;
 const MEMORY_BLOCKSIZE: usize = 32;
@@ -129,15 +131,13 @@ const MEMORY_SIZE: usize = MEMORY_BLOCKS * MEMORY_BLOCKSIZE;
 /// Note that this RNG is not suitable for use cases where cryptographic
 /// security is required.
 pub struct JitterRng<F> {
-    data: u64, // Actual random number
+    hash_state: Sha3_256, // Actual random number
     // Number of rounds to run the entropy collector per 64 bits
     rounds: u8,
     // Timer used by `measure_jitter`
     timer: F,
     // Memory for the Memory Access noise source
     mem_prev_index: u16,
-    // Make `next_u32` not waste 32 bits
-    data_half_used: bool,
 }
 
 // Note: `JitterRng` maintains a small 64-bit entropy pool. With every
@@ -202,13 +202,10 @@ where
 {
     fn clone(&self) -> JitterRng<F> {
         JitterRng {
-            data: self.data,
+            hash_state: self.hash_state.clone(),
             rounds: self.rounds,
             timer: self.timer.clone(),
             mem_prev_index: self.mem_prev_index,
-            // The 32 bits that may still be unused from the previous round are
-            // for the original to use, not for the clone.
-            data_half_used: false,
         }
     }
 }
@@ -292,11 +289,10 @@ where
     /// [`set_rounds`]: JitterRng::set_rounds
     pub fn new_with_timer(timer: F) -> JitterRng<F> {
         JitterRng {
-            data: 0,
+            hash_state: Sha3_256::new(),
             rounds: 64,
             timer,
             mem_prev_index: 0,
-            data_half_used: false,
         }
     }
 
@@ -328,9 +324,9 @@ where
         let mut rounds = 0;
 
         let mut time = (self.timer)();
-        // Mix with the current state of the random number balance the random
-        // loop counter a bit more.
-        time ^= self.data;
+        // // Mix with the current state of the random number balance the random
+        // // loop counter a bit more.
+        // time ^= self.data;
 
         // We fold the time value as much as possible to ensure that as many
         // bits of the time stamp are included as possible.
@@ -341,7 +337,7 @@ where
             time >>= n_bits;
         }
 
-        rounds as u32
+        (rounds as u32) + 1
     }
 
     // CPU jitter noise source
@@ -355,48 +351,31 @@ where
     // execution is used to measure the CPU execution time jitter. Any change to
     // the loop in this function implies that careful retesting must be done.
     #[inline(never)]
-    fn lfsr_time(&mut self, time: u64, var_rounds: bool) {
-        fn lfsr(mut data: u64, time: u64) -> u64 {
-            for i in 1..65 {
-                let mut tmp = time << (64 - i);
-                tmp >>= 64 - 1;
-
-                // Fibonacci LSFR with polynomial of
-                // x^64 + x^61 + x^56 + x^31 + x^28 + x^23 + 1 which is
-                // primitive according to
-                // http://poincare.matf.bg.ac.rs/~ezivkovm/publications/primpol1.pdf
-                // (the shift values are the polynomial values minus one
-                // due to counting bits from 0 to 63). As the current
-                // position is always the LSB, the polynomial only needs
-                // to shift data in from the left without wrap.
-                data ^= tmp;
-                data ^= (data >> 63) & 1;
-                data ^= (data >> 60) & 1;
-                data ^= (data >> 55) & 1;
-                data ^= (data >> 30) & 1;
-                data ^= (data >> 27) & 1;
-                data ^= (data >> 22) & 1;
-                data = data.rotate_left(1);
-            }
-            data
-        }
+    fn hash_time(&mut self, time: u64, var_rounds: bool) {
+        const JENT_SHA3_MAX_SIZE_BLOCK: usize = (1600 - 2 * 256) >> 3;
 
         // Note: in the reference implementation only the last round effects
         // `self.data`, all the other results are ignored. To make sure the
         // other rounds are not optimised out, we first run all but the last
         // round on a throw-away value instead of the real `self.data`.
-        let mut lfsr_loop_cnt = 0;
+        let mut hash_loop_cnt = 1;
         if var_rounds {
-            lfsr_loop_cnt = self.random_loop_cnt(4)
+            hash_loop_cnt = self.random_loop_cnt(4)
         };
+        assert!(hash_loop_cnt >= 1, "need at least one round to inject time into hash pool");
 
-        let mut throw_away: u64 = 0;
-        for _ in 0..lfsr_loop_cnt {
-            throw_away = lfsr(throw_away, time);
+        // Size of intermediary ensures a Keccak operation during hash_update
+        let mut intermediary = [0u8; JENT_SHA3_MAX_SIZE_BLOCK];
+
+        for j in 0..hash_loop_cnt {
+            let mut sha_state = Sha3_256::new();
+            sha_state.update(&intermediary);
+            sha_state.update(time.to_ne_bytes());
+            sha_state.update(j.to_ne_bytes());
+            sha_state.finalize_into((&mut intermediary[0..Sha3_256::output_size()]).into());
         }
-        black_box(throw_away);
 
-        self.data = lfsr(self.data, time);
+        self.hash_state.update(&intermediary);
     }
 
     // Memory Access noise source
@@ -458,7 +437,7 @@ where
         ec.prev_time = time;
 
         // Call the next noise source which also injects the data
-        self.lfsr_time(current_delta as u64, true);
+        self.hash_time(current_delta as u64, true);
 
         // Check whether we have a stuck measurement (i.e. does the last
         // measurement holds entropy?).
@@ -466,63 +445,7 @@ where
             return None;
         };
 
-        // Rotate the data buffer by a prime number (any odd number would
-        // do) to ensure that every bit position of the input time stamp
-        // has an even chance of being merged with a bit position in the
-        // entropy pool. We do not use one here as the adjacent bits in
-        // successive time deltas may have some form of dependency. The
-        // chosen value of 7 implies that the low 7 bits of the next
-        // time delta value is concatenated with the current time delta.
-        self.data = self.data.rotate_left(7);
-
         Some(())
-    }
-
-    // Shuffle the pool a bit by mixing some value with a bijective function
-    // (XOR) into the pool.
-    //
-    // The function generates a mixer value that depends on the bits set and
-    // the location of the set bits in the random number generated by the
-    // entropy source. Therefore, based on the generated random number, this
-    // mixer value can have 2^64 different values. That mixer value is
-    // initialized with the first two SHA-1 constants. After obtaining the
-    // mixer value, it is XORed into the random number.
-    //
-    // The mixer value is not assumed to contain any entropy. But due to the
-    // XOR operation, it can also not destroy any entropy present in the
-    // entropy pool.
-    #[inline(never)]
-    fn stir_pool(&mut self) {
-        // This constant is derived from the first two 32 bit initialization
-        // vectors of SHA-1 as defined in FIPS 180-4 section 5.3.1
-        // The order does not really matter as we do not rely on the specific
-        // numbers. We just pick the SHA-1 constants as they have a good mix of
-        // bit set and unset.
-        const CONSTANT: u64 = 0x67452301efcdab89;
-
-        // The start value of the mixer variable is derived from the third
-        // and fourth 32 bit initialization vector of SHA-1 as defined in
-        // FIPS 180-4 section 5.3.1
-        let mut mixer = 0x98badcfe10325476;
-
-        // This is a constant time function to prevent leaking timing
-        // information about the random number.
-        // The normal code is:
-        // ```
-        // for i in 0..64 {
-        //     if ((self.data >> i) & 1) == 1 { mixer ^= CONSTANT; }
-        // }
-        // ```
-        // This is a bit fragile, as LLVM really wants to use branches here, and
-        // we rely on it to not recognise the opportunity.
-        for i in 0..64 {
-            let apply = (self.data >> i) & 1;
-            let mask = !apply.wrapping_sub(1);
-            mixer ^= CONSTANT & mask;
-            mixer = mixer.rotate_left(1);
-        }
-
-        self.data ^= mixer;
     }
 
     fn gen_entropy(&mut self) -> u64 {
@@ -549,8 +472,9 @@ where
         // source is not optimised out.
         black_box(ec.mem[0]);
 
-        self.stir_pool();
-        self.data
+        let ret_buffer = self.hash_state.finalize_reset();
+
+        u64::from_ne_bytes(ret_buffer[0..8].try_into().unwrap())
     }
 
     /// Basic quality tests on the timer, by measuring CPU timing jitter a few
@@ -588,7 +512,7 @@ where
             // Measure time delta of core entropy collection logic
             let time = (self.timer)();
             self.memaccess(&mut ec.mem, true);
-            self.lfsr_time(time, true);
+            self.hash_time(time, true);
             let time2 = (self.timer)();
 
             // Test whether timer works
@@ -724,7 +648,7 @@ where
 
         let time = (self.timer)();
         self.memaccess(&mut mem, var_rounds);
-        self.lfsr_time(time, var_rounds);
+        self.hash_time(time, var_rounds);
         let time2 = (self.timer)();
         time2.wrapping_sub(time) as i64
     }
@@ -745,19 +669,10 @@ where
     F: Fn() -> u64 + Send + Sync,
 {
     fn next_u32(&mut self) -> u32 {
-        // We want to use both parts of the generated entropy
-        if self.data_half_used {
-            self.data_half_used = false;
-            (self.data >> 32) as u32
-        } else {
-            self.data = self.next_u64();
-            self.data_half_used = true;
-            self.data as u32
-        }
+        self.gen_entropy() as u32
     }
 
     fn next_u64(&mut self) -> u64 {
-        self.data_half_used = false;
         self.gen_entropy()
     }
 
