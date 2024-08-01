@@ -57,6 +57,12 @@
 #[cfg(feature = "std")]
 extern crate std;
 
+/// This module contains optimized hardware timers.
+/// They can be used instead of the generic get_nstime
+/// or on bare hardware without the std feature.
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+pub mod hw_timers;
+
 pub use rand_core;
 
 // Coming from https://crates.io/crates/doc-comment
