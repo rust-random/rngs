@@ -94,7 +94,7 @@ impl RngCore for Xoshiro128Plus {
         fill_bytes_via_next(self, dest);
     }
 }
-rand_core::impl_try_rng_from_rng_core!(Xoshiro128Plus);
+
 #[cfg(test)]
 mod tests {
     use super::*;

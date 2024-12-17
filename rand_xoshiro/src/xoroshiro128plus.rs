@@ -79,9 +79,6 @@ impl RngCore for Xoroshiro128Plus {
         fill_bytes_via_next(self, dest);
     }
 }
-
-rand_core::impl_try_rng_from_rng_core!(Xoroshiro128Plus);
-
 impl SeedableRng for Xoroshiro128Plus {
     type Seed = [u8; 16];
 

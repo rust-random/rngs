@@ -764,26 +764,3 @@ where
         impls::fill_bytes_via_next(self, dest)
     }
 }
-
-impl<F> rand_core::TryRngCore for JitterRng<F>
-where
-    F: Fn() -> u64 + Send + Sync,
-{
-    type Error = core::convert::Infallible;
-
-    #[inline]
-    fn try_next_u32(&mut self) -> Result<u32, Self::Error> {
-        Ok(rand_core::RngCore::next_u32(self))
-    }
-
-    #[inline]
-    fn try_next_u64(&mut self) -> Result<u64, Self::Error> {
-        Ok(rand_core::RngCore::next_u64(self))
-    }
-
-    #[inline]
-    fn try_fill_bytes(&mut self, dst: &mut [u8]) -> Result<(), Self::Error> {
-        rand_core::RngCore::fill_bytes(self, dst);
-        Ok(())
-    }
-}

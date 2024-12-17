@@ -110,8 +110,6 @@ impl RngCore for IsaacRng {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(IsaacRng);
-
 impl SeedableRng for IsaacRng {
     type Seed = <IsaacCore as SeedableRng>::Seed;
 

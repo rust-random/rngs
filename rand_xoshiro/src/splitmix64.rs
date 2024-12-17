@@ -59,8 +59,6 @@ impl RngCore for SplitMix64 {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(SplitMix64);
-
 impl SeedableRng for SplitMix64 {
     type Seed = [u8; 8];
 

@@ -89,8 +89,6 @@ impl RngCore for Hc128Rng {
     }
 }
 
-rand_core::impl_try_crypto_rng_from_crypto_rng!(Hc128Rng);
-
 impl SeedableRng for Hc128Rng {
     type Seed = <Hc128Core as SeedableRng>::Seed;
 

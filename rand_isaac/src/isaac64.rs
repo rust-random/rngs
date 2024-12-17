@@ -101,8 +101,6 @@ impl RngCore for Isaac64Rng {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(Isaac64Rng);
-
 impl SeedableRng for Isaac64Rng {
     type Seed = <Isaac64Core as SeedableRng>::Seed;
 
