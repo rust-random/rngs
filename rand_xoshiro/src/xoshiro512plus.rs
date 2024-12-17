@@ -9,7 +9,7 @@
 use rand_core::impls::fill_bytes_via_next;
 use rand_core::le::read_u64_into;
 use rand_core::{RngCore, SeedableRng};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 use crate::Seed512;
@@ -24,7 +24,7 @@ use crate::Seed512;
 /// reference source code](http://xoshiro.di.unimi.it/xoshiro512plus.c) by
 /// David Blackman and Sebastiano Vigna.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Xoshiro512Plus {
     s: [u64; 8],
 }

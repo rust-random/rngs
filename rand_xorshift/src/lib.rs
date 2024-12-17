@@ -33,7 +33,7 @@
 use core::fmt;
 use core::num::Wrapping as w;
 use rand_core::{impls, le, RngCore, SeedableRng, TryRngCore};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// An Xorshift random number generator.
@@ -51,7 +51,7 @@ use serde::{Deserialize, Serialize};
 ///       ["Xorshift RNGs"](https://www.jstatsoft.org/v08/i14/paper).
 ///       *Journal of Statistical Software*. Vol. 8 (Issue 14).
 #[derive(Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct XorShiftRng {
     x: w<u32>,
     y: w<u32>,
