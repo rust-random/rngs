@@ -114,7 +114,7 @@ impl SeedableRng for XorShiftRng {
         }
     }
 
-    fn from_rng(mut rng: impl RngCore) -> Self {
+    fn from_rng(rng: &mut impl RngCore) -> Self {
         let mut b = [0u8; 16];
         loop {
             rng.fill_bytes(b.as_mut());
@@ -131,7 +131,7 @@ impl SeedableRng for XorShiftRng {
         }
     }
 
-    fn try_from_rng<R: TryRngCore>(mut rng: R) -> Result<Self, R::Error> {
+    fn try_from_rng<R: TryRngCore>(rng: &mut R) -> Result<Self, R::Error> {
         let mut b = [0u8; 16];
         loop {
             rng.try_fill_bytes(b.as_mut())?;
