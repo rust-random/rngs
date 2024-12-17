@@ -10,7 +10,3 @@ exclude = [
     "benches",
 ]
 resolver = "2"
-
-[patch.crates-io.rand_core]
-git = "https://github.com/rust-random/rand.git"
-branch = "master"
