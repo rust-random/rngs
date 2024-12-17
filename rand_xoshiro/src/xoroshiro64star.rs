@@ -48,8 +48,6 @@ impl RngCore for Xoroshiro64Star {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(Xoroshiro64Star);
-
 impl SeedableRng for Xoroshiro64Star {
     type Seed = [u8; 8];
 

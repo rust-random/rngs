@@ -92,8 +92,6 @@ impl RngCore for XorShiftRng {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(XorShiftRng);
-
 impl SeedableRng for XorShiftRng {
     type Seed = [u8; 16];
 

@@ -114,8 +114,6 @@ impl RngCore for Xoshiro256StarStar {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(Xoshiro256StarStar);
-
 #[cfg(test)]
 mod tests {
     use super::*;
