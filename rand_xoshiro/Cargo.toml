@@ -14,7 +14,7 @@ edition = "2021"
 rust-version = "1.61"
 
 [features]
-serde1 = ["serde"]
+serde = ["dep:serde"]
 
 [dependencies]
 rand_core = { version = "=0.9.0-beta.1" }

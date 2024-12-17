@@ -1,4 +1,4 @@
-#![cfg(feature = "serde1")]
+#![cfg(feature = "serde")]
 
 use rand_core::{RngCore, SeedableRng};
 use rand_xoshiro::{

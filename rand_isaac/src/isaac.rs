@@ -14,7 +14,7 @@ use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng, BlockRngCore};
 use rand_core::{le, RngCore, SeedableRng, TryRngCore};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 #[allow(non_camel_case_types)]
@@ -90,7 +90,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///
 /// [`rand_hc`]: https://docs.rs/rand_hc
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacRng(BlockRng<IsaacCore>);
 
 impl RngCore for IsaacRng {
@@ -141,10 +141,10 @@ impl SeedableRng for IsaacRng {
 
 /// The core of [`IsaacRng`], used with [`BlockRng`].
 #[derive(Clone)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacCore {
     #[cfg_attr(
-        feature = "serde1",
+        feature = "serde",
         serde(with = "super::isaac_array::isaac_array_serde")
     )]
     mem: [w32; RAND_SIZE],
@@ -533,7 +533,7 @@ mod test {
     }
 
     #[test]
-    #[cfg(feature = "serde1")]
+    #[cfg(feature = "serde")]
     fn test_isaac_serde() {
         use bincode;
         use std::io::{BufReader, BufWriter};
