@@ -263,6 +263,12 @@ impl Default for Seed512 {
     }
 }
 
+impl AsRef<[u8]> for Seed512 {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
+    }
+}
+
 impl AsMut<[u8]> for Seed512 {
     fn as_mut(&mut self) -> &mut [u8] {
         &mut self.0
