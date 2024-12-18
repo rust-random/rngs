@@ -89,8 +89,6 @@ impl RngCore for Hc128Rng {
     }
 }
 
-rand_core::impl_try_crypto_rng_from_crypto_rng!(Hc128Rng);
-
 impl SeedableRng for Hc128Rng {
     type Seed = <Hc128Core as SeedableRng>::Seed;
 
@@ -100,12 +98,12 @@ impl SeedableRng for Hc128Rng {
     }
 
     #[inline]
-    fn from_rng(rng: impl RngCore) -> Self {
+    fn from_rng(rng: &mut impl RngCore) -> Self {
         Hc128Rng(BlockRng::<Hc128Core>::from_rng(rng))
     }
 
     #[inline]
-    fn try_from_rng<R: TryRngCore>(rng: R) -> Result<Self, R::Error> {
+    fn try_from_rng<R: TryRngCore>(rng: &mut R) -> Result<Self, R::Error> {
         BlockRng::<Hc128Core>::try_from_rng(rng).map(Hc128Rng)
     }
 }
