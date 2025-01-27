@@ -21,7 +21,7 @@ Links:
 
 `rand_xoshiro` is no_std compatible by default.
 
-The `serde1` feature includes implementations of `Serialize` and `Deserialize` for the included RNGs.
+The `serde` feature includes implementations of `Serialize` and `Deserialize` for the included RNGs.
 
 ## License
 

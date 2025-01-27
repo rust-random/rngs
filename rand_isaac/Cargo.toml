@@ -1,6 +1,6 @@
 [package]
 name = "rand_isaac"
-version = "0.3.0" # NB: When modifying, also modify html_root_url in lib.rs
+version = "0.4.0" # NB: When modifying, also modify html_root_url in lib.rs
 authors = ["The Rand Project Developers", "The Rust Project Developers"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
@@ -13,16 +13,14 @@ ISAAC random number generator
 keywords = ["random", "rng", "isaac"]
 categories = ["algorithms", "no-std"]
 edition = "2021"
-rust-version = "1.61"
+rust-version = "1.63"
 
 [features]
-serde1 = ["serde", "rand_core/serde1"]
+serde = ["dep:serde", "rand_core/serde"]
 
 [dependencies]
-rand_core = { version = "=0.9.0-alpha.1" }
-serde = { version = "1.0.103", features = ["derive"], optional = true }
-# Not a direct dependency but required to boost the minimum version:
-serde_derive = { version = "1.0.103", optional = true }
+rand_core = { version = "0.9.0" }
+serde = { version = "1.0.104", features = ["derive"], optional = true }
 
 [dev-dependencies]
 # This is for testing serde, unfortunately we can't specify feature-gated dev

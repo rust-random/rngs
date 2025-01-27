@@ -9,7 +9,7 @@
 use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
 use rand_core::le::read_u32_into;
 use rand_core::{RngCore, SeedableRng};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// A xoroshiro64* random number generator.
@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 /// David Blackman and Sebastiano Vigna.
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Xoroshiro64Star {
     s0: u32,
     s1: u32,
@@ -47,8 +47,6 @@ impl RngCore for Xoroshiro64Star {
         fill_bytes_via_next(self, dest);
     }
 }
-
-rand_core::impl_try_rng_from_rng_core!(Xoroshiro64Star);
 
 impl SeedableRng for Xoroshiro64Star {
     type Seed = [u8; 8];

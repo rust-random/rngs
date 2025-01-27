@@ -32,7 +32,7 @@ Links:
 `rand_isaac` is `no_std` compatible. It does not require any functionality
 outside of the `core` lib, thus there are no features to configure.
 
-The `serde1` feature includes implementations of `Serialize` and `Deserialize`
+The `serde` feature includes implementations of `Serialize` and `Deserialize`
 for the included RNGs.
 
 

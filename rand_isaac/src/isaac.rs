@@ -14,7 +14,7 @@ use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng, BlockRngCore};
 use rand_core::{le, RngCore, SeedableRng, TryRngCore};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 #[allow(non_camel_case_types)]
@@ -90,7 +90,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///
 /// [`rand_hc`]: https://docs.rs/rand_hc
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacRng(BlockRng<IsaacCore>);
 
 impl RngCore for IsaacRng {
@@ -110,8 +110,6 @@ impl RngCore for IsaacRng {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(IsaacRng);
-
 impl SeedableRng for IsaacRng {
     type Seed = <IsaacCore as SeedableRng>::Seed;
 
@@ -129,22 +127,22 @@ impl SeedableRng for IsaacRng {
     }
 
     #[inline]
-    fn from_rng(rng: impl RngCore) -> Self {
+    fn from_rng(rng: &mut impl RngCore) -> Self {
         IsaacRng(BlockRng::<IsaacCore>::from_rng(rng))
     }
 
     #[inline]
-    fn try_from_rng<S: TryRngCore>(rng: S) -> Result<Self, S::Error> {
+    fn try_from_rng<S: TryRngCore>(rng: &mut S) -> Result<Self, S::Error> {
         BlockRng::<IsaacCore>::try_from_rng(rng).map(IsaacRng)
     }
 }
 
 /// The core of [`IsaacRng`], used with [`BlockRng`].
 #[derive(Clone)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacCore {
     #[cfg_attr(
-        feature = "serde1",
+        feature = "serde",
         serde(with = "super::isaac_array::isaac_array_serde")
     )]
     mem: [w32; RAND_SIZE],
@@ -367,7 +365,7 @@ impl SeedableRng for IsaacCore {
         Self::init(key, 1)
     }
 
-    fn from_rng(mut rng: impl RngCore) -> Self {
+    fn from_rng(rng: &mut impl RngCore) -> Self {
         // Custom `from_rng` implementation that fills a seed with the same size
         // as the entire state.
         let mut seed = [w(0u32); RAND_SIZE];
@@ -384,7 +382,7 @@ impl SeedableRng for IsaacCore {
         Self::init(seed, 2)
     }
 
-    fn try_from_rng<R: TryRngCore>(mut rng: R) -> Result<Self, R::Error> {
+    fn try_from_rng<R: TryRngCore>(rng: &mut R) -> Result<Self, R::Error> {
         // Custom `from_rng` implementation that fills a seed with the same size
         // as the entire state.
         let mut seed = [w(0u32); RAND_SIZE];
@@ -417,7 +415,7 @@ mod test {
         let mut rng1 = IsaacRng::from_seed(seed);
         assert_eq!(rng1.next_u32(), 2869442790);
 
-        let mut rng2 = IsaacRng::from_rng(rng1);
+        let mut rng2 = IsaacRng::from_rng(&mut rng1);
         assert_eq!(rng2.next_u32(), 3094074039);
     }
 
@@ -533,7 +531,7 @@ mod test {
     }
 
     #[test]
-    #[cfg(feature = "serde1")]
+    #[cfg(feature = "serde")]
     fn test_isaac_serde() {
         use bincode;
         use std::io::{BufReader, BufWriter};

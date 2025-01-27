@@ -23,7 +23,7 @@
 #![doc(
     html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
     html_favicon_url = "https://www.rust-lang.org/favicon.ico",
-    html_root_url = "https://docs.rs/rand_xorshift/0.3.0"
+    html_root_url = "https://docs.rs/rand_xorshift/0.4.0"
 )]
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
@@ -33,7 +33,7 @@
 use core::fmt;
 use core::num::Wrapping as w;
 use rand_core::{impls, le, RngCore, SeedableRng, TryRngCore};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// An Xorshift random number generator.
@@ -51,7 +51,7 @@ use serde::{Deserialize, Serialize};
 ///       ["Xorshift RNGs"](https://www.jstatsoft.org/v08/i14/paper).
 ///       *Journal of Statistical Software*. Vol. 8 (Issue 14).
 #[derive(Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct XorShiftRng {
     x: w<u32>,
     y: w<u32>,
@@ -92,8 +92,6 @@ impl RngCore for XorShiftRng {
     }
 }
 
-rand_core::impl_try_rng_from_rng_core!(XorShiftRng);
-
 impl SeedableRng for XorShiftRng {
     type Seed = [u8; 16];
 
@@ -116,7 +114,7 @@ impl SeedableRng for XorShiftRng {
         }
     }
 
-    fn from_rng(mut rng: impl RngCore) -> Self {
+    fn from_rng(rng: &mut impl RngCore) -> Self {
         let mut b = [0u8; 16];
         loop {
             rng.fill_bytes(b.as_mut());
@@ -133,7 +131,7 @@ impl SeedableRng for XorShiftRng {
         }
     }
 
-    fn try_from_rng<R: TryRngCore>(mut rng: R) -> Result<Self, R::Error> {
+    fn try_from_rng<R: TryRngCore>(rng: &mut R) -> Result<Self, R::Error> {
         let mut b = [0u8; 16];
         loop {
             rng.try_fill_bytes(b.as_mut())?;
