@@ -19,9 +19,9 @@ Documentation:
 
 ### Rust version requirements
 
-All crates in this repository require **Rustc version 1.36 or greater**.
+All crates in this repository require **rustc version 1.63 or greater**.
 
-GitHub Actions always has a build with a pinned version of Rustc matching the
+GitHub Actions always has a build with a pinned version of rustc matching the
 oldest supported Rust release. The current policy is that this can be updated in
 any Rand release if required, but the change must be noted in the changelog.
 
