@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.5.0] - 2025-01-27
-- Bump the MSRV to 1.63
-- Update to `rand_core` v0.9.0
+- Bump the MSRV to 1.63 (#58)
+- Update to `rand_core` v0.9.0 (#58)
 
 ## [0.4.0] - 2023-12-08
 ### Changed
