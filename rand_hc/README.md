@@ -1,6 +1,6 @@
 # rand_hc
 
-[![Test Status](https://github.com/rust-random/rngs/workflows/Tests/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
+[![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_hc.svg)](https://crates.io/crates/rand_hc)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand/rand_hc)
