@@ -1,6 +1,6 @@
 # Rand
 
-[![Test Status](https://github.com/rust-random/rngs/workflows/Tests/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
+[![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand)
 [![Minimum rustc version](https://img.shields.io/badge/rustc-1.63-lightgray.svg)](https://github.com/rust-random/rngs#rust-version-requirements)
