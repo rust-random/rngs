@@ -74,7 +74,7 @@ impl SeedableRng for Sfc32 {
         let mut s = [0; 3];
         read_u32_into(&seed, &mut s);
 
-        let mut gen = Sfc32 {
+        let mut rng = Sfc32 {
             a: s[0],
             b: s[1],
             c: s[2],
@@ -82,10 +82,10 @@ impl SeedableRng for Sfc32 {
         };
 
         for _ in 0..SEED_MIXING_STEPS {
-            gen.next_u32();
+            rng.next_u32();
         }
 
-        gen
+        rng
     }
 }
 
@@ -97,7 +97,7 @@ mod tests {
     fn reference() {
         // These values were produced with the reference implementation:
         // https://pracrand.sourceforge.net/
-        let mut gen = Sfc32::from_seed([0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0]);
+        let mut rng = Sfc32::from_seed([0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0]);
         let expected: [u32; 16] = [
             0xA87DBC7E,
             0x1787178C,
@@ -118,7 +118,7 @@ mod tests {
         ];
 
         for &e in &expected {
-            assert_eq!(gen.next_u32(), e);
+            assert_eq!(rng.next_u32(), e);
         }
     }
 }

@@ -77,7 +77,7 @@ impl SeedableRng for Sfc64 {
         let mut s = [0; 3];
         read_u64_into(&seed, &mut s);
 
-        let mut gen = Sfc64 {
+        let mut rng = Sfc64 {
             a: s[0],
             b: s[1],
             c: s[2],
@@ -85,9 +85,9 @@ impl SeedableRng for Sfc64 {
         };
 
         for _ in 0..SEED_MIXING_STEPS {
-            gen.next_u64();
+            rng.next_u64();
         }
-        gen
+        rng
     }
 }
 
@@ -99,7 +99,7 @@ mod tests {
     fn reference() {
         // These values were produced with the reference implementation:
         // https://pracrand.sourceforge.net/
-        let mut gen = Sfc64::from_seed([
+        let mut rng = Sfc64::from_seed([
             1, 0, 0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0, 0, 0,
@@ -125,7 +125,7 @@ mod tests {
         ];
 
         for &e in &expected {
-            assert_eq!(gen.next_u64(), e);
+            assert_eq!(rng.next_u64(), e);
         }
     }
 }
