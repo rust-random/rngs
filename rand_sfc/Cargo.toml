@@ -1,0 +1,14 @@
+[package]
+name = "rand_sfc"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.63"
+keywords = ["random", "rng", "sfc"]
+categories = ["algorithms", "no-std"]
+
+[features]
+serde1 = ["serde"]
+
+[dependencies]
+rand_core = { version = "0.9.0" }
+serde = { version = "1.0.118", default-features = false, features = ["derive"], optional = true }
