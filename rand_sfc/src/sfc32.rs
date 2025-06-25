@@ -12,7 +12,7 @@ use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
 
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
 /// An sfc32 random number generator.
 ///
 /// Good performance and statistical quality, but not cryptographically secure
@@ -64,10 +64,28 @@ impl RngCore for Sfc32 {
 
 // PracRand uses different mixing step counts for different types of seeds.
 // Here, just use one of the larger values always.
-const SEED_MIXING_STEPS: u32 = 16;
+const SEED_MIXING_STEPS: u32 = 15;
 
 impl SeedableRng for Sfc32 {
     type Seed = [u8; 12];
+
+    fn seed_from_u64(state: u64) -> Self {
+        let low_half_mask = u32::MAX as u64;
+        let b = (state & low_half_mask) as u32;
+        let c = ((state >> 32) & low_half_mask) as u32;
+        let mut rng = Sfc32 {
+            a: 0,
+            b: b,
+            c: c,
+            weyl: WEYL_INC
+        };
+
+        for _ in 0..SEED_MIXING_STEPS {
+            rng.next_u32();
+        }
+
+        rng
+    }
 
     /// Create a new `Sfc32`.
     fn from_seed(seed: [u8; 12]) -> Sfc32 {
@@ -99,6 +117,7 @@ mod tests {
         // https://pracrand.sourceforge.net/
         let mut rng = Sfc32::from_seed([0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0]);
         let expected: [u32; 16] = [
+            0x03B80BB8,
             0xA87DBC7E,
             0x1787178C,
             0x4C7B7234,
@@ -113,8 +132,7 @@ mod tests {
             0x36CE9B32,
             0xF106947E,
             0x0AFC726B,
-            0x549BBC87,
-            0xD19A7B3E
+            0x549BBC87
         ];
 
         for &e in &expected {

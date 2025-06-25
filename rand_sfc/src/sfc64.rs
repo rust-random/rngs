@@ -12,7 +12,7 @@ use rand_core::impls::fill_bytes_via_next;
 
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
 /// An sfc64 random number generator.
 ///
 /// Good performance and statistical quality, but not cryptographically secure
@@ -71,6 +71,21 @@ const SEED_MIXING_STEPS: u32 = 18;
 
 impl SeedableRng for Sfc64 {
     type Seed = [u8; 24];
+
+    fn seed_from_u64(state: u64) -> Self {
+        let mut rng = Sfc64 {
+            a: state,
+            b: state,
+            c: state,
+            weyl: WEYL_INC
+        };
+
+        for _ in 0..SEED_MIXING_STEPS {
+            rng.next_u64();
+        }
+
+        rng
+    }
 
     /// Create a new `Sfc64`.
     fn from_seed(seed: [u8; 24]) -> Sfc64 {

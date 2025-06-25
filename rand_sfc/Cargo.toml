@@ -1,13 +1,19 @@
 [package]
 name = "rand_sfc"
 version = "0.1.0"
+authors = ["The Rand Project Developers"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rust-random/rngs"
+documentation = "https://docs.rs/rand_xoshiro"
+homepage = "https://rust-random.github.io/book"
+description = "Sfc32 and Sfc64 random number generators"
+keywords = ["random", "rng"]
+categories = ["algorithms", "no-std"]
 edition = "2021"
 rust-version = "1.63"
-keywords = ["random", "rng", "sfc"]
-categories = ["algorithms", "no-std"]
 
 [features]
-serde1 = ["serde"]
+serde = ["dep:serde"]
 
 [dependencies]
 rand_core = { version = "0.9.0" }
