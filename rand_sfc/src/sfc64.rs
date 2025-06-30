@@ -115,6 +115,19 @@ mod tests {
     use super::*;
 
     #[test]
+    fn u64_seed() {
+        let reference_rng = Sfc64 {
+            a: 0xBF8EB49C788CD33B,
+            b: 0x107A16BBB0B59B1F,
+            c: 0xA8F43429B57369D6,
+            weyl: 0x13
+        };
+        let test_rng = Sfc64::seed_from_u64(1);
+
+        assert_eq!(test_rng, reference_rng)
+    }
+
+    #[test]
     fn reference() {
         // These values were produced with the reference implementation:
         // https://pracrand.sourceforge.net/

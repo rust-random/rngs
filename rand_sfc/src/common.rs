@@ -7,8 +7,9 @@
 // except according to those terms.
 
 // A decent-quality 64 bit linear congruential generator used to extend seeds.
+// Parameters from M. E. O'Neill.
 pub fn seed_extender_lcg (state: u64) -> u64 {
-    let multiplier: u64 = 14647171131086947261;
+    let multiplier: u64 = 9199940308585234877;
 
     state.wrapping_mul(multiplier).wrapping_add(multiplier)
 }
