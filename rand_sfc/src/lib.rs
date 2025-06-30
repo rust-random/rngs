@@ -16,9 +16,9 @@
 //!
 //! This crate provides:
 //! - [`Sfc64`]: 64 bit output, seed space 192 bits, worst-case period 2^64,
-//! and expected period ~2^255.
+//!     and expected period ~2^255.
 //! - [`Sfc32`]: 32 bit output, seed space 96 bits, worst-case period 2^32,
-//! and expected period ~2^127.
+//!     and expected period ~2^127.
 //!
 //! The implementations provided are derived from PractRand.
 //!
@@ -33,6 +33,7 @@
 
 mod sfc32;
 mod sfc64;
+mod common;
 
 pub use rand_core;
 pub use sfc32::Sfc32;

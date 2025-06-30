@@ -10,6 +10,8 @@ use rand_core::le::read_u32_into;
 use rand_core::{RngCore, SeedableRng};
 use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
 
+use crate::common::seed_extender_lcg;
+
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
@@ -70,13 +72,13 @@ impl SeedableRng for Sfc32 {
     type Seed = [u8; 12];
 
     fn seed_from_u64(state: u64) -> Self {
-        let low_half_mask = u32::MAX as u64;
-        let b = (state & low_half_mask) as u32;
-        let c = ((state >> 32) & low_half_mask) as u32;
+        let raw_a = seed_extender_lcg(state);
+        let raw_b = seed_extender_lcg(raw_a);
+        let raw_c = seed_extender_lcg(raw_b);
         let mut rng = Sfc32 {
-            a: 0,
-            b: b,
-            c: c,
+            a: (raw_a >> 32) as u32,
+            b: (raw_b >> 32) as u32,
+            c: (raw_c >> 32) as u32,
             weyl: WEYL_INC
         };
 

@@ -9,6 +9,7 @@
 use rand_core::le::read_u64_into;
 use rand_core::{RngCore, SeedableRng};
 use rand_core::impls::fill_bytes_via_next;
+use crate::common::seed_extender_lcg;
 
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -73,10 +74,13 @@ impl SeedableRng for Sfc64 {
     type Seed = [u8; 24];
 
     fn seed_from_u64(state: u64) -> Self {
+        let a = seed_extender_lcg(state);
+        let b = seed_extender_lcg(a);
+        let c = seed_extender_lcg(b);
         let mut rng = Sfc64 {
-            a: state,
-            b: state,
-            c: state,
+            a,
+            b,
+            c,
             weyl: WEYL_INC
         };
 
