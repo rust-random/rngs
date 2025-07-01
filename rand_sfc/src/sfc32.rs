@@ -10,8 +10,6 @@ use rand_core::le::read_u32_into;
 use rand_core::{RngCore, SeedableRng};
 use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
 
-use crate::common::seed_extender_lcg;
-
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
@@ -71,24 +69,6 @@ const SEED_MIXING_STEPS: u32 = 15;
 impl SeedableRng for Sfc32 {
     type Seed = [u8; 12];
 
-    fn seed_from_u64(state: u64) -> Self {
-        let raw_a = seed_extender_lcg(state);
-        let raw_b = seed_extender_lcg(raw_a);
-        let raw_c = seed_extender_lcg(raw_b);
-        let mut rng = Sfc32 {
-            a: (raw_a >> 32) as u32,
-            b: (raw_b >> 32) as u32,
-            c: (raw_c >> 32) as u32,
-            weyl: WEYL_INC
-        };
-
-        for _ in 0..SEED_MIXING_STEPS {
-            rng.next_u32();
-        }
-
-        rng
-    }
-
     /// Create a new `Sfc32`.
     fn from_seed(seed: [u8; 12]) -> Sfc32 {
         let mut s = [0; 3];
@@ -116,9 +96,9 @@ mod tests {
     #[test]
     fn u64_seed() {
         let reference_rng = Sfc32 {
-            a: 0x3EBC3C84,
-            b: 0xBABE69FA,
-            c: 0x340F0C0E,
+            a: 0x09BC85E1,
+            b: 0x5A96CB07,
+            c: 0xB53C149C,
             weyl: 0x10
         };
         let test_rng = Sfc32::seed_from_u64(1);

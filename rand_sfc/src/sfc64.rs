@@ -9,7 +9,6 @@
 use rand_core::le::read_u64_into;
 use rand_core::{RngCore, SeedableRng};
 use rand_core::impls::fill_bytes_via_next;
-use crate::common::seed_extender_lcg;
 
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -73,24 +72,6 @@ const SEED_MIXING_STEPS: u32 = 18;
 impl SeedableRng for Sfc64 {
     type Seed = [u8; 24];
 
-    fn seed_from_u64(state: u64) -> Self {
-        let a = seed_extender_lcg(state);
-        let b = seed_extender_lcg(a);
-        let c = seed_extender_lcg(b);
-        let mut rng = Sfc64 {
-            a,
-            b,
-            c,
-            weyl: WEYL_INC
-        };
-
-        for _ in 0..SEED_MIXING_STEPS {
-            rng.next_u64();
-        }
-
-        rng
-    }
-
     /// Create a new `Sfc64`.
     fn from_seed(seed: [u8; 24]) -> Sfc64 {
         let mut s = [0; 3];
@@ -117,9 +98,9 @@ mod tests {
     #[test]
     fn u64_seed() {
         let reference_rng = Sfc64 {
-            a: 0xBF8EB49C788CD33B,
-            b: 0x107A16BBB0B59B1F,
-            c: 0xA8F43429B57369D6,
+            a: 0xFAFE87BC868CA702,
+            b: 0x143212184DB2E2BB,
+            c: 0xA4C7E95D7B898700,
             weyl: 0x13
         };
         let test_rng = Sfc64::seed_from_u64(1);

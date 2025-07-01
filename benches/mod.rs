@@ -26,6 +26,7 @@ use rand_xoshiro::{
     Xoshiro128Plus, Xoshiro128PlusPlus, Xoshiro128StarStar, Xoshiro256Plus, Xoshiro256PlusPlus,
     Xoshiro256StarStar,
 };
+use rand_sfc::{Sfc32, Sfc64};
 
 const RAND_BENCH_N: u64 = 1000;
 const BYTES_LEN: usize = 1024;
@@ -64,6 +65,8 @@ fn gen_bytes(c: &mut Criterion<CyclesPerByte>) {
     gen_bytes!("hc128", Hc128Rng::from_os_rng());
     gen_bytes!("isaac", IsaacRng::from_os_rng());
     gen_bytes!("isaac64", Isaac64Rng::from_os_rng());
+    gen_bytes!("sfc32", Sfc32::from_os_rng());
+    gen_bytes!("sfc64", Sfc64::from_os_rng());
 }
 
 // Save a dependency on Rand:
@@ -150,6 +153,8 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         gen_uint!(g, "hc128", u32, Hc128Rng::from_os_rng());
         gen_uint!(g, "isaac", u32, IsaacRng::from_os_rng());
         gen_uint!(g, "isaac64", u32, Isaac64Rng::from_os_rng());
+        gen_uint!(g, "sfc32", u32, Sfc32::from_os_rng());
+        gen_uint!(g, "sfc64", u32, Sfc64::from_os_rng());
     }
 
     {
@@ -201,6 +206,8 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         gen_uint!(g, "hc128", u64, Hc128Rng::from_os_rng());
         gen_uint!(g, "isaac", u64, IsaacRng::from_os_rng());
         gen_uint!(g, "isaac64", u64, Isaac64Rng::from_os_rng());
+        gen_uint!(g, "sfc32", u64, Sfc32::from_os_rng());
+        gen_uint!(g, "sfc64", u64, Sfc64::from_os_rng());
     }
 }
 
