@@ -238,6 +238,8 @@ fn init(c: &mut Criterion) {
     init_gen!("hc128", Hc128Rng);
     init_gen!("isaac", IsaacRng);
     init_gen!("isaac64", Isaac64Rng);
+    init_gen!("sfc32", Sfc32);
+    init_gen!("sfc64", Sfc64);
 }
 
 criterion_group! {
