@@ -25,4 +25,4 @@ serde = { version = "1.0.118", default-features = false, features = ["derive"], 
 [dev-dependencies]
 # This is for testing serde, unfortunately we can't specify feature-gated dev
 # deps yet, see: https://github.com/rust-lang/cargo/issues/1596
-bincode = "1"
+bincode = "2"
