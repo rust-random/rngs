@@ -5,6 +5,7 @@ members = [
     "rand_xorshift",
     "rand_xoshiro",
     "rand_hc",
+    "rand_sfc"
 ]
 exclude = [
     "benches",
