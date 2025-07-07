@@ -10,6 +10,9 @@ use rand_core::le::read_u32_into;
 use rand_core::{RngCore, SeedableRng};
 use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[allow(missing_copy_implementations)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature="serde", derive(Serialize, Deserialize))]

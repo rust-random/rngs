@@ -31,9 +31,6 @@
 #![deny(missing_debug_implementations)]
 #![no_std]
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 mod sfc32;
 mod sfc64;
 
