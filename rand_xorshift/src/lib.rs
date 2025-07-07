@@ -10,7 +10,7 @@
 //!
 //! # Example
 //!
-//! To initialize a generator, use the [`SeedableRng`][rand_core::SeedableRng] trait:
+//! To initialize a generator, use the [`SeedableRng`] trait:
 //!
 //! ```
 //! use rand_core::{SeedableRng, RngCore};
