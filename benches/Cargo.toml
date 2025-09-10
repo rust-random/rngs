@@ -19,7 +19,3 @@ rand_hc = { path = "../rand_hc", version = "0.4" }
 name = "mod"
 path = "mod.rs"
 harness = false
-
-[patch.crates-io.rand_core]
-git = "https://github.com/rust-random/rand.git"
-branch = "master"
