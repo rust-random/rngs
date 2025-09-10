@@ -9,6 +9,9 @@
 A cryptographically secure random number generator that uses the ChaCha
 algorithm.
 
+This implementation of ChaCha RNGs is built over `ppv-lite86` by Kaz Wesley,
+and was formerly the implementation behind `rand::rngs::StdRng`.
+
 ChaCha is a stream cipher designed by Daniel J. Bernstein[^1], that we use
 as an RNG. It is an improved variant of the Salsa20 cipher family, which was
 selected as one of the "stream ciphers suitable for widespread adoption" by
