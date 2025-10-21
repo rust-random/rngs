@@ -18,6 +18,7 @@ use criterion::{criterion_group, criterion_main, Criterion, Throughput};
 use criterion_cycles_per_byte::CyclesPerByte;
 use rand_core::{RngCore, SeedableRng};
 
+use rand_chacha::{ChaCha12Rng, ChaCha20Rng, ChaCha8Rng};
 use rand_hc::Hc128Rng;
 use rand_isaac::{Isaac64Rng, IsaacRng};
 use rand_xorshift::XorShiftRng;
@@ -64,6 +65,9 @@ fn gen_bytes(c: &mut Criterion<CyclesPerByte>) {
     gen_bytes!("hc128", Hc128Rng::from_os_rng());
     gen_bytes!("isaac", IsaacRng::from_os_rng());
     gen_bytes!("isaac64", Isaac64Rng::from_os_rng());
+    gen_bytes!("chacha8", ChaCha8Rng::from_os_rng());
+    gen_bytes!("chacha12", ChaCha12Rng::from_os_rng());
+    gen_bytes!("chacha20", ChaCha20Rng::from_os_rng());
 }
 
 // Save a dependency on Rand:
@@ -150,6 +154,9 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         gen_uint!(g, "hc128", u32, Hc128Rng::from_os_rng());
         gen_uint!(g, "isaac", u32, IsaacRng::from_os_rng());
         gen_uint!(g, "isaac64", u32, Isaac64Rng::from_os_rng());
+        gen_uint!(g, "chacha8", u32, ChaCha8Rng::from_os_rng());
+        gen_uint!(g, "chacha12", u32, ChaCha12Rng::from_os_rng());
+        gen_uint!(g, "chacha20", u32, ChaCha20Rng::from_os_rng());
     }
 
     {
@@ -201,6 +208,9 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         gen_uint!(g, "hc128", u64, Hc128Rng::from_os_rng());
         gen_uint!(g, "isaac", u64, IsaacRng::from_os_rng());
         gen_uint!(g, "isaac64", u64, Isaac64Rng::from_os_rng());
+        gen_uint!(g, "chacha8", u64, ChaCha8Rng::from_os_rng());
+        gen_uint!(g, "chacha12", u64, ChaCha12Rng::from_os_rng());
+        gen_uint!(g, "chacha20", u64, ChaCha20Rng::from_os_rng());
     }
 }
 
@@ -231,6 +241,9 @@ fn init(c: &mut Criterion) {
     init_gen!("hc128", Hc128Rng);
     init_gen!("isaac", IsaacRng);
     init_gen!("isaac64", Isaac64Rng);
+    init_gen!("chacha8", ChaCha8Rng);
+    init_gen!("chacha12", ChaCha12Rng);
+    init_gen!("chacha20", ChaCha20Rng);
 }
 
 criterion_group! {
