@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "rand_chacha",
     "rand_jitter",
     "rand_isaac",
     "rand_xorshift",
