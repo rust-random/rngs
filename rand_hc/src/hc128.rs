@@ -98,7 +98,10 @@ impl SeedableRng for Hc128Rng {
     }
 
     #[inline]
-    fn from_rng<R: RngCore + ?Sized>(rng: &mut R) -> Self {
+    fn from_rng<R>(rng: &mut R) -> Self
+    where
+        R: RngCore + ?Sized,
+    {
         Hc128Rng(BlockRng::<Hc128Core>::from_rng(rng))
     }
 
