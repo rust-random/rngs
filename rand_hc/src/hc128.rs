@@ -108,14 +108,6 @@ impl SeedableRng for Hc128Rng {
     fn from_seed(seed: Self::Seed) -> Self {
         Hc128Rng(BlockRng::<Hc128Core>::from_seed(seed))
     }
-
-    #[inline]
-    fn from_rng<R>(rng: &mut R) -> Self
-    where
-        R: RngCore + ?Sized,
-    {
-        Hc128Rng(BlockRng::<Hc128Core>::from_rng(rng))
-    }
 }
 
 impl CryptoRng for Hc128Rng {}

@@ -133,14 +133,6 @@ impl SeedableRng for IsaacRng {
     fn seed_from_u64(seed: u64) -> Self {
         IsaacRng(BlockRng::<IsaacCore>::seed_from_u64(seed))
     }
-
-    #[inline]
-    fn from_rng<R>(rng: &mut R) -> Self
-    where
-        R: RngCore + ?Sized,
-    {
-        IsaacRng(BlockRng::<IsaacCore>::from_rng(rng))
-    }
 }
 
 /// The core of [`IsaacRng`], used with [`BlockRng`].
