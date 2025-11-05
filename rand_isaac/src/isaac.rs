@@ -141,14 +141,6 @@ impl SeedableRng for IsaacRng {
     {
         IsaacRng(BlockRng::<IsaacCore>::from_rng(rng))
     }
-
-    #[inline]
-    fn try_from_rng<S>(rng: &mut S) -> Result<Self, S::Error>
-    where
-        S: TryRngCore + ?Sized,
-    {
-        BlockRng::<IsaacCore>::try_from_rng(rng).map(IsaacRng)
-    }
 }
 
 /// The core of [`IsaacRng`], used with [`BlockRng`].
