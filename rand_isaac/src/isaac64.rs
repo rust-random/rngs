@@ -14,10 +14,14 @@ use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng64, BlockRngCore};
 <<<<<<< HEAD
+<<<<<<< HEAD
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
 =======
 use rand_core::{le, RngCore, SeedableRng};
 >>>>>>> 01ec28a (Remove all `try_from_rng`)
+=======
+use rand_core::{le, RngCore, SeedableRng, TryRngCore};
+>>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -127,6 +131,14 @@ impl SeedableRng for Isaac64Rng {
         R: RngCore + ?Sized,
     {
         Isaac64Rng(BlockRng64::<Isaac64Core>::from_rng(rng))
+    }
+
+    #[inline]
+    fn try_from_rng<S>(rng: &mut S) -> Result<Self, S::Error>
+    where
+        S: TryRngCore + ?Sized,
+    {
+        BlockRng64::<Isaac64Core>::try_from_rng(rng).map(Isaac64Rng)
     }
 }
 
@@ -346,6 +358,25 @@ impl SeedableRng for Isaac64Core {
         }
 
         Self::init(seed, 2)
+    }
+
+    fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error>
+    where
+        R: TryRngCore + ?Sized,
+    {
+        // Custom `from_rng` implementation that fills a seed with the same size
+        // as the entire state.
+        let mut seed = [w(0u64); RAND_SIZE];
+        unsafe {
+            let ptr = seed.as_mut_ptr() as *mut u8;
+            let slice = slice::from_raw_parts_mut(ptr, RAND_SIZE * 8);
+            rng.try_fill_bytes(slice)?;
+        }
+        for i in seed.iter_mut() {
+            *i = w(i.0.to_le());
+        }
+
+        Ok(Self::init(seed, 2))
     }
 }
 
