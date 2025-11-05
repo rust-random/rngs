@@ -150,8 +150,15 @@ impl SeedableRng for XorShiftRng {
     {
 =======
 
+<<<<<<< HEAD
     fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error> where R: TryRngCore + ?Sized {
 >>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
+=======
+    fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error>
+    where
+        R: TryRngCore + ?Sized,
+    {
+>>>>>>> f6b7509 (fmt)
         let mut b = [0u8; 16];
         loop {
             rng.try_fill_bytes(b.as_mut())?;
