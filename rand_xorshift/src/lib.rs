@@ -32,7 +32,11 @@
 
 use core::fmt;
 use core::num::Wrapping as w;
+<<<<<<< HEAD
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
+=======
+use rand_core::{le, RngCore, SeedableRng};
+>>>>>>> 01ec28a (Remove all `try_from_rng`)
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -133,6 +137,7 @@ impl SeedableRng for XorShiftRng {
             w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         }
     }
+<<<<<<< HEAD
 
     fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error>
     where
@@ -153,4 +158,6 @@ impl SeedableRng for XorShiftRng {
             w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         })
     }
+=======
+>>>>>>> 01ec28a (Remove all `try_from_rng`)
 }
