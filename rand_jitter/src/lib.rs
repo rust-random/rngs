@@ -107,10 +107,7 @@ mod error;
 mod platform;
 
 pub use crate::error::TimerError;
-use rand_core::{
-    RngCore,
-    le::{self},
-};
+use rand_core::{le, RngCore};
 
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
