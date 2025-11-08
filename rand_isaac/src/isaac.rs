@@ -13,7 +13,7 @@ use crate::isaac_array::IsaacArray;
 use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng, BlockRngCore};
-use rand_core::{le, RngCore, SeedableRng, TryRngCore};
+use rand_core::{RngCore, SeedableRng, TryRngCore, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

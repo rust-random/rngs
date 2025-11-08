@@ -16,7 +16,7 @@
 
 use core::fmt;
 use rand_core::block::{BlockRng, BlockRngCore, CryptoBlockRng};
-use rand_core::{le, CryptoRng, RngCore, SeedableRng, TryRngCore};
+use rand_core::{CryptoRng, RngCore, SeedableRng, TryRngCore, le};
 
 const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 
