@@ -3,7 +3,6 @@
 [![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand)
-[![Minimum rustc version](https://img.shields.io/badge/rustc-1.63-lightgray.svg)](https://github.com/rust-random/rngs#rust-version-requirements)
 
 Extra random number generators provided by the Rust Random project.
 The main repository, [rust-random/rand](https://github.com/rust-random/rand),
@@ -19,7 +18,7 @@ Documentation:
 
 ### Rust version requirements
 
-All crates in this repository require **rustc version 1.63 or greater**.
+All crates in this repository require **rustc version 1.85 or greater**.
 
 GitHub Actions always has a build with a pinned version of rustc matching the
 oldest supported Rust release. The current policy is that this can be updated in
