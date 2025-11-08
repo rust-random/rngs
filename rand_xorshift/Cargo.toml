@@ -15,6 +15,9 @@ categories = ["algorithms", "no-std"]
 edition = "2024"
 rust-version = "1.85"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 serde = ["dep:serde"]
 

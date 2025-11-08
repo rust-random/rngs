@@ -11,6 +11,9 @@ keywords = ["random", "rng", "os"]
 edition = "2024"
 rust-version = "1.85"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 std = ["rand_core/std"]
 log = ["dep:log"]
