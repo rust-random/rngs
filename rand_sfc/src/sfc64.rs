@@ -6,16 +6,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use rand_core::impls::fill_bytes_via_next;
 use rand_core::le::read_u64_into;
 use rand_core::{RngCore, SeedableRng};
-use rand_core::impls::fill_bytes_via_next;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[allow(missing_copy_implementations)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
 /// An sfc64 random number generator.
 ///
 /// Good performance and statistical quality, but not cryptographically secure
@@ -27,6 +24,9 @@ use serde::{Deserialize, Serialize};
 /// This implementation is derived ultimately from
 /// [`the PractRand RNG test suite`](https://pracrand.sourceforge.net/) by
 /// Chris Doty-Humphrey.
+#[allow(missing_copy_implementations)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Sfc64 {
     a: u64,
     b: u64,
@@ -84,7 +84,7 @@ impl SeedableRng for Sfc64 {
             a: s[0],
             b: s[1],
             c: s[2],
-            weyl: WEYL_INC
+            weyl: WEYL_INC,
         };
 
         for _ in 0..SEED_MIXING_STEPS {
@@ -104,7 +104,7 @@ mod tests {
             a: 0xFAFE87BC868CA702,
             b: 0x143212184DB2E2BB,
             c: 0xA4C7E95D7B898700,
-            weyl: 0x13
+            weyl: 0x13,
         };
         let test_rng = Sfc64::seed_from_u64(1);
 
@@ -116,9 +116,7 @@ mod tests {
         // These values were produced with the reference implementation:
         // https://pracrand.sourceforge.net/
         let mut rng = Sfc64::from_seed([
-            1, 0, 0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0, 0, 0,
+            1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
         ]);
 
         let expected: [u64; 16] = [
@@ -137,7 +135,7 @@ mod tests {
             0x67AF9C007B825917,
             0x5134AEC9998D8629,
             0x205AA24994068634,
-            0x1C762918DBA3E139
+            0x1C762918DBA3E139,
         ];
 
         for &e in &expected {
