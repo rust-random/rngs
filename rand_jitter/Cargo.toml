@@ -8,7 +8,7 @@ repository = "https://github.com/rust-random/rngs"
 documentation = "https://docs.rs/rand_jitter"
 description = "Random number generator based on timing jitter"
 keywords = ["random", "rng", "os"]
-edition = "2021"
+edition = "2024"
 rust-version = "1.85"
 
 [features]

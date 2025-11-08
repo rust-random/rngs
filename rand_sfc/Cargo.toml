@@ -9,7 +9,7 @@ homepage = "https://rust-random.github.io/book"
 description = "Sfc32 and Sfc64 random number generators"
 keywords = ["random", "rng"]
 categories = ["algorithms", "no-std"]
-edition = "2021"
+edition = "2024"
 rust-version = "1.85"
 
 [features]
