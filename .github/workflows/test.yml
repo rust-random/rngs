@@ -21,10 +21,9 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
       - run: cargo install cargo-deadlinks
       - name: doc (rand)
-        env:
-          RUSTDOCFLAGS: --cfg doc_cfg
-        # --all builds all crates, but with default features for other crates (okay in this case)
-        run: cargo deadlinks --ignore-fragments -- --all --all-features
+        run: |
+          cargo doc --workspace --all-features -Zwarnings --config 'build.warnings="deny"'
+          cargo deadlinks -- --workspace --all-features -Zwarnings --config 'build.warnings="deny"'
 
   test:
     runs-on: ${{ matrix.os }}
