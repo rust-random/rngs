@@ -32,7 +32,7 @@
 
 use core::fmt;
 use core::num::Wrapping as w;
-use rand_core::{impls, le, RngCore, SeedableRng, TryRngCore};
+use rand_core::{RngCore, SeedableRng, TryRngCore, impls, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

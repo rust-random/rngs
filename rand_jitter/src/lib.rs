@@ -107,7 +107,7 @@ mod error;
 mod platform;
 
 pub use crate::error::TimerError;
-use rand_core::{impls, RngCore};
+use rand_core::{RngCore, impls};
 
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
@@ -328,7 +328,7 @@ where
 
         // We fold the time value as much as possible to ensure that as many
         // bits of the time stamp are included as possible.
-        let folds = (64 + n_bits - 1) / n_bits;
+        let folds = 64_u32.div_ceil(n_bits);
         let mask = (1 << n_bits) - 1;
         for _ in 0..folds {
             rounds ^= time & mask;
@@ -686,7 +686,7 @@ where
         if delta_average >= 16 {
             let log2 = 64 - delta_average.leading_zeros();
             // Do something similar to roundup(64/(log2/2)):
-            Ok(((64u32 * 2 + log2 - 1) / log2) as u8)
+            Ok((64u32 * 2).div_ceil(log2) as u8)
         } else {
             // For values < 16 the rounding error becomes too large, use a
             // lookup table.

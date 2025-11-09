@@ -14,19 +14,19 @@ extern crate test;
 use std::mem::size_of;
 use test::black_box;
 
-use criterion::{criterion_group, criterion_main, Criterion, Throughput};
+use criterion::{Criterion, Throughput, criterion_group, criterion_main};
 use criterion_cycles_per_byte::CyclesPerByte;
 use rand_core::{RngCore, SeedableRng};
 
 use rand_hc::Hc128Rng;
 use rand_isaac::{Isaac64Rng, IsaacRng};
+use rand_sfc::{Sfc32, Sfc64};
 use rand_xorshift::XorShiftRng;
 use rand_xoshiro::{
-    SplitMix64, Xoroshiro128Plus, Xoroshiro128StarStar, Xoroshiro64Star, Xoroshiro64StarStar,
+    SplitMix64, Xoroshiro64Star, Xoroshiro64StarStar, Xoroshiro128Plus, Xoroshiro128StarStar,
     Xoshiro128Plus, Xoshiro128PlusPlus, Xoshiro128StarStar, Xoshiro256Plus, Xoshiro256PlusPlus,
     Xoshiro256StarStar,
 };
-use rand_sfc::{Sfc32, Sfc64};
 
 const RAND_BENCH_N: u64 = 1000;
 const BYTES_LEN: usize = 1024;

@@ -1,8 +1,8 @@
 [package]
 name = "benches"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.63"
+edition = "2024"
+rust-version = "1.85"
 publish = false
 
 [dev-dependencies]
@@ -19,7 +19,3 @@ rand_sfc = { path = "../rand_sfc", version = "0.1" }
 name = "mod"
 path = "mod.rs"
 harness = false
-
-[patch.crates-io.rand_core]
-git = "https://github.com/rust-random/rand.git"
-branch = "master"
