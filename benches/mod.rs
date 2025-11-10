@@ -53,15 +53,33 @@ fn gen_bytes(c: &mut Criterion<CyclesPerByte>) {
     }
 
     gen_bytes!("xorshift", XorShiftRng::from_rng(&mut master));
-    gen_bytes!("xoshiro256starstar", Xoshiro256StarStar::from_rng(&mut master));
+    gen_bytes!(
+        "xoshiro256starstar",
+        Xoshiro256StarStar::from_rng(&mut master)
+    );
     gen_bytes!("xoshiro256plus", Xoshiro256Plus::from_rng(&mut master));
-    gen_bytes!("xoshiro256plusplus", Xoshiro256PlusPlus::from_rng(&mut master));
-    gen_bytes!("xoshiro128starstar", Xoshiro128StarStar::from_rng(&mut master));
+    gen_bytes!(
+        "xoshiro256plusplus",
+        Xoshiro256PlusPlus::from_rng(&mut master)
+    );
+    gen_bytes!(
+        "xoshiro128starstar",
+        Xoshiro128StarStar::from_rng(&mut master)
+    );
     gen_bytes!("xoshiro128plus", Xoshiro128Plus::from_rng(&mut master));
-    gen_bytes!("xoshiro128plusplus", Xoshiro128PlusPlus::from_rng(&mut master));
-    gen_bytes!("xoroshiro128starstar", Xoroshiro128StarStar::from_rng(&mut master));
+    gen_bytes!(
+        "xoshiro128plusplus",
+        Xoshiro128PlusPlus::from_rng(&mut master)
+    );
+    gen_bytes!(
+        "xoroshiro128starstar",
+        Xoroshiro128StarStar::from_rng(&mut master)
+    );
     gen_bytes!("xoroshiro128plus", Xoroshiro128Plus::from_rng(&mut master));
-    gen_bytes!("xoroshiro64starstar", Xoroshiro64StarStar::from_rng(&mut master));
+    gen_bytes!(
+        "xoroshiro64starstar",
+        Xoroshiro64StarStar::from_rng(&mut master)
+    );
     gen_bytes!("xoroshiro64star", Xoroshiro64Star::from_rng(&mut master));
     gen_bytes!("splitmix64", SplitMix64::from_rng(&mut master));
     gen_bytes!("hc128", Hc128Rng::from_rng(&mut master));
@@ -119,7 +137,12 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
             u32,
             Xoshiro256StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoshiro256plus", u32, Xoshiro256Plus::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoshiro256plus",
+            u32,
+            Xoshiro256Plus::from_rng(&mut master)
+        );
         gen_uint!(
             g,
             "xoshiro256plusplus",
@@ -132,7 +155,12 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
             u32,
             Xoshiro128StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoshiro128plus", u32, Xoshiro128Plus::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoshiro128plus",
+            u32,
+            Xoshiro128Plus::from_rng(&mut master)
+        );
         gen_uint!(
             g,
             "xoshiro128plusplus",
@@ -145,14 +173,24 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
             u32,
             Xoroshiro128StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoroshiro128plus", u32, Xoroshiro128Plus::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoroshiro128plus",
+            u32,
+            Xoroshiro128Plus::from_rng(&mut master)
+        );
         gen_uint!(
             g,
             "xoroshiro64starstar",
             u32,
             Xoroshiro64StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoroshiro64star", u32, Xoroshiro64Star::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoroshiro64star",
+            u32,
+            Xoroshiro64Star::from_rng(&mut master)
+        );
         gen_uint!(g, "splitmix64", u32, SplitMix64::from_rng(&mut master));
         gen_uint!(g, "hc128", u32, Hc128Rng::from_rng(&mut master));
         gen_uint!(g, "isaac", u32, IsaacRng::from_rng(&mut master));
@@ -172,7 +210,12 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
             u64,
             Xoshiro256StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoshiro256plus", u64, Xoshiro256Plus::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoshiro256plus",
+            u64,
+            Xoshiro256Plus::from_rng(&mut master)
+        );
         gen_uint!(
             g,
             "xoshiro256plusplus",
@@ -185,7 +228,12 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
             u64,
             Xoshiro128StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoshiro128plus", u64, Xoshiro128Plus::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoshiro128plus",
+            u64,
+            Xoshiro128Plus::from_rng(&mut master)
+        );
         gen_uint!(
             g,
             "xoshiro128plusplus",
@@ -198,14 +246,24 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
             u64,
             Xoroshiro128StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoroshiro128plus", u64, Xoroshiro128Plus::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoroshiro128plus",
+            u64,
+            Xoroshiro128Plus::from_rng(&mut master)
+        );
         gen_uint!(
             g,
             "xoroshiro64starstar",
             u64,
             Xoroshiro64StarStar::from_rng(&mut master)
         );
-        gen_uint!(g, "xoroshiro64star", u64, Xoroshiro64Star::from_rng(&mut master));
+        gen_uint!(
+            g,
+            "xoroshiro64star",
+            u64,
+            Xoroshiro64Star::from_rng(&mut master)
+        );
         gen_uint!(g, "splitmix64", u64, SplitMix64::from_rng(&mut master));
         gen_uint!(g, "hc128", u64, Hc128Rng::from_rng(&mut master));
         gen_uint!(g, "isaac", u64, IsaacRng::from_rng(&mut master));
