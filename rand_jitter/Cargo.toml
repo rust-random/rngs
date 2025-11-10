@@ -15,11 +15,11 @@ rust-version = "1.85"
 all-features = true
 
 [features]
-std = ["rand_core/std"]
+std = []
 log = ["dep:log"]
 
 [dependencies]
-rand_core = { version = "0.9.0" }
+rand_core = "0.10.0-rc-2"
 log = { version = "0.4.4", optional = true }
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
