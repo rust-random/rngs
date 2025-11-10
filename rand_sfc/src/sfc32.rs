@@ -6,8 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rand_core::impls::{fill_bytes_via_next, next_u64_via_u32};
-use rand_core::le::read_u32_into;
+use rand_core::le::{fill_bytes_via_next, next_u64_via_u32, read_u32_into};
 use rand_core::{RngCore, SeedableRng};
 
 #[cfg(feature = "serde")]
