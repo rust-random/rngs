@@ -13,15 +13,7 @@ use crate::isaac_array::IsaacArray;
 use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng64, BlockRngCore};
-<<<<<<< HEAD
-<<<<<<< HEAD
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
-=======
-use rand_core::{le, RngCore, SeedableRng};
->>>>>>> 01ec28a (Remove all `try_from_rng`)
-=======
-use rand_core::{le, RngCore, SeedableRng, TryRngCore};
->>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

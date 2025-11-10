@@ -16,19 +16,7 @@
 
 use core::fmt;
 use rand_core::block::{BlockRng, BlockRngCore, CryptoBlockRng};
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-use rand_core::{CryptoRng, RngCore, SeedableRng, TryRngCore, le};
-=======
-use rand_core::{le, CryptoRng, RngCore, SeedableRng};
->>>>>>> 01ec28a (Remove all `try_from_rng`)
-=======
-use rand_core::{le, CryptoRng, RngCore, SeedableRng, TryRngCore};
->>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
-=======
-use rand_core::{le, CryptoRng, RngCore, SeedableRng};
->>>>>>> 41a9645 (Remove trivial `try_from_rng`)
+use rand_core::{CryptoRng, RngCore, SeedableRng, le};
 
 const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 

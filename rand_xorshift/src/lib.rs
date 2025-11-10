@@ -32,15 +32,7 @@
 
 use core::fmt;
 use core::num::Wrapping as w;
-<<<<<<< HEAD
-<<<<<<< HEAD
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
-=======
-use rand_core::{le, RngCore, SeedableRng};
->>>>>>> 01ec28a (Remove all `try_from_rng`)
-=======
-use rand_core::{le, RngCore, SeedableRng, TryRngCore};
->>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -141,24 +133,11 @@ impl SeedableRng for XorShiftRng {
             w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error>
     where
         R: TryRngCore + ?Sized,
     {
-=======
-
-<<<<<<< HEAD
-    fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error> where R: TryRngCore + ?Sized {
->>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
-=======
-    fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error>
-    where
-        R: TryRngCore + ?Sized,
-    {
->>>>>>> f6b7509 (fmt)
         let mut b = [0u8; 16];
         loop {
             rng.try_fill_bytes(b.as_mut())?;
@@ -174,9 +153,4 @@ impl SeedableRng for XorShiftRng {
             w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         })
     }
-<<<<<<< HEAD
-=======
->>>>>>> 01ec28a (Remove all `try_from_rng`)
-=======
->>>>>>> bc9add8 (Revert "Remove all `try_from_rng`")
 }
