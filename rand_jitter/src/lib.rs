@@ -107,7 +107,7 @@ mod error;
 mod platform;
 
 pub use crate::error::TimerError;
-use rand_core::{RngCore, impls};
+use rand_core::{RngCore, le};
 
 use core::{fmt, mem, ptr};
 #[cfg(feature = "std")]
@@ -761,6 +761,6 @@ where
         //
         // This is done especially for wrappers that implement `next_u32`
         // themselves via `fill_bytes`.
-        impls::fill_bytes_via_next(self, dest)
+        le::fill_bytes_via_next(self, dest)
     }
 }

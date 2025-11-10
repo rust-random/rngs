@@ -118,12 +118,18 @@ impl SeedableRng for Isaac64Rng {
     }
 
     #[inline]
-    fn from_rng(rng: &mut impl RngCore) -> Self {
+    fn from_rng<R>(rng: &mut R) -> Self
+    where
+        R: RngCore + ?Sized,
+    {
         Isaac64Rng(BlockRng64::<Isaac64Core>::from_rng(rng))
     }
 
     #[inline]
-    fn try_from_rng<S: TryRngCore>(rng: &mut S) -> Result<Self, S::Error> {
+    fn try_from_rng<S>(rng: &mut S) -> Result<Self, S::Error>
+    where
+        S: TryRngCore + ?Sized,
+    {
         BlockRng64::<Isaac64Core>::try_from_rng(rng).map(Isaac64Rng)
     }
 }
@@ -327,7 +333,10 @@ impl SeedableRng for Isaac64Core {
         Self::init(key, 1)
     }
 
-    fn from_rng(rng: &mut impl RngCore) -> Self {
+    fn from_rng<R>(rng: &mut R) -> Self
+    where
+        R: RngCore + ?Sized,
+    {
         // Custom `from_rng` implementation that fills a seed with the same size
         // as the entire state.
         let mut seed = [w(0u64); RAND_SIZE];
@@ -343,7 +352,10 @@ impl SeedableRng for Isaac64Core {
         Self::init(seed, 2)
     }
 
-    fn try_from_rng<R: TryRngCore>(rng: &mut R) -> Result<Self, R::Error> {
+    fn try_from_rng<R>(rng: &mut R) -> Result<Self, R::Error>
+    where
+        R: TryRngCore + ?Sized,
+    {
         // Custom `from_rng` implementation that fills a seed with the same size
         // as the entire state.
         let mut seed = [w(0u64); RAND_SIZE];

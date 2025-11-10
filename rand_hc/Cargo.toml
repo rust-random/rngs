@@ -16,4 +16,4 @@ edition = "2024"
 rust-version = "1.85"
 
 [dependencies]
-rand_core = "0.9.0"
+rand_core = "0.10.0-rc-2"

@@ -16,7 +16,7 @@
 
 use core::fmt;
 use rand_core::block::{BlockRng, BlockRngCore, CryptoBlockRng};
-use rand_core::{CryptoRng, RngCore, SeedableRng, TryRngCore, le};
+use rand_core::{CryptoRng, RngCore, SeedableRng, le};
 
 const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 
@@ -95,16 +95,6 @@ impl SeedableRng for Hc128Rng {
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
         Hc128Rng(BlockRng::<Hc128Core>::from_seed(seed))
-    }
-
-    #[inline]
-    fn from_rng(rng: &mut impl RngCore) -> Self {
-        Hc128Rng(BlockRng::<Hc128Core>::from_rng(rng))
-    }
-
-    #[inline]
-    fn try_from_rng<R: TryRngCore>(rng: &mut R) -> Result<Self, R::Error> {
-        BlockRng::<Hc128Core>::try_from_rng(rng).map(Hc128Rng)
     }
 }
 
