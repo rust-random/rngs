@@ -81,10 +81,11 @@ jobs:
         run: |
           cargo test --target ${{ matrix.target }} --manifest-path rand_hc/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_isaac/Cargo.toml --all-features
-          cargo test --target ${{ matrix.target }} --manifest-path rand_xorshift/Cargo.toml --all-features
-          cargo test --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --no-default-features
           cargo test --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
+          cargo test --target ${{ matrix.target }} --manifest-path rand_sfc/Cargo.toml --all-features
+          cargo test --target ${{ matrix.target }} --manifest-path rand_xorshift/Cargo.toml --all-features
+          cargo test --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
 
   test-cross:
     runs-on: ubuntu-latest
@@ -112,9 +113,10 @@ jobs:
         run: |
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_hc/Cargo.toml --all-features
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_isaac/Cargo.toml --all-features
+          cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
+          cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_sfc/Cargo.toml --all-features
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_xorshift/Cargo.toml --all-features
           cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_xoshiro/Cargo.toml --all-features
-          cross test --no-fail-fast --target ${{ matrix.target }} --manifest-path rand_jitter/Cargo.toml --all-features
 
   test-miri:
     runs-on: ubuntu-latest
@@ -129,6 +131,7 @@ jobs:
         run: |
           cargo miri test --manifest-path rand_hc/Cargo.toml --all-features
           cargo miri test --manifest-path rand_isaac/Cargo.toml --all-features
+          cargo miri test --manifest-path rand_sfc/Cargo.toml --all-features
           cargo miri test --manifest-path rand_xorshift/Cargo.toml --all-features
           cargo miri test --manifest-path rand_xoshiro/Cargo.toml --all-features
           MIRIFLAGS="-Zmiri-disable-isolation" cargo miri test --manifest-path rand_jitter/Cargo.toml
