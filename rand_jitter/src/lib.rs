@@ -754,12 +754,12 @@ where
         self.gen_entropy()
     }
 
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
+    fn fill_bytes(&mut self, dst: &mut [u8]) {
         // Fill using `next_u32`. This is faster for filling small slices (four
         // bytes or less), while the overhead is negligible.
         //
         // This is done especially for wrappers that implement `next_u32`
         // themselves via `fill_bytes`.
-        le::fill_bytes_via_next(self, dest)
+        le::fill_bytes_via_next_word(dst, || self.next_u64())
     }
 }

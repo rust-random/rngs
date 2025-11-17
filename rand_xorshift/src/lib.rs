@@ -30,7 +30,7 @@
 #![no_std]
 
 use core::fmt;
-use core::num::Wrapping as w;
+use core::num::Wrapping as W;
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -52,10 +52,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct XorShiftRng {
-    x: w<u32>,
-    y: w<u32>,
-    z: w<u32>,
-    w: w<u32>,
+    x: W<u32>,
+    y: W<u32>,
+    z: W<u32>,
+    w: W<u32>,
 }
 
 // Custom Debug implementation that does not expose the internal state
@@ -86,8 +86,8 @@ impl RngCore for XorShiftRng {
     }
 
     #[inline]
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        le::fill_bytes_via_next(self, dest)
+    fn fill_bytes(&mut self, dst: &mut [u8]) {
+        le::fill_bytes_via_next_word(dst, || self.next_u32())
     }
 }
 
@@ -95,22 +95,17 @@ impl SeedableRng for XorShiftRng {
     type Seed = [u8; 16];
 
     fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u32 = [0u32; 4];
-        le::read_u32_into(&seed, &mut seed_u32);
+        let mut seed: [u32; 4] = le::read_words(&seed);
 
         // Xorshift cannot be seeded with 0 and we cannot return an Error, but
         // also do not wish to panic (because a random seed can legitimately be
         // 0); our only option is therefore to use a preset value.
-        if seed_u32 == [0; 4] {
-            seed_u32 = [0xBAD_5EED, 0xBAD_5EED, 0xBAD_5EED, 0xBAD_5EED];
+        if seed == [0; 4] {
+            seed = [0xBAD_5EED, 0xBAD_5EED, 0xBAD_5EED, 0xBAD_5EED];
         }
+        let [x, y, z, w] = seed.map(W);
 
-        XorShiftRng {
-            x: w(seed_u32[0]),
-            y: w(seed_u32[1]),
-            z: w(seed_u32[2]),
-            w: w(seed_u32[3]),
-        }
+        XorShiftRng { x, y, z, w }
     }
 
     fn from_rng<R>(rng: &mut R) -> Self
@@ -126,10 +121,10 @@ impl SeedableRng for XorShiftRng {
         }
 
         XorShiftRng {
-            x: w(u32::from_le_bytes([b[0], b[1], b[2], b[3]])),
-            y: w(u32::from_le_bytes([b[4], b[5], b[6], b[7]])),
-            z: w(u32::from_le_bytes([b[8], b[9], b[10], b[11]])),
-            w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
+            x: W(u32::from_le_bytes([b[0], b[1], b[2], b[3]])),
+            y: W(u32::from_le_bytes([b[4], b[5], b[6], b[7]])),
+            z: W(u32::from_le_bytes([b[8], b[9], b[10], b[11]])),
+            w: W(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         }
     }
 
@@ -146,10 +141,10 @@ impl SeedableRng for XorShiftRng {
         }
 
         Ok(XorShiftRng {
-            x: w(u32::from_le_bytes([b[0], b[1], b[2], b[3]])),
-            y: w(u32::from_le_bytes([b[4], b[5], b[6], b[7]])),
-            z: w(u32::from_le_bytes([b[8], b[9], b[10], b[11]])),
-            w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
+            x: W(u32::from_le_bytes([b[0], b[1], b[2], b[3]])),
+            y: W(u32::from_le_bytes([b[4], b[5], b[6], b[7]])),
+            z: W(u32::from_le_bytes([b[8], b[9], b[10], b[11]])),
+            w: W(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         })
     }
 }
