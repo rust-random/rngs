@@ -6,8 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rand_core::le::{fill_bytes_via_next, read_u64_into};
-use rand_core::{RngCore, SeedableRng};
+use rand_core::{RngCore, SeedableRng, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -53,8 +52,8 @@ impl RngCore for SplitMix64 {
     }
 
     #[inline]
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        fill_bytes_via_next(self, dest);
+    fn fill_bytes(&mut self, dst: &mut [u8]) {
+        le::fill_bytes_via_next_word(dst, || self.next_u64());
     }
 }
 
@@ -63,9 +62,8 @@ impl SeedableRng for SplitMix64 {
 
     /// Create a new `SplitMix64`.
     fn from_seed(seed: [u8; 8]) -> SplitMix64 {
-        let mut state = [0; 1];
-        read_u64_into(&seed, &mut state);
-        SplitMix64 { x: state[0] }
+        let x = u64::from_le_bytes(seed);
+        Self { x }
     }
 
     /// Seed a `SplitMix64` from a `u64`.

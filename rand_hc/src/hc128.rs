@@ -6,19 +6,15 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// Disable some noisy clippy lints.
-#![allow(clippy::many_single_char_names)]
-#![allow(clippy::identity_op)]
-// Disable a lint that cannot be fixed without increasing the MSRV
-#![allow(clippy::op_ref)]
-
 //! The HC-128 random number generator.
 
 use core::fmt;
-use rand_core::block::{BlockRng, BlockRngCore, CryptoBlockRng};
 use rand_core::{CryptoRng, RngCore, SeedableRng, le};
 
-const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
+/// Number of words required to initialize HC-128.
+///
+/// The seed contains 128-bit key followed by 128-bit IV.
+const SEED_WORDS: usize = 8;
 
 /// A cryptographically secure random number generator that uses the HC-128
 /// algorithm.
@@ -70,31 +66,39 @@ const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 /// [^5]: Internet Engineering Task Force (February 2015),
 ///       ["Prohibiting RC4 Cipher Suites"](https://tools.ietf.org/html/rfc7465).
 #[derive(Clone, Debug)]
-pub struct Hc128Rng(BlockRng<Hc128Core>);
+pub struct Hc128Rng {
+    core: Hc128Core,
+    buffer: [u32; 16],
+}
 
 impl RngCore for Hc128Rng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        self.0.next_u32()
+        let Self { core, buffer } = self;
+        le::next_word_via_gen_block(buffer, |block| core.next_block(block))
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        self.0.next_u64()
+        let Self { core, buffer } = self;
+        le::next_u64_via_gen_block(buffer, |block| core.next_block(block))
     }
 
     #[inline]
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        self.0.fill_bytes(dest)
+    fn fill_bytes(&mut self, dst: &mut [u8]) {
+        let Self { core, buffer } = self;
+        le::fill_bytes_via_gen_block(dst, buffer, |block| core.next_block(block));
     }
 }
 
 impl SeedableRng for Hc128Rng {
-    type Seed = <Hc128Core as SeedableRng>::Seed;
+    type Seed = [u8; 32];
 
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
-        Hc128Rng(BlockRng::<Hc128Core>::from_seed(seed))
+        let core = Hc128Core::init(le::read_words(&seed));
+        let buffer = le::new_buffer();
+        Self { core, buffer }
     }
 }
 
@@ -102,14 +106,16 @@ impl CryptoRng for Hc128Rng {}
 
 impl PartialEq for Hc128Rng {
     fn eq(&self, rhs: &Self) -> bool {
-        self.0.core == rhs.0.core && self.0.index() == rhs.0.index()
+        // TODO: fix buffer equality check
+        self.core == rhs.core && self.buffer == rhs.buffer
     }
 }
+
 impl Eq for Hc128Rng {}
 
-/// The core of `Hc128Rng`, used with `BlockRng`.
-#[derive(Clone)]
-pub struct Hc128Core {
+/// The core state of `Hc128Rng`.
+#[derive(Clone, PartialEq, Eq)]
+struct Hc128Core {
     t: [u32; 1024],
     counter1024: usize,
 }
@@ -121,11 +127,9 @@ impl fmt::Debug for Hc128Core {
     }
 }
 
-impl BlockRngCore for Hc128Core {
-    type Item = u32;
-    type Results = [u32; 16];
-
-    fn generate(&mut self, results: &mut Self::Results) {
+impl Hc128Core {
+    #[allow(clippy::identity_op)]
+    fn next_block(&mut self, results: &mut [u32; 16]) {
         assert!(self.counter1024 % 16 == 0);
 
         let cc = self.counter1024 % 512;
@@ -216,6 +220,7 @@ impl Hc128Core {
         temp3 ^ q[i]
     }
 
+    #[allow(clippy::identity_op)]
     fn sixteen_steps(&mut self) {
         assert!(self.counter1024 % 16 == 0);
 
@@ -328,29 +333,6 @@ impl Hc128Core {
         core
     }
 }
-
-impl SeedableRng for Hc128Core {
-    type Seed = [u8; SEED_WORDS * 4];
-
-    /// Create an HC-128 random number generator with a seed. The seed has to be
-    /// 256 bits in length, matching the 128 bit `key` followed by 128 bit `iv`
-    /// when HC-128 where to be used as a stream cipher.
-    fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u32 = [0u32; SEED_WORDS];
-        le::read_u32_into(&seed, &mut seed_u32);
-        Self::init(seed_u32)
-    }
-}
-
-impl CryptoBlockRng for Hc128Core {}
-
-// Custom PartialEq implementation as it can't currently be derived from an array of size 1024
-impl PartialEq for Hc128Core {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.t[..] == &rhs.t[..] && self.counter1024 == rhs.counter1024
-    }
-}
-impl Eq for Hc128Core {}
 
 #[cfg(test)]
 mod test {

@@ -24,10 +24,14 @@
 )]
 #![cfg_attr(not(all(feature = "serde", test)), no_std)]
 
+const RAND_SIZE_LOG2: usize = 8;
+const RAND_SIZE: usize = 1 << RAND_SIZE_LOG2;
+
 pub mod isaac;
 pub mod isaac64;
 
-mod isaac_array;
+#[cfg(feature = "serde")]
+mod array_serde;
 
 pub use self::isaac::IsaacRng;
 pub use self::isaac64::Isaac64Rng;

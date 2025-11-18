@@ -9,19 +9,15 @@
 
 //! The ISAAC random number generator.
 
-use crate::isaac_array::IsaacArray;
+use crate::{RAND_SIZE, RAND_SIZE_LOG2};
 use core::num::Wrapping as w;
 use core::{fmt, slice};
-use rand_core::block::{BlockRng, BlockRngCore};
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 #[allow(non_camel_case_types)]
 type w32 = w<u32>;
-
-const RAND_SIZE_LEN: usize = 8;
-const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 
 /// A random number generator that uses the ISAAC algorithm.
 ///
@@ -91,31 +87,40 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// [`rand_hc`]: https://docs.rs/rand_hc
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct IsaacRng(BlockRng<IsaacCore>);
+pub struct IsaacRng {
+    core: IsaacCore,
+    #[cfg_attr(feature = "serde", serde(with = "crate::array_serde"))]
+    buffer: [u32; RAND_SIZE],
+}
 
 impl RngCore for IsaacRng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        self.0.next_u32()
+        let Self { core, buffer } = self;
+        le::next_word_via_gen_block(buffer, |block| core.next_block(block))
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        self.0.next_u64()
+        let Self { core, buffer } = self;
+        le::next_u64_via_gen_block(buffer, |block| core.next_block(block))
     }
 
     #[inline]
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        self.0.fill_bytes(dest)
+    fn fill_bytes(&mut self, dst: &mut [u8]) {
+        let Self { core, buffer } = self;
+        le::fill_bytes_via_gen_block(dst, buffer, |block| core.next_block(block));
     }
 }
 
 impl SeedableRng for IsaacRng {
-    type Seed = <IsaacCore as SeedableRng>::Seed;
+    type Seed = [u8; 32];
 
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
-        IsaacRng(BlockRng::<IsaacCore>::from_seed(seed))
+        let core = IsaacCore::from_seed(seed);
+        let buffer = le::new_buffer();
+        Self { core, buffer }
     }
 
     /// Create an ISAAC random number generator using an `u64` as seed.
@@ -123,7 +128,9 @@ impl SeedableRng for IsaacRng {
     /// the reference implementation when used unseeded.
     #[inline]
     fn seed_from_u64(seed: u64) -> Self {
-        IsaacRng(BlockRng::<IsaacCore>::seed_from_u64(seed))
+        let core = IsaacCore::seed_from_u64(seed);
+        let buffer = le::new_buffer();
+        Self { core, buffer }
     }
 
     #[inline]
@@ -131,7 +138,9 @@ impl SeedableRng for IsaacRng {
     where
         R: RngCore + ?Sized,
     {
-        IsaacRng(BlockRng::<IsaacCore>::from_rng(rng))
+        let core = IsaacCore::from_rng(rng);
+        let buffer = le::new_buffer();
+        Self { core, buffer }
     }
 
     #[inline]
@@ -139,7 +148,9 @@ impl SeedableRng for IsaacRng {
     where
         S: TryRngCore + ?Sized,
     {
-        BlockRng::<IsaacCore>::try_from_rng(rng).map(IsaacRng)
+        let core = IsaacCore::try_from_rng(rng)?;
+        let buffer = le::new_buffer();
+        Ok(Self { core, buffer })
     }
 }
 
@@ -147,10 +158,7 @@ impl SeedableRng for IsaacRng {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacCore {
-    #[cfg_attr(
-        feature = "serde",
-        serde(with = "super::isaac_array::isaac_array_serde")
-    )]
+    #[cfg_attr(feature = "serde", serde(with = "crate::array_serde"))]
     mem: [w32; RAND_SIZE],
     a: w32,
     b: w32,
@@ -174,10 +182,7 @@ impl ::core::cmp::PartialEq for IsaacCore {
 // Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
 impl ::core::cmp::Eq for IsaacCore {}
 
-impl BlockRngCore for IsaacCore {
-    type Item = u32;
-    type Results = IsaacArray<Self::Item>;
-
+impl IsaacCore {
     /// Refills the output buffer, `results`. See also the pseudocode description
     /// of the algorithm in the `IsaacRng` documentation.
     ///
@@ -198,7 +203,7 @@ impl BlockRngCore for IsaacCore {
     ///   make `fill_bytes` a memcopy. To maintain compatibility we fill in
     ///   reverse.
     #[rustfmt::skip]
-    fn generate(&mut self, results: &mut IsaacArray<Self::Item>) {
+    fn next_block(&mut self, results: &mut [u32; 256]) {
         self.c += w(1);
         // abbreviations
         let mut a = self.a;
@@ -226,7 +231,7 @@ impl BlockRngCore for IsaacCore {
             *a = mix + mem[base + m2];
             let y = *a + *b + ind(mem, x, 2);
             mem[base + m] = y;
-            *b = x + ind(mem, y, 2 + RAND_SIZE_LEN);
+            *b = x + ind(mem, y, 2 + RAND_SIZE_LOG2);
             results[RAND_SIZE - 1 - base - m] = b.0;
         }
 
@@ -341,15 +346,12 @@ impl IsaacCore {
     }
 }
 
-impl SeedableRng for IsaacCore {
-    type Seed = [u8; 32];
-
-    fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u32 = [0u32; 8];
-        le::read_u32_into(&seed, &mut seed_u32);
+impl IsaacCore {
+    fn from_seed(seed: [u8; 32]) -> Self {
+        let seed: [u32; 8] = le::read_words(&seed);
         // Convert the seed to `Wrapping<u32>` and zero-extend to `RAND_SIZE`.
         let mut seed_extended = [w(0); RAND_SIZE];
-        for (x, y) in seed_extended.iter_mut().zip(seed_u32.iter()) {
+        for (x, y) in seed_extended.iter_mut().zip(seed.iter()) {
             *x = w(*y);
         }
         Self::init(seed_extended, 2)
