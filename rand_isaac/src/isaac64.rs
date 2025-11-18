@@ -40,10 +40,10 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// non-cryptographic applications.
 ///
 /// In spite of being designed with cryptographic security in mind, ISAAC hasn't
-/// been stringently cryptanalyzed and thus cryptographers do not not
+/// been stringently cryptanalyzed and thus cryptographers do not
 /// consensually trust it to be secure. When looking for a secure RNG, prefer
 /// `Hc128Rng` from the [`rand_hc`] crate instead, which, like ISAAC, is an
-/// array-based RNG and one of the stream-ciphers selected the by eSTREAM
+/// array-based RNG and one of the stream-ciphers selected by eSTREAM
 ///
 /// ## Overview of the ISAAC-64 algorithm:
 /// (in pseudo-code)
