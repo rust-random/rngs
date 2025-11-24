@@ -19,7 +19,7 @@ rust-version = "1.85"
 all-features = true
 
 [features]
-serde = ["dep:serde", "rand_core/serde"]
+serde = ["dep:serde"]
 
 [dependencies]
 rand_core = "0.10.0-rc-2"
