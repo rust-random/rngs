@@ -90,7 +90,6 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///
 /// [`rand_hc`]: https://docs.rs/rand_hc
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacRng(BlockRng<IsaacCore>);
 
 impl RngCore for IsaacRng {
@@ -140,6 +139,124 @@ impl SeedableRng for IsaacRng {
         S: TryRngCore + ?Sized,
     {
         BlockRng::<IsaacCore>::try_from_rng(rng).map(IsaacRng)
+    }
+}
+
+#[cfg(feature = "serde")]
+mod serde_impls {
+    use super::{IsaacArray, IsaacRng, IsaacCore};
+    use rand_core::block::BlockRng;
+    use serde::ser::{Serialize, Serializer, SerializeStruct};
+    use serde::de::{Deserialize, Deserializer, Visitor, SeqAccess, MapAccess, Error};
+    use core::fmt;
+
+    impl Serialize for IsaacRng {
+        fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+            let mut state = serializer.serialize_struct("IsaacRng", 2)?;
+            state.serialize_field("core", &self.0.core)?;
+            state.serialize_field("results", self.0.remaining_results())?;
+            state.end()
+        }
+    }
+
+    struct Results {
+        results: IsaacArray<u32>,
+        len: usize,
+    }
+    impl Results {
+        fn to_rng(&self, core: IsaacCore) -> IsaacRng {
+            let results = &self.results[..self.len];
+            IsaacRng(BlockRng::from_core_and_remaining_results(core, results).unwrap())
+        }
+    }
+    struct ResultsVisitor;
+    impl<'de> Visitor<'de> for ResultsVisitor {
+        type Value = Results;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(formatter, "") // TODO
+        }
+
+        fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+            let mut results = IsaacArray::<u32>::default();
+            let mut len = 0;
+            while let Some(value) = seq.next_element()? {
+                if len >= results.len() {
+                    return Err(Error::invalid_length(len + 1, &("up to 256 elements" as &str)));
+                }
+
+                results[len] = value;
+                len += 1;
+            }
+
+            Ok(Results { results, len })
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Results {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+            deserializer.deserialize_seq(ResultsVisitor)
+        }
+    }
+
+    #[derive(serde::Deserialize)]
+    #[serde(field_identifier, rename_all = "lowercase")]
+    enum Field { Core, Results }
+
+    struct IsaacVisitor;
+    impl<'de> Visitor<'de> for IsaacVisitor {
+        type Value = IsaacRng;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(formatter, "") // TODO
+        }
+
+        fn visit_seq<V>(self, mut seq: V) -> Result<IsaacRng, V::Error>
+        where
+            V: SeqAccess<'de>,
+        {
+            let core = seq.next_element()?
+                .ok_or_else(|| Error::invalid_length(0, &self))?;
+            let results: Results = seq.next_element()?
+                .ok_or_else(|| Error::invalid_length(1, &self))?;
+
+            Ok(results.to_rng(core))
+        }
+
+        fn visit_map<V>(self, mut map: V) -> Result<IsaacRng, V::Error>
+        where
+            V: MapAccess<'de>,
+        {
+            let mut core = None;
+            let mut results: Option<Results> = None;
+            while let Some(key) = map.next_key()? {
+                match key {
+                    Field::Core => {
+                        if core.is_some() {
+                            return Err(Error::duplicate_field("core"));
+                        }
+                        core = Some(map.next_value()?);
+                    }
+                    Field::Results => {
+                        if results.is_some() {
+                            return Err(Error::duplicate_field("results"));
+                        }
+                        results = Some(map.next_value()?);
+                    }
+                }
+            }
+            let core = core.ok_or_else(|| Error::missing_field("core"))?;
+            let results = results.ok_or_else(|| Error::missing_field("results"))?;
+
+            Ok(results.to_rng(core))
+        }
+    }
+
+    impl<'de> Deserialize<'de> for IsaacRng {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+            const FIELDS: &[&str] = &["core", "results"];
+            deserializer.deserialize_struct("IsaacRng", FIELDS, IsaacVisitor)
+        }
     }
 }
 
