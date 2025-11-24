@@ -80,7 +80,6 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// [`rand_hc`]: https://docs.rs/rand_hc
 /// [`BlockRng`]: rand_core::block::BlockRng
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Isaac64Rng(BlockRng<Isaac64Core>);
 
 impl RngCore for Isaac64Rng {
@@ -130,6 +129,132 @@ impl SeedableRng for Isaac64Rng {
         S: TryRngCore + ?Sized,
     {
         Isaac64Core::try_from_rng(rng).map(|core| Isaac64Rng(BlockRng::new(core)))
+    }
+}
+
+#[cfg(feature = "serde")]
+mod serde_impls {
+    use super::{Isaac64Core, Isaac64Rng, RAND_SIZE};
+    use core::fmt;
+    use rand_core::block::BlockRng;
+    use serde::de::{Deserialize, Deserializer, Error, MapAccess, SeqAccess, Visitor};
+    use serde::ser::{Serialize, SerializeStruct, Serializer};
+
+    impl Serialize for Isaac64Rng {
+        fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+            let mut state = serializer.serialize_struct("Isaac64Rng", 2)?;
+            state.serialize_field("core", &self.0.core)?;
+            state.serialize_field("results", self.0.remaining_results())?;
+            state.end()
+        }
+    }
+
+    struct Results {
+        results: [u64; RAND_SIZE],
+        len: usize,
+    }
+    impl Results {
+        fn to_rng(&self, core: Isaac64Core) -> Isaac64Rng {
+            let results = &self.results[..self.len];
+            Isaac64Rng(BlockRng::reconstruct(core, results).unwrap())
+        }
+    }
+    struct ResultsVisitor;
+    impl<'de> Visitor<'de> for ResultsVisitor {
+        type Value = Results;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(formatter, "") // TODO
+        }
+
+        fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+            let mut results = [0u64; RAND_SIZE];
+            let mut len = 0;
+            while let Some(value) = seq.next_element()? {
+                if len >= results.len() {
+                    return Err(Error::invalid_length(
+                        len + 1,
+                        &("up to 256 elements" as &str),
+                    ));
+                }
+
+                results[len] = value;
+                len += 1;
+            }
+
+            Ok(Results { results, len })
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Results {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+            deserializer.deserialize_seq(ResultsVisitor)
+        }
+    }
+
+    #[derive(serde::Deserialize)]
+    #[serde(field_identifier, rename_all = "lowercase")]
+    enum Field {
+        Core,
+        Results,
+    }
+
+    struct IsaacVisitor;
+    impl<'de> Visitor<'de> for IsaacVisitor {
+        type Value = Isaac64Rng;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(formatter, "") // TODO
+        }
+
+        fn visit_seq<V>(self, mut seq: V) -> Result<Isaac64Rng, V::Error>
+        where
+            V: SeqAccess<'de>,
+        {
+            let core = seq
+                .next_element()?
+                .ok_or_else(|| Error::invalid_length(0, &self))?;
+            let results: Results = seq
+                .next_element()?
+                .ok_or_else(|| Error::invalid_length(1, &self))?;
+
+            Ok(results.to_rng(core))
+        }
+
+        fn visit_map<V>(self, mut map: V) -> Result<Isaac64Rng, V::Error>
+        where
+            V: MapAccess<'de>,
+        {
+            let mut core = None;
+            let mut results: Option<Results> = None;
+            while let Some(key) = map.next_key()? {
+                match key {
+                    Field::Core => {
+                        if core.is_some() {
+                            return Err(Error::duplicate_field("core"));
+                        }
+                        core = Some(map.next_value()?);
+                    }
+                    Field::Results => {
+                        if results.is_some() {
+                            return Err(Error::duplicate_field("results"));
+                        }
+                        results = Some(map.next_value()?);
+                    }
+                }
+            }
+            let core = core.ok_or_else(|| Error::missing_field("core"))?;
+            let results = results.ok_or_else(|| Error::missing_field("results"))?;
+
+            Ok(results.to_rng(core))
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Isaac64Rng {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+            const FIELDS: &[&str] = &["core", "results"];
+            deserializer.deserialize_struct("Isaac64Rng", FIELDS, IsaacVisitor)
+        }
     }
 }
 
@@ -497,7 +622,7 @@ mod test {
 
     #[test]
     fn test_isaac64_new_uninitialized() {
-        // Compare the results from initializing `IsaacRng` with
+        // Compare the results from initializing `Isaac64Rng` with
         // `seed_from_u64(0)`, to make sure it is the same as the reference
         // implementation when used uninitialized.
         // Note: We only test the first 16 integers, not the full 256 of the
