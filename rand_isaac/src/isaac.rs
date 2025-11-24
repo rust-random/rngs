@@ -146,10 +146,7 @@ impl SeedableRng for IsaacRng {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacCore {
-    #[cfg_attr(
-        feature = "serde",
-        serde(with = "super::isaac_array::isaac_array_serde")
-    )]
+    #[cfg_attr(feature = "serde", serde(with = "serde_arrays"))]
     mem: [w32; RAND_SIZE],
     a: w32,
     b: w32,
