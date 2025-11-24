@@ -671,6 +671,10 @@ mod test {
         ];
         let mut rng = IsaacRng::from_seed(seed);
 
+        // discard some results
+        let _ = rng.next_u64();
+        let _ = rng.next_u32();
+
         let buf: Vec<u8> = Vec::new();
         let mut buf = BufWriter::new(buf);
         bincode::serialize_into(&mut buf, &rng).expect("Could not serialize");
