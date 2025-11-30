@@ -14,8 +14,6 @@ use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng64, BlockRngCore};
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 
 #[allow(non_camel_case_types)]
 type w64 = w<u64>;
@@ -81,7 +79,6 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// [`rand_hc`]: https://docs.rs/rand_hc
 /// [`BlockRng64`]: rand_core::block::BlockRng64
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Isaac64Rng(BlockRng64<Isaac64Core>);
 
 impl RngCore for Isaac64Rng {
@@ -136,12 +133,7 @@ impl SeedableRng for Isaac64Rng {
 
 /// The core of `Isaac64Rng`, used with `BlockRng`.
 #[derive(Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Isaac64Core {
-    #[cfg_attr(
-        feature = "serde",
-        serde(with = "super::isaac_array::isaac_array_serde")
-    )]
     mem: [w64; RAND_SIZE],
     a: w64,
     b: w64,
@@ -544,33 +536,6 @@ mod test {
         let mut rng2 = rng1.clone();
         for _ in 0..16 {
             assert_eq!(rng1.next_u64(), rng2.next_u64());
-        }
-    }
-
-    #[test]
-    #[cfg(feature = "serde")]
-    fn test_isaac64_serde() {
-        use bincode;
-        use std::io::{BufReader, BufWriter};
-
-        let seed = [
-            1, 0, 0, 0, 23, 0, 0, 0, 200, 1, 0, 0, 210, 30, 0, 0, 57, 48, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        ];
-        let mut rng = Isaac64Rng::from_seed(seed);
-
-        let buf: Vec<u8> = Vec::new();
-        let mut buf = BufWriter::new(buf);
-        bincode::serialize_into(&mut buf, &rng).expect("Could not serialize");
-
-        let buf = buf.into_inner().unwrap();
-        let mut read = BufReader::new(&buf[..]);
-        let mut deserialized: Isaac64Rng =
-            bincode::deserialize_from(&mut read).expect("Could not deserialize");
-
-        // more than the 256 buffered results
-        for _ in 0..300 {
-            assert_eq!(rng.next_u64(), deserialized.next_u64());
         }
     }
 }
