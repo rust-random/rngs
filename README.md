@@ -2,7 +2,6 @@
 
 [![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
-[![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand)
 
 Extra random number generators provided by the Rust Random project.
 The main repository, [rust-random/rand](https://github.com/rust-random/rand),
@@ -12,7 +11,6 @@ This repository houses extra generators maintained by the project.
 Documentation:
 -   [Our generators](https://rust-random.github.io/book/guide-rngs.html)
 -   [The Rust Rand Book](https://rust-random.github.io/book)
--   [API reference (master)](https://rust-random.github.io/rand)
 -   [API reference (docs.rs)](https://docs.rs/rand)
 
 

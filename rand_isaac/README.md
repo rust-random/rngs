@@ -3,7 +3,6 @@
 [![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_isaac.svg)](https://crates.io/crates/rand_isaac)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
-[![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand/rand_isaac)
 [![API](https://docs.rs/rand_isaac/badge.svg)](https://docs.rs/rand_isaac)
 
 Implements the ISAAC and ISAAC-64 random number generators.
@@ -18,7 +17,6 @@ non-cryptographic applications.
 
 Links:
 
--   [API documentation (master)](https://rust-random.github.io/rand/rand_isaac)
 -   [API documentation (docs.rs)](https://docs.rs/rand_isaac)
 -   [Changelog](https://github.com/rust-random/rngs/blob/master/rand_isaac/CHANGELOG.md)
 

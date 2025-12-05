@@ -3,7 +3,6 @@
 [![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_hc.svg)](https://crates.io/crates/rand_hc)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
-[![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand/rand_hc)
 [![API](https://docs.rs/rand_hc/badge.svg)](https://docs.rs/rand_hc)
 
 A cryptographically secure random number generator that uses the HC-128
@@ -15,7 +14,6 @@ adoption" by eSTREAM[^2].
 
 Links:
 
--   [API documentation (master)](https://rust-random.github.io/rand/rand_hc)
 -   [API documentation (docs.rs)](https://docs.rs/rand_hc)
 -   [Changelog](https://github.com/rust-random/rngs/blob/master/rand_hc/CHANGELOG.md)
 
