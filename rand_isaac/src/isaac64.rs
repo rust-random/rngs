@@ -12,6 +12,7 @@
 use super::{RAND_SIZE, RAND_SIZE_LOG2};
 use core::num::Wrapping as w;
 use core::{fmt, slice};
+use rand_core::le::BlockBuffer;
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -80,8 +81,8 @@ type w64 = w<u64>;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Isaac64Rng {
     core: Isaac64Core,
-    #[cfg_attr(feature = "serde", serde(with = "crate::array_serde"))]
-    buffer: [u64; RAND_SIZE],
+    #[cfg_attr(feature = "serde", serde(with = "crate::serde_impl::buffer"))]
+    buffer: BlockBuffer<u64, RAND_SIZE>,
 }
 
 impl RngCore for Isaac64Rng {
@@ -92,14 +93,13 @@ impl RngCore for Isaac64Rng {
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        let Self { core, buffer } = self;
-        le::next_word_via_gen_block(buffer, |block| core.next_block(block))
+        self.buffer.next_word(|block| self.core.next_block(block))
     }
 
     #[inline]
     fn fill_bytes(&mut self, dst: &mut [u8]) {
-        let Self { core, buffer } = self;
-        le::fill_bytes_via_gen_block(dst, buffer, |block| core.next_block(block));
+        self.buffer
+            .fill_bytes(dst, |block| self.core.next_block(block));
     }
 }
 
@@ -109,7 +109,7 @@ impl SeedableRng for Isaac64Rng {
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
         let core = Isaac64Core::from_seed(seed);
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 
@@ -119,7 +119,7 @@ impl SeedableRng for Isaac64Rng {
     #[inline]
     fn seed_from_u64(seed: u64) -> Self {
         let core = Isaac64Core::seed_from_u64(seed);
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 
@@ -129,7 +129,7 @@ impl SeedableRng for Isaac64Rng {
         R: RngCore + ?Sized,
     {
         let core = Isaac64Core::from_rng(rng);
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 
@@ -139,7 +139,7 @@ impl SeedableRng for Isaac64Rng {
         S: TryRngCore + ?Sized,
     {
         let core = Isaac64Core::try_from_rng(rng)?;
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Ok(Self { core, buffer })
     }
 }
@@ -148,7 +148,7 @@ impl SeedableRng for Isaac64Rng {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Isaac64Core {
-    #[cfg_attr(feature = "serde", serde(with = "crate::array_serde"))]
+    #[cfg_attr(feature = "serde", serde(with = "crate::serde_impl::array"))]
     mem: [w64; RAND_SIZE],
     a: w64,
     b: w64,

@@ -12,7 +12,10 @@
 use crate::{RAND_SIZE, RAND_SIZE_LOG2};
 use core::num::Wrapping as w;
 use core::{fmt, slice};
-use rand_core::{RngCore, SeedableRng, TryRngCore, le};
+use rand_core::{
+    RngCore, SeedableRng, TryRngCore,
+    le::{BlockBuffer, read_words},
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -89,27 +92,25 @@ type w32 = w<u32>;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacRng {
     core: IsaacCore,
-    #[cfg_attr(feature = "serde", serde(with = "crate::array_serde"))]
-    buffer: [u32; RAND_SIZE],
+    #[cfg_attr(feature = "serde", serde(with = "crate::serde_impl::buffer"))]
+    buffer: BlockBuffer<u32, RAND_SIZE>,
 }
 
 impl RngCore for IsaacRng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        let Self { core, buffer } = self;
-        le::next_word_via_gen_block(buffer, |block| core.next_block(block))
+        self.buffer.next_word(|block| self.core.next_block(block))
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        let Self { core, buffer } = self;
-        le::next_u64_via_gen_block(buffer, |block| core.next_block(block))
+        self.buffer.next_u64(|block| self.core.next_block(block))
     }
 
     #[inline]
     fn fill_bytes(&mut self, dst: &mut [u8]) {
-        let Self { core, buffer } = self;
-        le::fill_bytes_via_gen_block(dst, buffer, |block| core.next_block(block));
+        self.buffer
+            .fill_bytes(dst, |block| self.core.next_block(block));
     }
 }
 
@@ -119,7 +120,7 @@ impl SeedableRng for IsaacRng {
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
         let core = IsaacCore::from_seed(seed);
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 
@@ -129,7 +130,7 @@ impl SeedableRng for IsaacRng {
     #[inline]
     fn seed_from_u64(seed: u64) -> Self {
         let core = IsaacCore::seed_from_u64(seed);
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 
@@ -139,7 +140,7 @@ impl SeedableRng for IsaacRng {
         R: RngCore + ?Sized,
     {
         let core = IsaacCore::from_rng(rng);
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 
@@ -149,7 +150,7 @@ impl SeedableRng for IsaacRng {
         S: TryRngCore + ?Sized,
     {
         let core = IsaacCore::try_from_rng(rng)?;
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Ok(Self { core, buffer })
     }
 }
@@ -158,7 +159,7 @@ impl SeedableRng for IsaacRng {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IsaacCore {
-    #[cfg_attr(feature = "serde", serde(with = "crate::array_serde"))]
+    #[cfg_attr(feature = "serde", serde(with = "crate::serde_impl::array"))]
     mem: [w32; RAND_SIZE],
     a: w32,
     b: w32,
@@ -348,7 +349,7 @@ impl IsaacCore {
 
 impl IsaacCore {
     fn from_seed(seed: [u8; 32]) -> Self {
-        let seed: [u32; 8] = le::read_words(&seed);
+        let seed: [u32; 8] = read_words(&seed);
         // Convert the seed to `Wrapping<u32>` and zero-extend to `RAND_SIZE`.
         let mut seed_extended = [w(0); RAND_SIZE];
         for (x, y) in seed_extended.iter_mut().zip(seed.iter()) {

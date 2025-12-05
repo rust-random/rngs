@@ -9,7 +9,10 @@
 //! The HC-128 random number generator.
 
 use core::fmt;
-use rand_core::{CryptoRng, RngCore, SeedableRng, le};
+use rand_core::{
+    CryptoRng, RngCore, SeedableRng,
+    le::{self, BlockBuffer},
+};
 
 /// Number of words required to initialize HC-128.
 ///
@@ -68,26 +71,24 @@ const SEED_WORDS: usize = 8;
 #[derive(Clone, Debug)]
 pub struct Hc128Rng {
     core: Hc128Core,
-    buffer: [u32; 16],
+    buffer: BlockBuffer<u32, 16>,
 }
 
 impl RngCore for Hc128Rng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        let Self { core, buffer } = self;
-        le::next_word_via_gen_block(buffer, |block| core.next_block(block))
+        self.buffer.next_word(|block| self.core.next_block(block))
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        let Self { core, buffer } = self;
-        le::next_u64_via_gen_block(buffer, |block| core.next_block(block))
+        self.buffer.next_u64(|block| self.core.next_block(block))
     }
 
     #[inline]
     fn fill_bytes(&mut self, dst: &mut [u8]) {
-        let Self { core, buffer } = self;
-        le::fill_bytes_via_gen_block(dst, buffer, |block| core.next_block(block));
+        self.buffer
+            .fill_bytes(dst, |block| self.core.next_block(block));
     }
 }
 
@@ -97,7 +98,7 @@ impl SeedableRng for Hc128Rng {
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
         let core = Hc128Core::init(le::read_words(&seed));
-        let buffer = le::new_buffer();
+        let buffer = Default::default();
         Self { core, buffer }
     }
 }
@@ -106,7 +107,6 @@ impl CryptoRng for Hc128Rng {}
 
 impl PartialEq for Hc128Rng {
     fn eq(&self, rhs: &Self) -> bool {
-        // TODO: fix buffer equality check
         self.core == rhs.core && self.buffer == rhs.buffer
     }
 }
