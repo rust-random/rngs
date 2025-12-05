@@ -3,7 +3,6 @@
 [![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_sfc.svg)](https://crates.io/crates/rand_sfc)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
-[![API](https://img.shields.io/badge/api-master-yellow.svg)](https://rust-random.github.io/rand/rand_sfc)
 [![API](https://docs.rs/rand_sfc/badge.svg)](https://docs.rs/rand_sfc)
 
 Rust implementation of the SFC random number generators, originally developed for the [PractRand](https://pracrand.sourceforge.net/) random number generator test suite.
@@ -13,7 +12,6 @@ part of the [Rand project](https://github.com/rust-random/rand).
 
 Links:
 
--   [API documentation (master)](https://rust-random.github.io/rand/rand_sfc)
 -   [API documentation (docs.rs)](https://docs.rs/rand_sfc)
 
 ## Crate Features
