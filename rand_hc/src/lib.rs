@@ -22,4 +22,4 @@
 
 mod hc128;
 
-pub use hc128::{Hc128Core, Hc128Rng};
+pub use hc128::Hc128Rng;

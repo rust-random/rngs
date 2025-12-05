@@ -1,13 +1,16 @@
 [workspace]
 members = [
-    "rand_jitter",
+    "rand_hc",
     "rand_isaac",
+    "rand_jitter",
+    "rand_sfc",
     "rand_xorshift",
     "rand_xoshiro",
-    "rand_hc",
-    "rand_sfc"
 ]
 exclude = [
     "benches",
 ]
 resolver = "2"
+
+[patch.crates-io]
+rand_core = { git = "https://github.com/rust-random/rand_core", branch = "block_buffer" }
