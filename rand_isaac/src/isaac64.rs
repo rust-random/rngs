@@ -9,10 +9,9 @@
 
 //! The ISAAC-64 random number generator.
 
-use crate::isaac_array::IsaacArray;
 use core::num::Wrapping as w;
 use core::{fmt, slice};
-use rand_core::block::{BlockRng64, BlockRngCore};
+use rand_core::block::{BlockRng, Generator};
 use rand_core::{RngCore, SeedableRng, TryRngCore, le};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -70,7 +69,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// }
 /// ```
 ///
-/// This implementation uses [`BlockRng64`] to implement the [`RngCore`] methods.
+/// This implementation uses [`BlockRng`] to implement the [`RngCore`] methods.
 ///
 /// See for more information the documentation of [`IsaacRng`].
 ///
@@ -79,20 +78,20 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///
 /// [`IsaacRng`]: crate::isaac::IsaacRng
 /// [`rand_hc`]: https://docs.rs/rand_hc
-/// [`BlockRng64`]: rand_core::block::BlockRng64
+/// [`BlockRng`]: rand_core::block::BlockRng
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Isaac64Rng(BlockRng64<Isaac64Core>);
+pub struct Isaac64Rng(BlockRng<Isaac64Core>);
 
 impl RngCore for Isaac64Rng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        self.0.next_u32()
+        self.0.next_word() as u32
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        self.0.next_u64()
+        self.0.next_word()
     }
 
     #[inline]
@@ -106,7 +105,7 @@ impl SeedableRng for Isaac64Rng {
 
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
-        Isaac64Rng(BlockRng64::<Isaac64Core>::from_seed(seed))
+        Isaac64Rng(BlockRng::new(Isaac64Core::from_seed(seed)))
     }
 
     /// Create an ISAAC random number generator using an `u64` as seed.
@@ -114,7 +113,7 @@ impl SeedableRng for Isaac64Rng {
     /// the reference implementation when used unseeded.
     #[inline]
     fn seed_from_u64(seed: u64) -> Self {
-        Isaac64Rng(BlockRng64::<Isaac64Core>::seed_from_u64(seed))
+        Isaac64Rng(BlockRng::new(Isaac64Core::seed_from_u64(seed)))
     }
 
     #[inline]
@@ -122,7 +121,7 @@ impl SeedableRng for Isaac64Rng {
     where
         R: RngCore + ?Sized,
     {
-        Isaac64Rng(BlockRng64::<Isaac64Core>::from_rng(rng))
+        Isaac64Rng(BlockRng::new(Isaac64Core::from_rng(rng)))
     }
 
     #[inline]
@@ -130,7 +129,7 @@ impl SeedableRng for Isaac64Rng {
     where
         S: TryRngCore + ?Sized,
     {
-        BlockRng64::<Isaac64Core>::try_from_rng(rng).map(Isaac64Rng)
+        Isaac64Core::try_from_rng(rng).map(|core| Isaac64Rng(BlockRng::new(core)))
     }
 }
 
@@ -165,9 +164,8 @@ impl ::core::cmp::PartialEq for Isaac64Core {
 // Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
 impl ::core::cmp::Eq for Isaac64Core {}
 
-impl BlockRngCore for Isaac64Core {
-    type Item = u64;
-    type Results = IsaacArray<Self::Item>;
+impl Generator for Isaac64Core {
+    type Output = [u64; RAND_SIZE];
 
     /// Refills the output buffer, `results`. See also the pseudocode description
     /// of the algorithm in the `Isaac64Rng` documentation.
@@ -189,7 +187,7 @@ impl BlockRngCore for Isaac64Core {
     ///   make `fill_bytes` a memcopy. To maintain compatibility we fill in
     ///   reverse.
     #[rustfmt::skip]
-    fn generate(&mut self, results: &mut IsaacArray<Self::Item>) {
+    fn generate(&mut self, results: &mut [u64; RAND_SIZE]) {
         self.c += w(1);
         // abbreviations
         let mut a = self.a;
@@ -457,8 +455,8 @@ mod test {
         }
         // Subset of above values, as an LE u32 sequence
         let expected = [
-            3477963620, 3509106075, 687845478, 1797495790, 227048253, 2523132918, 4044335064,
-            1260557630, 4079741768, 3001306521, 69157722, 3958365844,
+            3477963620, 687845478, 227048253, 4044335064, 4079741768, 69157722, 3912394646,
+            1204022051, 2459090310, 2151271855, 384864925, 1183723065,
         ];
         assert_eq!(results, expected);
     }
@@ -475,12 +473,12 @@ mod test {
         // `test_isaac64_true_values_32`.
         assert_eq!(rng.next_u64(), 15071495833797886820);
         assert_eq!(rng.next_u32(), 687845478);
-        assert_eq!(rng.next_u32(), 1797495790);
-        assert_eq!(rng.next_u64(), 10836773366498097981);
-        assert_eq!(rng.next_u32(), 4044335064);
+        assert_eq!(rng.next_u32(), 227048253);
+        assert_eq!(rng.next_u64(), 5414053799617603544);
+        assert_eq!(rng.next_u32(), 4079741768);
         // Skip one u32
-        assert_eq!(rng.next_u64(), 12890513357046278984);
-        assert_eq!(rng.next_u32(), 69157722);
+        assert_eq!(rng.next_u64(), 17001051845652595546);
+        assert_eq!(rng.next_u32(), 3912394646);
     }
 
     #[test]

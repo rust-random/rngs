@@ -15,7 +15,7 @@
 //! The HC-128 random number generator.
 
 use core::fmt;
-use rand_core::block::{BlockRng, BlockRngCore, CryptoBlockRng};
+use rand_core::block::{BlockRng, CryptoGenerator, Generator};
 use rand_core::{CryptoRng, RngCore, SeedableRng, le};
 
 const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
@@ -75,12 +75,12 @@ pub struct Hc128Rng(BlockRng<Hc128Core>);
 impl RngCore for Hc128Rng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        self.0.next_u32()
+        self.0.next_word()
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        self.0.next_u64()
+        self.0.next_u64_from_u32()
     }
 
     #[inline]
@@ -94,7 +94,7 @@ impl SeedableRng for Hc128Rng {
 
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
-        Hc128Rng(BlockRng::<Hc128Core>::from_seed(seed))
+        Hc128Rng(BlockRng::new(Hc128Core::from_seed(seed)))
     }
 }
 
@@ -121,11 +121,10 @@ impl fmt::Debug for Hc128Core {
     }
 }
 
-impl BlockRngCore for Hc128Core {
-    type Item = u32;
-    type Results = [u32; 16];
+impl Generator for Hc128Core {
+    type Output = [u32; 16];
 
-    fn generate(&mut self, results: &mut Self::Results) {
+    fn generate(&mut self, results: &mut Self::Output) {
         assert!(self.counter1024 % 16 == 0);
 
         let cc = self.counter1024 % 512;
@@ -342,7 +341,7 @@ impl SeedableRng for Hc128Core {
     }
 }
 
-impl CryptoBlockRng for Hc128Core {}
+impl CryptoGenerator for Hc128Core {}
 
 // Custom PartialEq implementation as it can't currently be derived from an array of size 1024
 impl PartialEq for Hc128Core {
