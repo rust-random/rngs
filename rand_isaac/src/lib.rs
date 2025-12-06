@@ -27,7 +27,5 @@
 pub mod isaac;
 pub mod isaac64;
 
-mod isaac_array;
-
 pub use self::isaac::IsaacRng;
 pub use self::isaac64::Isaac64Rng;
