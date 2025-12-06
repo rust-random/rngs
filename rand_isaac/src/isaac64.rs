@@ -455,8 +455,8 @@ mod test {
         }
         // Subset of above values, as an LE u32 sequence
         let expected = [
-            3477963620, 3509106075, 687845478, 1797495790, 227048253, 2523132918, 4044335064,
-            1260557630, 4079741768, 3001306521, 69157722, 3958365844,
+            3477963620, 687845478, 227048253, 4044335064, 4079741768, 69157722, 3912394646,
+            1204022051, 2459090310, 2151271855, 384864925, 1183723065,
         ];
         assert_eq!(results, expected);
     }
@@ -473,12 +473,12 @@ mod test {
         // `test_isaac64_true_values_32`.
         assert_eq!(rng.next_u64(), 15071495833797886820);
         assert_eq!(rng.next_u32(), 687845478);
-        assert_eq!(rng.next_u32(), 1797495790);
-        assert_eq!(rng.next_u64(), 10836773366498097981);
-        assert_eq!(rng.next_u32(), 4044335064);
+        assert_eq!(rng.next_u32(), 227048253);
+        assert_eq!(rng.next_u64(), 5414053799617603544);
+        assert_eq!(rng.next_u32(), 4079741768);
         // Skip one u32
-        assert_eq!(rng.next_u64(), 12890513357046278984);
-        assert_eq!(rng.next_u32(), 69157722);
+        assert_eq!(rng.next_u64(), 17001051845652595546);
+        assert_eq!(rng.next_u32(), 3912394646);
     }
 
     #[test]
