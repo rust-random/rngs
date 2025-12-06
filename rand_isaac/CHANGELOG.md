@@ -5,8 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Value-breaking changes
+- Drop use of half-used words in `Isaac64Rng::next_u32` (#82)
+
 ### Changes
 - Use Edition 2024 and MSRV 1.85 (#73)
+- Update to `rand_core` v0.10 (#82)
 
 ## [0.4.0] - 2025-01-27
 - Bump the MSRV to 1.63 (#58)
