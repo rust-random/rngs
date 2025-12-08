@@ -10,13 +10,11 @@ fn test_jitter_init() {
     // Don't fail this test if initializing `JitterRng` fails because of a
     // bad timer (the timer from the standard library may not have enough
     // accuracy on all platforms).
-    match JitterRng::new() {
-        Ok(ref mut rng) => {
-            // false positives are possible, but extremely unlikely
-            assert!(rng.next_u32() | rng.next_u32() != 0);
-        }
-        Err(_) => {}
-    }
+    let Ok(mut rng) = JitterRng::new() else {
+        return;
+    };
+    // false positives are possible, but extremely unlikely
+    assert!(rng.next_u32() | rng.next_u32() != 0);
 }
 
 #[test]
