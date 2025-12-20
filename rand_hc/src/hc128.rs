@@ -16,7 +16,7 @@
 
 use core::fmt;
 use rand_core::block::{BlockRng, CryptoGenerator, Generator};
-use rand_core::{CryptoRng, RngCore, SeedableRng, le};
+use rand_core::{CryptoRng, RngCore, SeedableRng, utils};
 
 const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 
@@ -335,8 +335,7 @@ impl SeedableRng for Hc128Core {
     /// 256 bits in length, matching the 128 bit `key` followed by 128 bit `iv`
     /// when HC-128 where to be used as a stream cipher.
     fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u32 = [0u32; SEED_WORDS];
-        le::read_u32_into(&seed, &mut seed_u32);
+        let seed_u32: [u32; SEED_WORDS] = utils::read_words(&seed);
         Self::init(seed_u32)
     }
 }

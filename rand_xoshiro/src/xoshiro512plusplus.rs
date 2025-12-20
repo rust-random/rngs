@@ -6,7 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rand_core::le::{fill_bytes_via_next, read_u64_into};
+use rand_core::utils::{fill_bytes_via_next_word, read_words};
 use rand_core::{RngCore, SeedableRng};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -91,8 +91,7 @@ impl SeedableRng for Xoshiro512PlusPlus {
     #[inline]
     fn from_seed(seed: Seed512) -> Xoshiro512PlusPlus {
         deal_with_zero_seed!(seed, Self);
-        let mut state = [0; 8];
-        read_u64_into(&seed.0, &mut state);
+        let state: [u64; 8] = read_words(&seed.0);
         Xoshiro512PlusPlus { s: state }
     }
 
@@ -119,7 +118,7 @@ impl RngCore for Xoshiro512PlusPlus {
 
     #[inline]
     fn fill_bytes(&mut self, dest: &mut [u8]) {
-        fill_bytes_via_next(self, dest);
+        fill_bytes_via_next_word(dest, || self.next_u64());
     }
 }
 

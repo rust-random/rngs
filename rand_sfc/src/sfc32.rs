@@ -6,7 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rand_core::le::{fill_bytes_via_next, next_u64_via_u32, read_u32_into};
+use rand_core::utils::{fill_bytes_via_next_word, next_u64_via_u32, read_words};
 use rand_core::{RngCore, SeedableRng};
 
 #[cfg(feature = "serde")]
@@ -60,7 +60,7 @@ impl RngCore for Sfc32 {
 
     #[inline]
     fn fill_bytes(&mut self, dest: &mut [u8]) {
-        fill_bytes_via_next(self, dest);
+        fill_bytes_via_next_word(dest, || self.next_u64());
     }
 }
 
@@ -73,8 +73,7 @@ impl SeedableRng for Sfc32 {
 
     /// Create a new `Sfc32`.
     fn from_seed(seed: [u8; 12]) -> Sfc32 {
-        let mut s = [0; 3];
-        read_u32_into(&seed, &mut s);
+        let s: [u32; 3] = read_words(&seed);
 
         let mut rng = Sfc32 {
             a: s[0],

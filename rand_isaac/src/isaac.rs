@@ -12,7 +12,7 @@
 use core::num::Wrapping as w;
 use core::{fmt, slice};
 use rand_core::block::{BlockRng, Generator};
-use rand_core::{RngCore, SeedableRng, TryRngCore, le};
+use rand_core::{RngCore, SeedableRng, TryRngCore, utils};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -343,8 +343,7 @@ impl SeedableRng for IsaacCore {
     type Seed = [u8; 32];
 
     fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u32 = [0u32; 8];
-        le::read_u32_into(&seed, &mut seed_u32);
+        let seed_u32: [u32; 8] = utils::read_words(&seed);
         // Convert the seed to `Wrapping<u32>` and zero-extend to `RAND_SIZE`.
         let mut seed_extended = [w(0); RAND_SIZE];
         for (x, y) in seed_extended.iter_mut().zip(seed_u32.iter()) {

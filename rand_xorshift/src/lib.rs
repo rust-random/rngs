@@ -31,7 +31,7 @@
 
 use core::fmt;
 use core::num::Wrapping as w;
-use rand_core::{RngCore, SeedableRng, TryRngCore, le};
+use rand_core::{RngCore, SeedableRng, TryRngCore, utils};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -82,12 +82,12 @@ impl RngCore for XorShiftRng {
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        le::next_u64_via_u32(self)
+        utils::next_u64_via_u32(self)
     }
 
     #[inline]
     fn fill_bytes(&mut self, dest: &mut [u8]) {
-        le::fill_bytes_via_next(self, dest)
+        utils::fill_bytes_via_next_word(dest, || self.next_u64())
     }
 }
 
@@ -95,8 +95,7 @@ impl SeedableRng for XorShiftRng {
     type Seed = [u8; 16];
 
     fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u32 = [0u32; 4];
-        le::read_u32_into(&seed, &mut seed_u32);
+        let mut seed_u32: [u32; 4] = utils::read_words(&seed);
 
         // Xorshift cannot be seeded with 0 and we cannot return an Error, but
         // also do not wish to panic (because a random seed can legitimately be
