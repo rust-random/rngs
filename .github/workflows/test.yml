@@ -73,10 +73,6 @@ jobs:
         if: ${{ matrix.variant == 'minimal_versions' }}
         run: |
           cargo generate-lockfile -Z minimal-versions
-      - name: Maybe nightly
-        if: ${{ matrix.toolchain == 'nightly' }}
-        run: |
-          cargo test --target ${{ matrix.target }} --benches
       - name: Test
         run: |
           cargo test --target ${{ matrix.target }} --manifest-path rand_hc/Cargo.toml --all-features

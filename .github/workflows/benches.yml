@@ -1,10 +1,12 @@
 name: Benches
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
-    paths:
-      - ".github/workflows/benches.yml"
-      - "benches/**"
+    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * SUN'
 
 jobs:
   benches:
@@ -24,3 +26,16 @@ jobs:
         run: cargo fmt -- --check
       - name: Clippy
         run: cargo clippy --all-targets -- -D warnings
+
+  test-benches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install toolchain
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+      - name: Test benches
+        working-directory: ./benches
+        run: |
+          cargo test --benches
