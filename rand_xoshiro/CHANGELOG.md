@@ -6,29 +6,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changes
-- Use Edition 2024 and MSRV 1.85 (#73)
-- Update to `rand_core` v0.10 (#82)
+- Use Edition 2024 and MSRV 1.85 ([#73])
+- Update to `rand_core` v0.10 ([#82])
+
+[#73]: https://github.com/rust-random/rngs/pull/73
+[#82]: https://github.com/rust-random/rngs/pull/82
 
 ## [0.7.0] - 2025-01-27
-- Bump the MSRV to 1.63 (#58)
-- Update to `rand_core` v0.9.0 (#58)
-- Rename feature `serde1` to `serde` (#58)
+- Bump the MSRV to 1.63 ([#58])
+- Update to `rand_core` v0.9.0 ([#58])
+- Rename feature `serde1` to `serde` ([#58])
 - Add `Xoshiro128Plus::long_jump`
 - Add examples for initializing the RNGs
 - Speed up `from_seed` implementation for 128-bit seeds
 - Fix a few typos in the docs
 
+[#58]: https://github.com/rust-random/rngs/pull/58
+
 ## [0.6.0] - 2020-12-18
-- Bump `rand_core` version to 0.6 (#17)
+- Bump `rand_core` version to 0.6 ([#17])
+
+[#17]: https://github.com/rust-random/rngs/pull/17
 
 ## [0.5.0] - 2020-09-11
 - Derive PartialEq+Eq for SplitMix64, Xoroshiro64Star, Xoroshiro64StarStar,
   Xoroshiro128Plus, Xoroshiro128PlusPlus, Xoroshiro128StarStar,
   Xoshiro128Plus, Xoshiro128PlusPlus, Xoshiro128StarStar, Xoshiro256Plus,
   Xoshiro256PlusPlus, Xoshiro256StarStar, Xoshiro512Plus, Xoshiro512PlusPlus,
-  and Xoshiro512StarStar (#6)
+  and Xoshiro512StarStar ([#6])
 - `next_u32`: Prefer upper bits for `Xoshiro256{PlusPlus,StarStar}` and
   `Xoshiro512{Plus,PlusPlus,StarStar}`, breaking value stability
+
+[#6]: https://github.com/rust-random/rngs/pull/6
 
 ## [0.4.0] - 2019-09-03
 - Add xoshiro128++, 256++ and 512++ variants

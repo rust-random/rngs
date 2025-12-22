@@ -6,22 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Value-breaking changes
-- Drop use of half-used words in `Isaac64Rng::next_u32` (#82)
+- Drop use of half-used words in `Isaac64Rng::next_u32` ([#82])
 
 ### Changes
-- Use Edition 2024 and MSRV 1.85 (#73)
-- Update to `rand_core` v0.10 (#82)
+- Use Edition 2024 and MSRV 1.85 ([#73])
+- Update to `rand_core` v0.10 ([#82])
+
+[#73]: https://github.com/rust-random/rngs/pull/73
+[#82]: https://github.com/rust-random/rngs/pull/82
 
 ## [0.4.0] - 2025-01-27
-- Bump the MSRV to 1.63 (#58)
-- Update to `rand_core` v0.9.0 (#58)
-- Rename feature `serde1` to `serde` (#58)
+- Bump the MSRV to 1.63 ([#58])
+- Update to `rand_core` v0.9.0 ([#58])
+- Rename feature `serde1` to `serde` ([#58])
 - Fix compiler and clippy warnings
 - Add examples for initializing the RNGs
 
+[#58]: https://github.com/rust-random/rngs/pull/58
+
 ## [0.3.0] - 2020-12-18
-- Bump `rand_core` version to 0.6 (#17)
-- Derive PartialEq+Eq for IsaacCore, Isaac64Core, and IsaacArray (#6)
+- Bump `rand_core` version to 0.6 ([#17])
+- Derive PartialEq+Eq for IsaacCore, Isaac64Core, and IsaacArray ([#6])
+
+[#17]: https://github.com/rust-random/rngs/pull/17
+[#6]: https://github.com/rust-random/rngs/pull/6
 
 ## [0.2.0] - 2019-06-12
 - Bump minor crate version since rand_core bump is a breaking change
