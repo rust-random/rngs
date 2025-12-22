@@ -19,7 +19,7 @@ std = []
 log = ["dep:log"]
 
 [dependencies]
-rand_core = "0.10.0-rc-2"
+rand_core = "0.10.0-rc-3"
 log = { version = "0.4.4", optional = true }
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]

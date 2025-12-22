@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changes
 - Use Edition 2024 and MSRV 1.85 (#73)
+- Update to `rand_core` v0.10 (#82)
 
 ## [0.5.0] - 2025-01-27
 - Bump the MSRV to 1.63 (#58)
