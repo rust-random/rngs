@@ -20,7 +20,7 @@ all-features = true
 serde = ["dep:serde"]
 
 [dependencies]
-rand_core = "0.10.0-rc-2"
+rand_core = "0.10.0-rc-3"
 serde = { version = "1", features = ["derive"], optional=true }
 
 [dev-dependencies]

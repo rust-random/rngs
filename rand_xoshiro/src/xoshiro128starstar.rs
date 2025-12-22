@@ -6,8 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rand_core::le::{fill_bytes_via_next, next_u64_via_u32, read_u32_into};
-use rand_core::{RngCore, SeedableRng};
+use rand_core::{RngCore, SeedableRng, utils};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -63,9 +62,9 @@ impl SeedableRng for Xoshiro128StarStar {
     #[inline]
     fn from_seed(seed: [u8; 16]) -> Xoshiro128StarStar {
         deal_with_zero_seed!(seed, Self, 16);
-        let mut state = [0; 4];
-        read_u32_into(&seed, &mut state);
-        Xoshiro128StarStar { s: state }
+        Xoshiro128StarStar {
+            s: utils::read_words(&seed),
+        }
     }
 
     /// Seed a `Xoshiro128StarStar` from a `u64` using `SplitMix64`.
@@ -84,12 +83,12 @@ impl RngCore for Xoshiro128StarStar {
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        next_u64_via_u32(self)
+        utils::next_u64_via_u32(self)
     }
 
     #[inline]
     fn fill_bytes(&mut self, dest: &mut [u8]) {
-        fill_bytes_via_next(self, dest);
+        utils::fill_bytes_via_next_word(dest, || self.next_u32());
     }
 }
 
