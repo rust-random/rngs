@@ -9,11 +9,10 @@
 
 //! The ISAAC-64 random number generator.
 
-use crate::isaac_array::IsaacArray;
 use core::num::Wrapping as w;
 use core::{fmt, slice};
-use rand_core::block::{BlockRng64, BlockRngCore};
-use rand_core::{RngCore, SeedableRng, TryRngCore, le};
+use rand_core::block::{BlockRng, Generator};
+use rand_core::{RngCore, SeedableRng, TryRngCore, utils};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -70,7 +69,7 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 /// }
 /// ```
 ///
-/// This implementation uses [`BlockRng64`] to implement the [`RngCore`] methods.
+/// This implementation uses [`BlockRng`] to implement the [`RngCore`] methods.
 ///
 /// See for more information the documentation of [`IsaacRng`].
 ///
@@ -79,20 +78,19 @@ const RAND_SIZE: usize = 1 << RAND_SIZE_LEN;
 ///
 /// [`IsaacRng`]: crate::isaac::IsaacRng
 /// [`rand_hc`]: https://docs.rs/rand_hc
-/// [`BlockRng64`]: rand_core::block::BlockRng64
+/// [`BlockRng`]: rand_core::block::BlockRng
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Isaac64Rng(BlockRng64<Isaac64Core>);
+pub struct Isaac64Rng(BlockRng<Isaac64Core>);
 
 impl RngCore for Isaac64Rng {
     #[inline]
     fn next_u32(&mut self) -> u32 {
-        self.0.next_u32()
+        self.0.next_word() as u32
     }
 
     #[inline]
     fn next_u64(&mut self) -> u64 {
-        self.0.next_u64()
+        self.0.next_word()
     }
 
     #[inline]
@@ -106,7 +104,7 @@ impl SeedableRng for Isaac64Rng {
 
     #[inline]
     fn from_seed(seed: Self::Seed) -> Self {
-        Isaac64Rng(BlockRng64::<Isaac64Core>::from_seed(seed))
+        Isaac64Rng(BlockRng::new(Isaac64Core::from_seed(seed)))
     }
 
     /// Create an ISAAC random number generator using an `u64` as seed.
@@ -114,7 +112,7 @@ impl SeedableRng for Isaac64Rng {
     /// the reference implementation when used unseeded.
     #[inline]
     fn seed_from_u64(seed: u64) -> Self {
-        Isaac64Rng(BlockRng64::<Isaac64Core>::seed_from_u64(seed))
+        Isaac64Rng(BlockRng::new(Isaac64Core::seed_from_u64(seed)))
     }
 
     #[inline]
@@ -122,7 +120,7 @@ impl SeedableRng for Isaac64Rng {
     where
         R: RngCore + ?Sized,
     {
-        Isaac64Rng(BlockRng64::<Isaac64Core>::from_rng(rng))
+        Isaac64Rng(BlockRng::new(Isaac64Core::from_rng(rng)))
     }
 
     #[inline]
@@ -130,7 +128,133 @@ impl SeedableRng for Isaac64Rng {
     where
         S: TryRngCore + ?Sized,
     {
-        BlockRng64::<Isaac64Core>::try_from_rng(rng).map(Isaac64Rng)
+        Isaac64Core::try_from_rng(rng).map(|core| Isaac64Rng(BlockRng::new(core)))
+    }
+}
+
+#[cfg(feature = "serde")]
+mod serde_impls {
+    use super::{Isaac64Core, Isaac64Rng, RAND_SIZE};
+    use core::fmt;
+    use rand_core::block::BlockRng;
+    use serde::de::{Deserialize, Deserializer, Error, MapAccess, SeqAccess, Visitor};
+    use serde::ser::{Serialize, SerializeStruct, Serializer};
+
+    impl Serialize for Isaac64Rng {
+        fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+            let mut state = serializer.serialize_struct("Isaac64Rng", 2)?;
+            state.serialize_field("core", &self.0.core)?;
+            state.serialize_field("results", self.0.remaining_results())?;
+            state.end()
+        }
+    }
+
+    struct Results {
+        results: [u64; RAND_SIZE],
+        len: usize,
+    }
+    impl Results {
+        fn to_rng(&self, core: Isaac64Core) -> Isaac64Rng {
+            let results = &self.results[..self.len];
+            Isaac64Rng(BlockRng::reconstruct(core, results).unwrap())
+        }
+    }
+    struct ResultsVisitor;
+    impl<'de> Visitor<'de> for ResultsVisitor {
+        type Value = Results;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(formatter, "") // TODO
+        }
+
+        fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+            let mut results = [0u64; RAND_SIZE];
+            let mut len = 0;
+            while let Some(value) = seq.next_element()? {
+                if len >= results.len() {
+                    return Err(Error::invalid_length(
+                        len + 1,
+                        &("up to 256 elements" as &str),
+                    ));
+                }
+
+                results[len] = value;
+                len += 1;
+            }
+
+            Ok(Results { results, len })
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Results {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+            deserializer.deserialize_seq(ResultsVisitor)
+        }
+    }
+
+    #[derive(serde::Deserialize)]
+    #[serde(field_identifier, rename_all = "lowercase")]
+    enum Field {
+        Core,
+        Results,
+    }
+
+    struct IsaacVisitor;
+    impl<'de> Visitor<'de> for IsaacVisitor {
+        type Value = Isaac64Rng;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(formatter, "") // TODO
+        }
+
+        fn visit_seq<V>(self, mut seq: V) -> Result<Isaac64Rng, V::Error>
+        where
+            V: SeqAccess<'de>,
+        {
+            let core = seq
+                .next_element()?
+                .ok_or_else(|| Error::invalid_length(0, &self))?;
+            let results: Results = seq
+                .next_element()?
+                .ok_or_else(|| Error::invalid_length(1, &self))?;
+
+            Ok(results.to_rng(core))
+        }
+
+        fn visit_map<V>(self, mut map: V) -> Result<Isaac64Rng, V::Error>
+        where
+            V: MapAccess<'de>,
+        {
+            let mut core = None;
+            let mut results: Option<Results> = None;
+            while let Some(key) = map.next_key()? {
+                match key {
+                    Field::Core => {
+                        if core.is_some() {
+                            return Err(Error::duplicate_field("core"));
+                        }
+                        core = Some(map.next_value()?);
+                    }
+                    Field::Results => {
+                        if results.is_some() {
+                            return Err(Error::duplicate_field("results"));
+                        }
+                        results = Some(map.next_value()?);
+                    }
+                }
+            }
+            let core = core.ok_or_else(|| Error::missing_field("core"))?;
+            let results = results.ok_or_else(|| Error::missing_field("results"))?;
+
+            Ok(results.to_rng(core))
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Isaac64Rng {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+            const FIELDS: &[&str] = &["core", "results"];
+            deserializer.deserialize_struct("Isaac64Rng", FIELDS, IsaacVisitor)
+        }
     }
 }
 
@@ -138,10 +262,7 @@ impl SeedableRng for Isaac64Rng {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Isaac64Core {
-    #[cfg_attr(
-        feature = "serde",
-        serde(with = "super::isaac_array::isaac_array_serde")
-    )]
+    #[cfg_attr(feature = "serde", serde(with = "serde_arrays"))]
     mem: [w64; RAND_SIZE],
     a: w64,
     b: w64,
@@ -165,9 +286,8 @@ impl ::core::cmp::PartialEq for Isaac64Core {
 // Custom Eq implementation as it can't currently be derived from an array of size RAND_SIZE
 impl ::core::cmp::Eq for Isaac64Core {}
 
-impl BlockRngCore for Isaac64Core {
-    type Item = u64;
-    type Results = IsaacArray<Self::Item>;
+impl Generator for Isaac64Core {
+    type Output = [u64; RAND_SIZE];
 
     /// Refills the output buffer, `results`. See also the pseudocode description
     /// of the algorithm in the `Isaac64Rng` documentation.
@@ -189,7 +309,7 @@ impl BlockRngCore for Isaac64Core {
     ///   make `fill_bytes` a memcopy. To maintain compatibility we fill in
     ///   reverse.
     #[rustfmt::skip]
-    fn generate(&mut self, results: &mut IsaacArray<Self::Item>) {
+    fn generate(&mut self, results: &mut [u64; RAND_SIZE]) {
         self.c += w(1);
         // abbreviations
         let mut a = self.a;
@@ -311,8 +431,7 @@ impl SeedableRng for Isaac64Core {
     type Seed = [u8; 32];
 
     fn from_seed(seed: Self::Seed) -> Self {
-        let mut seed_u64 = [0u64; 4];
-        le::read_u64_into(&seed, &mut seed_u64);
+        let seed_u64: [u64; 4] = utils::read_words(&seed);
         // Convert the seed to `Wrapping<u64>` and zero-extend to `RAND_SIZE`.
         let mut seed_extended = [w(0); RAND_SIZE];
         for (x, y) in seed_extended.iter_mut().zip(seed_u64.iter()) {
@@ -457,8 +576,8 @@ mod test {
         }
         // Subset of above values, as an LE u32 sequence
         let expected = [
-            3477963620, 3509106075, 687845478, 1797495790, 227048253, 2523132918, 4044335064,
-            1260557630, 4079741768, 3001306521, 69157722, 3958365844,
+            3477963620, 687845478, 227048253, 4044335064, 4079741768, 69157722, 3912394646,
+            1204022051, 2459090310, 2151271855, 384864925, 1183723065,
         ];
         assert_eq!(results, expected);
     }
@@ -475,12 +594,12 @@ mod test {
         // `test_isaac64_true_values_32`.
         assert_eq!(rng.next_u64(), 15071495833797886820);
         assert_eq!(rng.next_u32(), 687845478);
-        assert_eq!(rng.next_u32(), 1797495790);
-        assert_eq!(rng.next_u64(), 10836773366498097981);
-        assert_eq!(rng.next_u32(), 4044335064);
+        assert_eq!(rng.next_u32(), 227048253);
+        assert_eq!(rng.next_u64(), 5414053799617603544);
+        assert_eq!(rng.next_u32(), 4079741768);
         // Skip one u32
-        assert_eq!(rng.next_u64(), 12890513357046278984);
-        assert_eq!(rng.next_u32(), 69157722);
+        assert_eq!(rng.next_u64(), 17001051845652595546);
+        assert_eq!(rng.next_u32(), 3912394646);
     }
 
     #[test]
@@ -503,7 +622,7 @@ mod test {
 
     #[test]
     fn test_isaac64_new_uninitialized() {
-        // Compare the results from initializing `IsaacRng` with
+        // Compare the results from initializing `Isaac64Rng` with
         // `seed_from_u64(0)`, to make sure it is the same as the reference
         // implementation when used uninitialized.
         // Note: We only test the first 16 integers, not the full 256 of the
@@ -558,6 +677,10 @@ mod test {
             0, 0, 0, 0, 0, 0,
         ];
         let mut rng = Isaac64Rng::from_seed(seed);
+
+        // discard some results
+        let _ = rng.next_u64();
+        let _ = rng.next_u32();
 
         let buf: Vec<u8> = Vec::new();
         let mut buf = BufWriter::new(buf);

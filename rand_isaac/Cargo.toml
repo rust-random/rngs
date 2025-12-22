@@ -19,11 +19,12 @@ rust-version = "1.85"
 all-features = true
 
 [features]
-serde = ["dep:serde", "rand_core/serde"]
+serde = ["dep:serde", "dep:serde_arrays"]
 
 [dependencies]
-rand_core = "0.10.0-rc-2"
+rand_core = "0.10.0-rc-3"
 serde = { version = "1.0.104", features = ["derive"], optional = true }
+serde_arrays = { version = "0.2.0", optional = true }
 
 [dev-dependencies]
 # This is for testing serde, unfortunately we can't specify feature-gated dev
