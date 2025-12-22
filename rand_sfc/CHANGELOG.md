@@ -13,8 +13,10 @@ Compared to the prior implementation:
 ### Changed
 
 - Value-stability is not preserved since constructors use a different number of mixing rounds
-- Update to `rand_core` v0.10 (#82)
+- Update to `rand_core` v0.10 ([#82])
 
 ### Removed
 
 - The `new` and `new_u64` constructors are not included
+
+[#82]: https://github.com/rust-random/rngs/pull/82
