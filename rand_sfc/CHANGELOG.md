@@ -13,6 +13,7 @@ Compared to the prior implementation:
 ### Changed
 
 - Value-stability is not preserved since constructors use a different number of mixing rounds
+- Update to `rand_core` v0.10 (#82)
 
 ### Removed
 

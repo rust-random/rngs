@@ -19,5 +19,5 @@ all-features = true
 serde = ["dep:serde"]
 
 [dependencies]
-rand_core = { version = "0.10.0-rc-2" }
+rand_core = { version = "0.10.0-rc-3" }
 serde = { version = "1.0.118", default-features = false, features = ["derive"], optional = true }
