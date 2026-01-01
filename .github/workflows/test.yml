@@ -16,7 +16,7 @@ jobs:
     name: Check doc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@nightly
       - run: cargo install cargo-deadlinks
@@ -59,7 +59,7 @@ jobs:
             variant: minimal_versions
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: MSRV
         if: ${{ matrix.variant == 'MSRV' }}
         run: cp Cargo.lock.msrv Cargo.lock
@@ -96,7 +96,7 @@ jobs:
         toolchain: [stable]
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
         with:
@@ -121,7 +121,7 @@ jobs:
   test-miri:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         run: |
           MIRI_NIGHTLY=nightly-$(curl -s https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/miri)
