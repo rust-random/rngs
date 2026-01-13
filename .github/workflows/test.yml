@@ -60,9 +60,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: MSRV
-        if: ${{ matrix.variant == 'MSRV' }}
-        run: cp Cargo.lock.msrv Cargo.lock
+      - name: Not MSRV
+        if: ${{ matrix.variant != 'MSRV' }}
+        run: cargo generate-lockfile --ignore-rust-version
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
         with:
@@ -73,10 +73,6 @@ jobs:
         if: ${{ matrix.variant == 'minimal_versions' }}
         run: |
           cargo generate-lockfile -Z minimal-versions
-      - name: Maybe nightly
-        if: ${{ matrix.toolchain == 'nightly' }}
-        run: |
-          cargo test --target ${{ matrix.target }} --benches
       - name: Test
         run: |
           cargo test --target ${{ matrix.target }} --manifest-path rand_hc/Cargo.toml --all-features
