@@ -80,20 +80,12 @@ fn test_xorshift_clone() {
 #[cfg(feature = "serde")]
 #[test]
 fn test_xorshift_serde() {
-    use bincode;
-    use std::io::{BufReader, BufWriter};
-
     let seed = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     let mut rng = XorShiftRng::from_seed(seed);
 
-    let buf: Vec<u8> = Vec::new();
-    let mut buf = BufWriter::new(buf);
-    bincode::serialize_into(&mut buf, &rng).expect("Could not serialize");
+    let buf = postcard::to_allocvec(&rng).expect("Could not serialize");
 
-    let buf = buf.into_inner().unwrap();
-    let mut read = BufReader::new(&buf[..]);
-    let mut deserialized: XorShiftRng =
-        bincode::deserialize_from(&mut read).expect("Could not deserialize");
+    let mut deserialized: XorShiftRng = postcard::from_bytes(&buf).expect("Could not deserialize");
 
     for _ in 0..16 {
         assert_eq!(rng.next_u64(), deserialized.next_u64());

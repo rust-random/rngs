@@ -9,19 +9,11 @@ use rand_xoshiro::{
 
 macro_rules! serde_rng {
     ($rng:ident) => {
-        use bincode;
-        use std::io::{BufReader, BufWriter};
-
         let mut rng = $rng::seed_from_u64(0);
 
-        let buf: Vec<u8> = Vec::new();
-        let mut buf = BufWriter::new(buf);
-        bincode::serialize_into(&mut buf, &rng).expect("Could not serialize");
+        let buf = postcard::to_allocvec(&rng).expect("Could not serialize");
 
-        let buf = buf.into_inner().unwrap();
-        let mut read = BufReader::new(&buf[..]);
-        let mut deserialized: $rng =
-            bincode::deserialize_from(&mut read).expect("Could not deserialize");
+        let mut deserialized: $rng = postcard::from_bytes(&buf).expect("Could not deserialize");
 
         for _ in 0..16 {
             assert_eq!(rng.next_u64(), deserialized.next_u64());

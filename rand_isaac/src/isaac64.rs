@@ -669,9 +669,6 @@ mod test {
     #[test]
     #[cfg(feature = "serde")]
     fn test_isaac64_serde() {
-        use bincode;
-        use std::io::{BufReader, BufWriter};
-
         let seed = [
             1, 0, 0, 0, 23, 0, 0, 0, 200, 1, 0, 0, 210, 30, 0, 0, 57, 48, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -682,14 +679,10 @@ mod test {
         let _ = rng.next_u64();
         let _ = rng.next_u32();
 
-        let buf: Vec<u8> = Vec::new();
-        let mut buf = BufWriter::new(buf);
-        bincode::serialize_into(&mut buf, &rng).expect("Could not serialize");
+        let buf = postcard::to_allocvec(&rng).expect("Could not serialize");
 
-        let buf = buf.into_inner().unwrap();
-        let mut read = BufReader::new(&buf[..]);
         let mut deserialized: Isaac64Rng =
-            bincode::deserialize_from(&mut read).expect("Could not deserialize");
+            postcard::from_bytes(&buf).expect("Could not deserialize");
 
         // more than the 256 buffered results
         for _ in 0..300 {
