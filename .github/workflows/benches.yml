@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Install toolchain
-      - uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
       - name: Test benches
