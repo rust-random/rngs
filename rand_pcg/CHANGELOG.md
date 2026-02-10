@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-02-09
+## 0.10.1 - 2026-02-10
 ### Changed
 - The crate is moved from [`rust-random/rand`] to [`rust-random/rngs`].
 
@@ -61,8 +61,7 @@ Initial release, including:
 - `Lcg64Xsh32` aka `Pcg32`
 - `Mcg128Xsl64` aka `Pcg64Mcg`
 
-[Unreleased]: https://github.com/rust-random/rand/compare/0.10.0...HEAD
-[0.9.0]: https://github.com/rust-random/rand/compare/0.9.0...0.10.0
+[0.10.0]: https://github.com/rust-random/rand/compare/0.9.0...0.10.0
 [0.9.0]: https://github.com/rust-random/rand/compare/rand_pcg-0.3.1...0.9.0
 [0.3.1]: https://github.com/rust-random/rand/compare/rand_pcg-0.3.0...rand_pcg-0.3.1
 [0.3.0]: https://github.com/rust-random/rand/compare/rand_pcg-0.2.1...rand_pcg-0.3.0
