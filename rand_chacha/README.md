@@ -1,6 +1,6 @@
 # rand_chacha
 
-[![Test Status](https://github.com/rust-random/rand/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rand/actions)
+[![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_chacha.svg)](https://crates.io/crates/rand_chacha)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://docs.rs/rand_chacha/badge.svg)](https://docs.rs/rand_chacha)
@@ -22,7 +22,7 @@ the [`c2-chacha`](https://crates.io/crates/c2-chacha) crate.
 Links:
 
 -   [API documentation (docs.rs)](https://docs.rs/rand_chacha)
--   [Changelog](https://github.com/rust-random/rand/blob/master/rand_chacha/CHANGELOG.md)
+-   [Changelog](https://github.com/rust-random/rngs/blob/master/rand_chacha/CHANGELOG.md)
 
 [rand]: https://crates.io/crates/rand
 [^1]: D. J. Bernstein, [*ChaCha, a variant of Salsa20*](
