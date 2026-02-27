@@ -1,6 +1,6 @@
 # rand_pcg
 
-[![Test Status](https://github.com/rust-random/rand/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rand/actions)
+[![Test Status](https://github.com/rust-random/rngs/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/rust-random/rngs/actions)
 [![Latest version](https://img.shields.io/crates/v/rand_pcg.svg)](https://crates.io/crates/rand_pcg)
 [![Book](https://img.shields.io/badge/book-master-yellow.svg)](https://rust-random.github.io/book/)
 [![API](https://docs.rs/rand_pcg/badge.svg)](https://docs.rs/rand_pcg)
@@ -20,7 +20,7 @@ part of the [Rand project](https://github.com/rust-random/rand).
 Links:
 
 -   [API documentation (docs.rs)](https://docs.rs/rand_pcg)
--   [Changelog](https://github.com/rust-random/rand/blob/master/rand_pcg/CHANGELOG.md)
+-   [Changelog](https://github.com/rust-random/rngs/blob/master/rand_pcg/CHANGELOG.md)
 
 
 ## Crate Features
