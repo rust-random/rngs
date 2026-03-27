@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Add methods to get the internal state of the generators (`state` and
+  `stream` except for `Mcg128Xsl64`) and constructors to reproducibly
+  restore them from that state (#108).
+
 ## 0.10.1 - 2026-02-10
 ### Changed
 - The crate is moved from [`rust-random/rand`] to [`rust-random/rngs`].

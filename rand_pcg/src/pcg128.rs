@@ -113,6 +113,8 @@ impl Lcg128Xsl64 {
     }
 }
 
+crate::macros::impl_state_stream!(Lcg128Xsl64, u128);
+
 // Custom Debug implementation that does not expose the internal state
 impl fmt::Debug for Lcg128Xsl64 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -216,6 +218,13 @@ impl Mcg128Xsl64 {
     pub fn new(state: u128) -> Self {
         // Force low bit to 1, as in C version (C++ uses `state | 3` instead).
         Mcg128Xsl64 { state: state | 1 }
+    }
+
+    /// Current state of the generator
+    ///
+    /// Will always be odd.
+    pub fn state(&self) -> u128 {
+        self.state
     }
 }
 

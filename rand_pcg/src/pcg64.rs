@@ -114,6 +114,8 @@ impl Lcg64Xsh32 {
     }
 }
 
+crate::macros::impl_state_stream!(Lcg64Xsh32, u64);
+
 // Custom Debug implementation that does not expose the internal state
 impl fmt::Debug for Lcg64Xsh32 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

@@ -52,6 +52,32 @@ fn test_mcg128xsl64_reference() {
     assert_eq!(results, expected);
 }
 
+#[test]
+fn test_mcg128xsl64_state_odd() {
+    let mut rng = Mcg128Xsl64::new(1001);
+
+    for _ in 0..1000 {
+        assert!(rng.state() % 2 == 1);
+        rng.next_u64();
+    }
+}
+
+#[test]
+fn test_mcg128xsl64_restore() {
+    let mut rng_orig = Mcg128Xsl64::new(1234567);
+
+    for _ in 0..100 {
+        rng_orig.next_u64();
+    }
+
+    let state = rng_orig.state();
+    let mut rng_copy = Mcg128Xsl64::new(state);
+
+    for _ in 0..1_000 {
+        assert_eq!(rng_copy.next_u64(), rng_orig.next_u64());
+    }
+}
+
 #[cfg(feature = "serde")]
 #[test]
 fn test_mcg128xsl64_serde() {
