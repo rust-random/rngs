@@ -96,3 +96,42 @@ pub use rand_core;
 pub use self::pcg64::{Lcg64Xsh32, Pcg32};
 pub use self::pcg128::{Lcg128Xsl64, Mcg128Xsl64, Pcg64, Pcg64Mcg};
 pub use self::pcg128cm::{Lcg128CmDxsm64, Pcg64Dxsm};
+
+mod macros {
+    macro_rules! impl_state_stream {
+        ($type:ident, $int:ty) => {
+            impl $type {
+                /// Current state of the generator
+                pub fn state(&self) -> $int {
+                    self.state
+                }
+
+                /// Stream parameter of the generator
+                ///
+                /// Note that PCG only stores an increment, which is always odd.
+                /// [`Self::from_state`] discards the highest bit from the
+                /// stream by shifting it to the left, so this method shifts the
+                /// increment by one bit to the right.
+                pub fn stream(&self) -> $int {
+                    self.increment >> 1
+                }
+
+                /// Construct an instance using a pre-initialized `state`
+                ///
+                /// Unlike [`Self::new`], this method does not mutate `state`.
+                /// It may therefore be used with [`Self::state`] and
+                /// [`Self::stream`] to reconstruct an RNG.
+                ///
+                /// Note that the highest bit of the `stream` parameter is
+                /// discarded to simplify upholding internal invariants.
+                pub fn from_state(state: $int, stream: $int) -> Self {
+                    // The increment must be odd, hence we discard one bit:
+                    let increment = (stream << 1) | 1;
+                    $type { state, increment }
+                }
+            }
+        };
+    }
+
+    pub(crate) use impl_state_stream;
+}

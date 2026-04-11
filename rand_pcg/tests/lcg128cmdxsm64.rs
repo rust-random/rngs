@@ -54,6 +54,23 @@ fn test_lcg128cmdxsm64_reference() {
     assert_eq!(results, expected);
 }
 
+#[test]
+fn test_lcg128cmdxsm64_advancing_restore() {
+    let mut rng_orig = Lcg128CmDxsm64::new(1234, 567);
+
+    for _ in 0..100 {
+        rng_orig.next_u64();
+    }
+
+    let state = rng_orig.state();
+    let stream = rng_orig.stream();
+    let mut rng_copy = Lcg128CmDxsm64::from_state(state, stream);
+
+    for _ in 0..1_000 {
+        assert_eq!(rng_copy.next_u64(), rng_orig.next_u64());
+    }
+}
+
 #[cfg(feature = "serde")]
 #[test]
 fn test_lcg128cmdxsm64_serde() {
