@@ -73,6 +73,8 @@ impl Xoshiro256PlusPlus {
     }
 }
 
+impl_state_array!(Xoshiro256PlusPlus, u64, 32);
+
 impl SeedableRng for Xoshiro256PlusPlus {
     type Seed = [u8; 32];
 
@@ -148,5 +150,17 @@ mod tests {
         let from_zero = Xoshiro256PlusPlus::from_seed([0; 32]);
         let from_sm0 = Xoshiro256PlusPlus::seed_from_u64(0);
         assert_eq!(from_zero, from_sm0);
+    }
+
+    #[test]
+    fn state_roundtrip() {
+        let mut rng = Xoshiro256PlusPlus::seed_from_u64(42);
+        for _ in 0..10 {
+            rng.next_u64();
+        }
+        let mut clone = Xoshiro256PlusPlus::from_seed(rng.state());
+        for _ in 0..10 {
+            assert_eq!(rng.next_u64(), clone.next_u64());
+        }
     }
 }

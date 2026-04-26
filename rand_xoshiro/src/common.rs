@@ -222,6 +222,99 @@ macro_rules! impl_xoshiro_large {
     };
 }
 
+/// Implement `state`, returning the internal state of a single-word RNG as
+/// little-endian bytes that round-trip through [`SeedableRng::from_seed`].
+macro_rules! impl_state_scalar {
+    ($type:ident) => {
+        impl $type {
+            /// Return the internal state of the generator as little-endian
+            /// bytes that can be passed to [`SeedableRng::from_seed`] to
+            /// reconstruct an identical generator.
+            ///
+            /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
+            pub fn state(&self) -> [u8; 8] {
+                self.x.to_le_bytes()
+            }
+        }
+    };
+}
+
+/// Implement `state` for an RNG with two word-sized fields `s0` and `s1`.
+macro_rules! impl_state_pair {
+    ($type:ident, $word:ty, $bytes:literal) => {
+        impl $type {
+            /// Return the internal state of the generator as little-endian
+            /// bytes that can be passed to [`SeedableRng::from_seed`] to
+            /// reconstruct an identical generator.
+            ///
+            /// The all-zero state is unreachable from any non-zero seed, so
+            /// the round-trip is exact for any generator obtained via the
+            /// usual constructors. (An all-zero input to `from_seed` is
+            /// remapped to `seed_from_u64(0)`.)
+            ///
+            /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
+            pub fn state(&self) -> [u8; $bytes] {
+                let mut out = [0u8; $bytes];
+                let n = core::mem::size_of::<$word>();
+                out[..n].copy_from_slice(&self.s0.to_le_bytes());
+                out[n..].copy_from_slice(&self.s1.to_le_bytes());
+                out
+            }
+        }
+    };
+}
+
+/// Implement `state` for an RNG with a `s: [WORD; N]` field.
+macro_rules! impl_state_array {
+    ($type:ident, $word:ty, $bytes:literal) => {
+        impl $type {
+            /// Return the internal state of the generator as little-endian
+            /// bytes that can be passed to [`SeedableRng::from_seed`] to
+            /// reconstruct an identical generator.
+            ///
+            /// The all-zero state is unreachable from any non-zero seed, so
+            /// the round-trip is exact for any generator obtained via the
+            /// usual constructors. (An all-zero input to `from_seed` is
+            /// remapped to `seed_from_u64(0)`.)
+            ///
+            /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
+            pub fn state(&self) -> [u8; $bytes] {
+                let mut out = [0u8; $bytes];
+                let n = core::mem::size_of::<$word>();
+                for (i, word) in self.s.iter().enumerate() {
+                    out[i * n..(i + 1) * n].copy_from_slice(&word.to_le_bytes());
+                }
+                out
+            }
+        }
+    };
+}
+
+/// Implement `state` for a 512-bit RNG (`s: [u64; 8]`), returning a [`Seed512`].
+macro_rules! impl_state_seed512 {
+    ($type:ident) => {
+        impl $type {
+            /// Return the internal state of the generator as a [`Seed512`]
+            /// that can be passed to [`SeedableRng::from_seed`] to reconstruct
+            /// an identical generator.
+            ///
+            /// The all-zero state is unreachable from any non-zero seed, so
+            /// the round-trip is exact for any generator obtained via the
+            /// usual constructors. (An all-zero input to `from_seed` is
+            /// remapped to `seed_from_u64(0)`.)
+            ///
+            /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
+            pub fn state(&self) -> crate::Seed512 {
+                let mut out = [0u8; 64];
+                for (i, word) in self.s.iter().enumerate() {
+                    out[i * 8..(i + 1) * 8].copy_from_slice(&word.to_le_bytes());
+                }
+                crate::Seed512(out)
+            }
+        }
+    };
+}
+
 /// Fallback seed used when `from_seed` is called with an all-zero input.
 ///
 /// Equal to the first 64 bytes of `SplitMix64::seed_from_u64(0)`'s output.

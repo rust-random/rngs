@@ -60,6 +60,8 @@ impl TryRng for SplitMix64 {
     }
 }
 
+impl_state_scalar!(SplitMix64);
+
 impl SeedableRng for SplitMix64 {
     type Seed = [u8; 8];
 
@@ -139,6 +141,18 @@ mod tests {
         ];
         for &e in expected.iter() {
             assert_eq!(rng.next_u64(), e);
+        }
+    }
+
+    #[test]
+    fn state_roundtrip() {
+        let mut rng = SplitMix64::seed_from_u64(42);
+        for _ in 0..10 {
+            rng.next_u64();
+        }
+        let mut clone = SplitMix64::from_seed(rng.state());
+        for _ in 0..10 {
+            assert_eq!(rng.next_u64(), clone.next_u64());
         }
     }
 
