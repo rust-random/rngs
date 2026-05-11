@@ -80,9 +80,8 @@ impl SeedableRng for Xoshiro256StarStar {
     /// mapped to a different seed.
     #[inline]
     fn from_seed(seed: [u8; 32]) -> Xoshiro256StarStar {
-        deal_with_zero_seed!(seed, Self);
         Xoshiro256StarStar {
-            s: utils::read_words(&seed),
+            s: utils::read_words(crate::common::zero_seed_fallback(&seed)),
         }
     }
 
@@ -142,5 +141,12 @@ mod tests {
         for &e in &expected {
             assert_eq!(rng.next_u64(), e);
         }
+    }
+
+    #[test]
+    fn zero_seed_maps_to_seed_from_u64_zero() {
+        let from_zero = Xoshiro256StarStar::from_seed([0u8; 32]);
+        let from_sm0 = Xoshiro256StarStar::seed_from_u64(0);
+        assert_eq!(from_zero, from_sm0);
     }
 }

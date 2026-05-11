@@ -86,8 +86,7 @@ impl SeedableRng for Xoroshiro128Plus {
     /// Create a new `Xoroshiro128Plus`.  If `seed` is entirely 0, it will be
     /// mapped to a different seed.
     fn from_seed(seed: [u8; 16]) -> Xoroshiro128Plus {
-        deal_with_zero_seed!(seed, Self, 16);
-        let s: [_; 2] = utils::read_words(&seed);
+        let s: [_; 2] = utils::read_words(crate::common::zero_seed_fallback(&seed));
 
         Xoroshiro128Plus { s0: s[0], s1: s[1] }
     }
@@ -122,5 +121,12 @@ mod tests {
         for &e in &expected {
             assert_eq!(rng.next_u64(), e);
         }
+    }
+
+    #[test]
+    fn zero_seed_maps_to_seed_from_u64_zero() {
+        let from_zero = Xoroshiro128Plus::from_seed([0u8; 16]);
+        let from_sm0 = Xoroshiro128Plus::seed_from_u64(0);
+        assert_eq!(from_zero, from_sm0);
     }
 }
