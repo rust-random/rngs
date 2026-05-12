@@ -238,7 +238,9 @@ macro_rules! impl_state_pair {
             /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
             pub fn state(&self) -> [u8; 2 * core::mem::size_of::<$word>()] {
                 const N: usize = core::mem::size_of::<$word>();
-                const { assert!(core::mem::size_of::<Self>() == 2 * N); }
+                const {
+                    assert!(core::mem::size_of::<Self>() == 2 * N);
+                }
                 let mut out = [0u8; 2 * N];
                 out[..N].copy_from_slice(&self.s0.to_le_bytes());
                 out[N..].copy_from_slice(&self.s1.to_le_bytes());
@@ -264,7 +266,9 @@ macro_rules! impl_state_array_of_four {
             /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
             pub fn state(&self) -> [u8; 4 * core::mem::size_of::<$word>()] {
                 const N: usize = core::mem::size_of::<$word>();
-                const { assert!(core::mem::size_of::<Self>() == 4 * N); }
+                const {
+                    assert!(core::mem::size_of::<Self>() == 4 * N);
+                }
                 let mut out = [0u8; 4 * N];
                 out[..N].copy_from_slice(&self.s[0].to_le_bytes());
                 out[N..2 * N].copy_from_slice(&self.s[1].to_le_bytes());
