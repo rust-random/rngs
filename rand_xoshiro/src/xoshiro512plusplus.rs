@@ -165,13 +165,8 @@ mod tests {
 
     #[test]
     fn state_roundtrip() {
-        let mut rng = Xoshiro512PlusPlus::seed_from_u64(42);
-        for _ in 0..10 {
-            rng.next_u64();
-        }
-        let mut clone = Xoshiro512PlusPlus::from_seed(rng.state());
-        for _ in 0..10 {
-            assert_eq!(rng.next_u64(), clone.next_u64());
-        }
+        let rng = Xoshiro512PlusPlus::seed_from_u64(42);
+        let clone = Xoshiro512PlusPlus::from_seed(rng.state());
+        assert_eq!(clone, rng);
     }
 }

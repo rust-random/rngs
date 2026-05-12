@@ -222,26 +222,9 @@ macro_rules! impl_xoshiro_large {
     };
 }
 
-/// Implement `state`, returning the internal state of a single-word RNG as
-/// little-endian bytes that round-trip through [`SeedableRng::from_seed`].
-macro_rules! impl_state_scalar {
-    ($type:ident) => {
-        impl $type {
-            /// Return the internal state of the generator as little-endian
-            /// bytes that can be passed to [`SeedableRng::from_seed`] to
-            /// reconstruct an identical generator.
-            ///
-            /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
-            pub fn state(&self) -> [u8; 8] {
-                self.x.to_le_bytes()
-            }
-        }
-    };
-}
-
 /// Implement `state` for an RNG with two word-sized fields `s0` and `s1`.
 macro_rules! impl_state_pair {
-    ($type:ident, $word:ty, $bytes:literal) => {
+    ($type:ident, $word:ty) => {
         impl $type {
             /// Return the internal state of the generator as little-endian
             /// bytes that can be passed to [`SeedableRng::from_seed`] to
@@ -253,20 +236,21 @@ macro_rules! impl_state_pair {
             /// remapped to `seed_from_u64(0)`.)
             ///
             /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
-            pub fn state(&self) -> [u8; $bytes] {
-                let mut out = [0u8; $bytes];
-                let n = core::mem::size_of::<$word>();
-                out[..n].copy_from_slice(&self.s0.to_le_bytes());
-                out[n..].copy_from_slice(&self.s1.to_le_bytes());
+            pub fn state(&self) -> [u8; 2 * core::mem::size_of::<$word>()] {
+                const N: usize = core::mem::size_of::<$word>();
+                const { assert!(core::mem::size_of::<Self>() == 2 * N); }
+                let mut out = [0u8; 2 * N];
+                out[..N].copy_from_slice(&self.s0.to_le_bytes());
+                out[N..].copy_from_slice(&self.s1.to_le_bytes());
                 out
             }
         }
     };
 }
 
-/// Implement `state` for an RNG with a `s: [WORD; N]` field.
-macro_rules! impl_state_array {
-    ($type:ident, $word:ty, $bytes:literal) => {
+/// Implement `state` for an RNG with an `s: [WORD; 4]` field.
+macro_rules! impl_state_array_of_four {
+    ($type:ident, $word:ty) => {
         impl $type {
             /// Return the internal state of the generator as little-endian
             /// bytes that can be passed to [`SeedableRng::from_seed`] to
@@ -278,12 +262,14 @@ macro_rules! impl_state_array {
             /// remapped to `seed_from_u64(0)`.)
             ///
             /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
-            pub fn state(&self) -> [u8; $bytes] {
-                let mut out = [0u8; $bytes];
-                let n = core::mem::size_of::<$word>();
-                for (i, word) in self.s.iter().enumerate() {
-                    out[i * n..(i + 1) * n].copy_from_slice(&word.to_le_bytes());
-                }
+            pub fn state(&self) -> [u8; 4 * core::mem::size_of::<$word>()] {
+                const N: usize = core::mem::size_of::<$word>();
+                const { assert!(core::mem::size_of::<Self>() == 4 * N); }
+                let mut out = [0u8; 4 * N];
+                out[..N].copy_from_slice(&self.s[0].to_le_bytes());
+                out[N..2 * N].copy_from_slice(&self.s[1].to_le_bytes());
+                out[2 * N..3 * N].copy_from_slice(&self.s[2].to_le_bytes());
+                out[3 * N..].copy_from_slice(&self.s[3].to_le_bytes());
                 out
             }
         }
