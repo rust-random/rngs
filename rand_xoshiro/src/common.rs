@@ -236,15 +236,13 @@ static ZERO_SEED_FALLBACK: [u8; 64] = [
 /// Yield seed bytes for state initialization, swapping in the fallback when
 /// the input is all-zero.
 #[inline]
-pub(crate) const fn zero_seed_fallback<const N: usize>(seed: &[u8; N]) -> &[u8] {
-    let mut i = 0;
-    while i < N {
-        if seed[i] != 0 {
-            return seed;
-        }
-        i += 1;
+pub(crate) fn zero_seed_fallback<const N: usize>(seed: &[u8; N]) -> &[u8; N] {
+    const { assert!(N <= ZERO_SEED_FALLBACK.len()) };
+    if seed.iter().any(|&b| b != 0) {
+        seed
+    } else {
+        ZERO_SEED_FALLBACK.first_chunk::<N>().unwrap()
     }
-    ZERO_SEED_FALLBACK.split_at(N).0
 }
 
 /// 512-bit seed for a generator.
