@@ -80,6 +80,8 @@ impl TryRng for Xoroshiro128Plus {
         utils::fill_bytes_via_next_word(dest, || self.try_next_u64())
     }
 }
+impl_state_pair!(Xoroshiro128Plus, u64);
+
 impl SeedableRng for Xoroshiro128Plus {
     type Seed = [u8; 16];
 
@@ -128,5 +130,12 @@ mod tests {
         let from_zero = Xoroshiro128Plus::from_seed([0u8; 16]);
         let from_sm0 = Xoroshiro128Plus::seed_from_u64(0);
         assert_eq!(from_zero, from_sm0);
+    }
+
+    #[test]
+    fn state_roundtrip() {
+        let rng = Xoroshiro128Plus::seed_from_u64(42);
+        let clone = Xoroshiro128Plus::from_seed(rng.state());
+        assert_eq!(clone, rng);
     }
 }

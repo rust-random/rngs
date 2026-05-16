@@ -4,10 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.8.1] - 2026-05-16
+### Added
+- `state()` method on every RNG type returning the internal state as a value
+  matching `SeedableRng::Seed`, allowing reproduction via `from_seed` without
+  the `serde` feature ([#110]).
+
 ### Changed
 - Shrink the code size of the all-zero-seed fallback by replacing the per-RNG
   `SplitMix64::seed_from_u64(0)` call with a single shared constant.
+
+[#110]: https://github.com/rust-random/rngs/pull/110
 
 ## [0.8.0] - 2026-02-01
 ### Changes

@@ -83,6 +83,8 @@ impl Xoshiro512StarStar {
     }
 }
 
+impl_state_seed512!(Xoshiro512StarStar);
+
 impl SeedableRng for Xoshiro512StarStar {
     type Seed = Seed512;
 
@@ -160,5 +162,12 @@ mod tests {
         let from_zero = Xoshiro512StarStar::from_seed(Seed512([0u8; 64]));
         let from_sm0 = Xoshiro512StarStar::seed_from_u64(0);
         assert_eq!(from_zero, from_sm0);
+    }
+
+    #[test]
+    fn state_roundtrip() {
+        let rng = Xoshiro512StarStar::seed_from_u64(42);
+        let clone = Xoshiro512StarStar::from_seed(rng.state());
+        assert_eq!(clone, rng);
     }
 }

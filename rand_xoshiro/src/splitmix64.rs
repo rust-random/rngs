@@ -60,6 +60,17 @@ impl TryRng for SplitMix64 {
     }
 }
 
+impl SplitMix64 {
+    /// Return the internal state of the generator as little-endian bytes
+    /// that can be passed to [`SeedableRng::from_seed`] to reconstruct an
+    /// identical generator.
+    ///
+    /// [`SeedableRng::from_seed`]: rand_core::SeedableRng::from_seed
+    pub fn state(&self) -> [u8; 8] {
+        self.x.to_le_bytes()
+    }
+}
+
 impl SeedableRng for SplitMix64 {
     type Seed = [u8; 8];
 
@@ -140,6 +151,13 @@ mod tests {
         for &e in expected.iter() {
             assert_eq!(rng.next_u64(), e);
         }
+    }
+
+    #[test]
+    fn state_roundtrip() {
+        let rng = SplitMix64::seed_from_u64(42);
+        let clone = SplitMix64::from_seed(rng.state());
+        assert_eq!(clone, rng);
     }
 
     #[test]
