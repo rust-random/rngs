@@ -1,4 +1,4 @@
-// Copyright 2018 Developers of the Rand project.
+// Copyright 2018-2026 Developers of the Rand project.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -222,19 +222,27 @@ macro_rules! impl_xoshiro_large {
     };
 }
 
-/// Map an all-zero seed to a different one.
-macro_rules! deal_with_zero_seed {
-    ($seed:expr, $Self:ident, $bytes:expr) => {
-        if $seed == [0; $bytes] {
-            return $Self::seed_from_u64(0);
-        }
-    };
+/// Fallback seed used when `from_seed` is called with an all-zero input.
+///
+/// Equal to the first 64 bytes of `SplitMix64::seed_from_u64(0)`'s output.
+/// Smaller generators take a prefix.
+static ZERO_SEED_FALLBACK: [u8; 64] = [
+    0xaf, 0xcd, 0x1d, 0x7b, 0x39, 0xa8, 0x20, 0xe2, 0xf4, 0x65, 0xb9, 0xa1, 0x6a, 0x9e, 0x78, 0x6e,
+    0x4f, 0x45, 0x09, 0x80, 0x18, 0x5d, 0xc4, 0x06, 0xec, 0x81, 0x4c, 0x72, 0xa8, 0xb8, 0x8b, 0xf8,
+    0x9b, 0x74, 0xa8, 0x51, 0x6a, 0x89, 0x39, 0x1b, 0xea, 0xa2, 0x7e, 0x74, 0x0c, 0x9f, 0xcb, 0x53,
+    0xe1, 0x32, 0x45, 0x1f, 0xbe, 0x9a, 0x82, 0x2c, 0x3c, 0xab, 0x16, 0xc9, 0x3a, 0x13, 0x84, 0xc5,
+];
 
-    ($seed:expr, $Self:ident) => {
-        if $seed.iter().all(|&x| x == 0) {
-            return $Self::seed_from_u64(0);
-        }
-    };
+/// Yield seed bytes for state initialization, swapping in the fallback when
+/// the input is all-zero.
+#[inline]
+pub(crate) fn zero_seed_fallback<const N: usize>(seed: &[u8; N]) -> &[u8; N] {
+    const { assert!(N <= ZERO_SEED_FALLBACK.len()) };
+    if seed.iter().any(|&b| b != 0) {
+        seed
+    } else {
+        ZERO_SEED_FALLBACK.first_chunk::<N>().unwrap()
+    }
 }
 
 /// 512-bit seed for a generator.
@@ -272,5 +280,20 @@ impl AsRef<[u8]> for Seed512 {
 impl AsMut<[u8]> for Seed512 {
     fn as_mut(&mut self) -> &mut [u8] {
         &mut self.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ZERO_SEED_FALLBACK;
+    use crate::SplitMix64;
+    use rand_core::{Rng, SeedableRng};
+
+    #[test]
+    fn zero_seed_fallback_matches_splitmix() {
+        let mut sm = SplitMix64::seed_from_u64(0);
+        let mut expected = [0u8; 64];
+        sm.fill_bytes(&mut expected);
+        assert_eq!(ZERO_SEED_FALLBACK, expected);
     }
 }

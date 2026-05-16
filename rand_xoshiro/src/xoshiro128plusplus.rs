@@ -62,9 +62,8 @@ impl SeedableRng for Xoshiro128PlusPlus {
     /// mapped to a different seed.
     #[inline]
     fn from_seed(seed: [u8; 16]) -> Xoshiro128PlusPlus {
-        deal_with_zero_seed!(seed, Self, 16);
         Xoshiro128PlusPlus {
-            s: utils::read_words(&seed),
+            s: utils::read_words(crate::common::zero_seed_fallback(&seed)),
         }
     }
 
@@ -138,5 +137,12 @@ mod tests {
         assert_eq!(rng.s[1], 2125834322);
         assert_eq!(rng.s[2], 966769569);
         assert_eq!(rng.s[3], 3193880526);
+    }
+
+    #[test]
+    fn zero_seed_maps_to_seed_from_u64_zero() {
+        let from_zero = Xoshiro128PlusPlus::from_seed([0u8; 16]);
+        let from_sm0 = Xoshiro128PlusPlus::seed_from_u64(0);
+        assert_eq!(from_zero, from_sm0);
     }
 }
