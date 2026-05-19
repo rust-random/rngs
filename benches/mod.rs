@@ -20,7 +20,6 @@ use rand_core::{Rng, SeedableRng};
 
 use rand_chacha::{ChaCha8Rng, ChaCha12Rng, ChaCha20Rng};
 use rand_hc::Hc128Rng;
-use rand_isaac::{Isaac64Rng, IsaacRng};
 use rand_sfc::{Sfc32, Sfc64};
 use rand_xorshift::XorShiftRng;
 use rand_xoshiro::{
@@ -84,8 +83,6 @@ fn gen_bytes(c: &mut Criterion<CyclesPerByte>) {
     gen_bytes!("xoroshiro64star", Xoroshiro64Star::from_rng(&mut master));
     gen_bytes!("splitmix64", SplitMix64::from_rng(&mut master));
     gen_bytes!("hc128", Hc128Rng::from_rng(&mut master));
-    gen_bytes!("isaac", IsaacRng::from_rng(&mut master));
-    gen_bytes!("isaac64", Isaac64Rng::from_rng(&mut master));
     gen_bytes!("sfc32", Sfc32::from_rng(&mut master));
     gen_bytes!("sfc64", Sfc64::from_rng(&mut master));
     gen_bytes!("chacha8", ChaCha8Rng::from_rng(&mut master));
@@ -197,8 +194,6 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         );
         gen_uint!(g, "splitmix64", u32, SplitMix64::from_rng(&mut master));
         gen_uint!(g, "hc128", u32, Hc128Rng::from_rng(&mut master));
-        gen_uint!(g, "isaac", u32, IsaacRng::from_rng(&mut master));
-        gen_uint!(g, "isaac64", u32, Isaac64Rng::from_rng(&mut master));
         gen_uint!(g, "sfc32", u32, Sfc32::from_rng(&mut master));
         gen_uint!(g, "sfc64", u32, Sfc64::from_rng(&mut master));
         gen_uint!(g, "chacha8", u32, ChaCha8Rng::from_rng(&mut master));
@@ -273,8 +268,6 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         );
         gen_uint!(g, "splitmix64", u64, SplitMix64::from_rng(&mut master));
         gen_uint!(g, "hc128", u64, Hc128Rng::from_rng(&mut master));
-        gen_uint!(g, "isaac", u64, IsaacRng::from_rng(&mut master));
-        gen_uint!(g, "isaac64", u64, Isaac64Rng::from_rng(&mut master));
         gen_uint!(g, "sfc32", u64, Sfc32::from_rng(&mut master));
         gen_uint!(g, "sfc64", u64, Sfc64::from_rng(&mut master));
         gen_uint!(g, "chacha8", u64, ChaCha8Rng::from_rng(&mut master));
@@ -309,8 +302,6 @@ fn init(c: &mut Criterion) {
     init_gen!("xoroshiro64star", Xoroshiro64Star);
     init_gen!("splitmix64", SplitMix64);
     init_gen!("hc128", Hc128Rng);
-    init_gen!("isaac", IsaacRng);
-    init_gen!("isaac64", Isaac64Rng);
     init_gen!("sfc32", Sfc32);
     init_gen!("sfc64", Sfc64);
     init_gen!("chacha8", ChaCha8Rng);
