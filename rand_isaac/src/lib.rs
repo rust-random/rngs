@@ -23,6 +23,10 @@
     clippy::identity_op
 )]
 #![cfg_attr(not(all(feature = "serde", test)), no_std)]
+#![deprecated(
+    since = "0.5.1",
+    note = "The rand_isaac crate is no longer maintained; we suggest switching to chacha20 or rand_hc"
+)]
 
 pub mod isaac;
 pub mod isaac64;
