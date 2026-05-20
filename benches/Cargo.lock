@@ -38,7 +38,6 @@ dependencies = [
  "rand_chacha",
  "rand_core",
  "rand_hc",
- "rand_isaac",
  "rand_sfc",
  "rand_xorshift",
  "rand_xoshiro",
@@ -340,7 +339,7 @@ dependencies = [
 
 [[package]]
 name = "rand_chacha"
-version = "0.10.0-rc.6"
+version = "0.10.0"
 dependencies = [
  "ppv-lite86",
  "rand_core",
@@ -348,41 +347,34 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
-version = "0.10.0-rc-6"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70765ff7112b0fb2d272d24d9a2f907fc206211304328fe58b2db15a5649ef28"
+checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 
 [[package]]
 name = "rand_hc"
-version = "0.5.0-rc.0"
-dependencies = [
- "rand_core",
-]
-
-[[package]]
-name = "rand_isaac"
-version = "0.5.0-rc.0"
+version = "0.5.0"
 dependencies = [
  "rand_core",
 ]
 
 [[package]]
 name = "rand_sfc"
-version = "0.2.0-rc.0"
+version = "0.2.0"
 dependencies = [
  "rand_core",
 ]
 
 [[package]]
 name = "rand_xorshift"
-version = "0.5.0-rc.0"
+version = "0.5.0"
 dependencies = [
  "rand_core",
 ]
 
 [[package]]
 name = "rand_xoshiro"
-version = "0.8.0-rc.0"
+version = "0.8.1"
 dependencies = [
  "rand_core",
 ]
