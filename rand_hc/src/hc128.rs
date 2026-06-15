@@ -35,9 +35,9 @@ const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 /// operations that parallelize well, it has very good performance. The size of
 /// the array it needs, 4kb, can however be a disadvantage.
 ///
-/// This implementation is not based on the version of HC-128 submitted to the
-/// eSTREAM contest, but on a later version by the author with a few small
-/// improvements from December 15, 2009[^3].
+/// This implementation is not based on the reference implementation of HC-128
+/// submitted to the eSTREAM contest, but on a later implementation by the
+/// author with a few performance optimizations[^3].
 ///
 /// HC-128 has no known weaknesses that are easier to exploit than doing a
 /// brute-force search of 2<sup>128</sup>. A very comprehensive analysis of the
@@ -58,10 +58,10 @@ const SEED_WORDS: usize = 8; // 128 bit key followed by 128 bit iv
 ///       *The eSTREAM Finalists*, LNCS 4986, pp. 39–47, Springer-Verlag.
 ///
 /// [^2]: [eSTREAM: the ECRYPT Stream Cipher Project](
-///       http://www.ecrypt.eu.org/stream/)
+///       http://www.ecrypt.eu.org/stream/).
 ///
-/// [^3]: Hongjun Wu, [Stream Ciphers HC-128 and HC-256](
-///       https://www.ntu.edu.sg/home/wuhj/research/hc/index.html)
+/// [^3]: Hongjun Wu (December 2009). `hc128_opt32.h`, [Stream Ciphers HC-128 and HC-256](
+///       https://web.archive.org/web/20110527154230/https://www.ntu.edu.sg/home/wuhj/research/hc/index.html).
 ///
 /// [^4]: Shashwat Raizada (January 2015),["Some Results On Analysis And
 ///       Implementation Of HC-128 Stream Cipher"](
