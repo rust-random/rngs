@@ -71,6 +71,28 @@ impl Xoshiro256PlusPlus {
             ]
         );
     }
+
+    /// Jump forward by c · 2^e calls to `next_u64()`.
+    ///
+    /// Expressing the distance as c · 2^e makes it possible to request both
+    /// ordinary counts (`jump_n(k, 0)`) and very large power-of-two jumps
+    /// without multiple-precision integers. For the jump to be meaningful,
+    /// c · 2^e should be smaller than the period 2^256 - 1.
+    pub fn jump_n(&mut self, c: u64, e: u64) {
+        impl_jump_n!(
+            u64,
+            self,
+            [
+                0x9d116f2bb0f0f001,
+                0x0280002bcefd1a5e,
+                0x04b4edcf26259f85,
+                0x0003c03c3f3ecb19
+            ],
+            c,
+            e,
+            array4
+        );
+    }
 }
 
 impl_state_array_of_four!(Xoshiro256PlusPlus, u64);
@@ -119,6 +141,59 @@ impl TryRng for Xoshiro256PlusPlus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const SEED: [u8; 32] = [
+        1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0,
+        0, 0,
+    ];
+
+    fn outputs(rng: &mut Xoshiro256PlusPlus) -> [u64; 16] {
+        let mut o = [0; 16];
+        for x in &mut o {
+            *x = rng.next_u64();
+        }
+        o
+    }
+
+    #[test]
+    fn jump_n_small_distances_match_stepping() {
+        for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
+            let mut a = Xoshiro256PlusPlus::from_seed(SEED);
+            for _ in 0..d {
+                a.next_u64();
+            }
+            let mut b = Xoshiro256PlusPlus::from_seed(SEED);
+            b.jump_n(d, 0);
+            assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n({d}, 0)");
+        }
+        // c * 2^e with e > 0, small enough to step literally: 3 * 2^8 = 768.
+        let mut a = Xoshiro256PlusPlus::from_seed(SEED);
+        for _ in 0..3 * 256 {
+            a.next_u64();
+        }
+        let mut b = Xoshiro256PlusPlus::from_seed(SEED);
+        b.jump_n(3, 8);
+        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(3, 8)");
+    }
+
+    #[test]
+    fn jump_n_matches_predefined_jumps() {
+        let mut a = Xoshiro256PlusPlus::from_seed(SEED);
+        a.jump();
+        let mut b = Xoshiro256PlusPlus::from_seed(SEED);
+        b.jump_n(1, 128);
+        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(1,128) == jump()");
+
+        let mut a = Xoshiro256PlusPlus::from_seed(SEED);
+        a.long_jump();
+        let mut b = Xoshiro256PlusPlus::from_seed(SEED);
+        b.jump_n(1, 192);
+        assert_eq!(
+            outputs(&mut a),
+            outputs(&mut b),
+            "jump_n(1,192) == long_jump()"
+        );
+    }
 
     #[test]
     fn reference() {

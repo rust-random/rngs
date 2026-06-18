@@ -143,6 +143,96 @@ macro_rules! impl_jump {
     };
 }
 
+/// Implement an arbitrary-jump function (`jump_n`) for an RNG from the xoshiro
+/// family.
+macro_rules! impl_jump_n {
+    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, array4) => {
+        let mut poly = [0; 4];
+        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+        let mut s0 = 0;
+        let mut s1 = 0;
+        let mut s2 = 0;
+        let mut s3 = 0;
+        for word in poly {
+            for b in 0..64 {
+                if (word >> b) & 1 != 0 {
+                    s0 ^= $self.s[0];
+                    s1 ^= $self.s[1];
+                    s2 ^= $self.s[2];
+                    s3 ^= $self.s[3];
+                }
+                $self.next_u64();
+            }
+        }
+        $self.s[0] = s0;
+        $self.s[1] = s1;
+        $self.s[2] = s2;
+        $self.s[3] = s3;
+    };
+    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, array8) => {
+        let mut poly = [0; 8];
+        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+        let mut s = [0; 8];
+        for word in poly {
+            for b in 0..64 {
+                if (word >> b) & 1 != 0 {
+                    s[0] ^= $self.s[0];
+                    s[1] ^= $self.s[1];
+                    s[2] ^= $self.s[2];
+                    s[3] ^= $self.s[3];
+                    s[4] ^= $self.s[4];
+                    s[5] ^= $self.s[5];
+                    s[6] ^= $self.s[6];
+                    s[7] ^= $self.s[7];
+                }
+                $self.next_u64();
+            }
+        }
+        $self.s = s;
+    };
+    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, pair) => {
+        let mut poly = [0; 2];
+        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+        let mut s0 = 0;
+        let mut s1 = 0;
+        for word in poly {
+            for b in 0..64 {
+                if (word >> b) & 1 != 0 {
+                    s0 ^= $self.s0;
+                    s1 ^= $self.s1;
+                }
+                $self.next_u64();
+            }
+        }
+        $self.s0 = s0;
+        $self.s1 = s1;
+    };
+    (u32, $self:expr, $charpoly:expr, $c:expr, $e:expr, array4) => {
+        // 128 bits of state = 4 × u32 = 2 × u64 polynomial words.
+        let mut poly = [0; 2];
+        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+        let mut s0 = 0;
+        let mut s1 = 0;
+        let mut s2 = 0;
+        let mut s3 = 0;
+        for word in poly {
+            for b in 0..64 {
+                if (word >> b) & 1 != 0 {
+                    s0 ^= $self.s[0];
+                    s1 ^= $self.s[1];
+                    s2 ^= $self.s[2];
+                    s3 ^= $self.s[3];
+                }
+                $self.next_u32();
+            }
+        }
+        $self.s[0] = s0;
+        $self.s[1] = s1;
+        $self.s[2] = s2;
+        $self.s[3] = s3;
+    };
+}
+
 /// Implement the xoroshiro iteration.
 macro_rules! impl_xoroshiro_u32 {
     ($self:expr) => {

@@ -82,6 +82,32 @@ impl Xoshiro512Plus {
             ]
         );
     }
+
+    /// Jump forward by c · 2^e calls to `next_u64()`.
+    ///
+    /// Expressing the distance as c · 2^e makes it possible to request both
+    /// ordinary counts (`jump_n(k, 0)`) and very large power-of-two jumps
+    /// without multiple-precision integers. For the jump to be meaningful,
+    /// c · 2^e should be smaller than the period 2^512 - 1.
+    pub fn jump_n(&mut self, c: u64, e: u64) {
+        impl_jump_n!(
+            u64,
+            self,
+            [
+                0xcf3cff0c00000001,
+                0x7fdc78d886f00c63,
+                0xf05e63fca6d7b781,
+                0x7a67058e7bbab6f0,
+                0xf11eef832e32518f,
+                0x51ba7c47edc758ad,
+                0x8f2d27268ce4b20b,
+                0x0000500055d8b77f
+            ],
+            c,
+            e,
+            array8
+        );
+    }
 }
 
 impl_state_seed512!(Xoshiro512Plus);
@@ -130,6 +156,57 @@ impl TryRng for Xoshiro512Plus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn fresh() -> Xoshiro512Plus {
+        Xoshiro512Plus::seed_from_u64(0x0123456789abcdef)
+    }
+
+    fn outputs(rng: &mut Xoshiro512Plus) -> [u64; 16] {
+        let mut o = [0; 16];
+        for x in &mut o {
+            *x = rng.next_u64();
+        }
+        o
+    }
+
+    #[test]
+    fn jump_n_small_distances_match_stepping() {
+        for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
+            let mut a = fresh();
+            for _ in 0..d {
+                a.next_u64();
+            }
+            let mut b = fresh();
+            b.jump_n(d, 0);
+            assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n({d}, 0)");
+        }
+        let mut a = fresh();
+        for _ in 0..3 * 256 {
+            a.next_u64();
+        }
+        let mut b = fresh();
+        b.jump_n(3, 8);
+        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(3, 8)");
+    }
+
+    #[test]
+    fn jump_n_matches_predefined_jumps() {
+        let mut a = fresh();
+        a.jump();
+        let mut b = fresh();
+        b.jump_n(1, 256);
+        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(1,256) == jump()");
+
+        let mut a = fresh();
+        a.long_jump();
+        let mut b = fresh();
+        b.jump_n(1, 384);
+        assert_eq!(
+            outputs(&mut a),
+            outputs(&mut b),
+            "jump_n(1,384) == long_jump()"
+        );
+    }
 
     #[test]
     fn reference() {
