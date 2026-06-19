@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- `jump_n(c, e)` on every xoshiro/xoroshiro generator that has `jump()`,
+- `jump_ce(c, e)` on every xoshiro/xoroshiro generator that has `jump()`,
   jumping ahead by c · 2^e steps via the jump polynomial x^(c · 2^e) mod p(x).
+- `jump_n(jump)` on the same generators, jumping ahead by the arbitrary
+  little-endian distance held in `jump` (a `[u64; N]` matching the state words).
+  Unlike `jump_ce`, it can express any jump distance up to the period.
 
 ## [0.8.1] - 2026-05-16
 ### Added

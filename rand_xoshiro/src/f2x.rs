@@ -8,7 +8,7 @@
 
 //! Minimal arithmetic in F₂[*x*] / (charpoly), the ring in which advancing a
 //! linear generator by one step is multiplication by *x*. Used to compute the
-//! jump polynomial for the `jump_n` methods.
+//! jump polynomial for the `jump_ce` and `jump_n` methods.
 //!
 //! `charpoly` holds the `deg` low coefficients of the characteristic polynomial
 //! (`deg = 64 * charpoly.len()`); the leading `x^deg` term is implicit. All
@@ -56,7 +56,7 @@ fn mul_mod(a: &mut [u64], b: &[u64], charpoly: &[u64]) {
 
 /// `out <- x^(c · 2^e) mod charpoly`, by square-and-multiply. Requires
 /// `out.len() == charpoly.len()`.
-pub(crate) fn jump_poly(c: u64, e: u64, charpoly: &[u64], out: &mut [u64]) {
+pub(crate) fn jump_poly_ce(c: u64, e: u32, charpoly: &[u64], out: &mut [u64]) {
     let w = charpoly.len();
     for o in out.iter_mut() {
         *o = 0;
@@ -79,9 +79,30 @@ pub(crate) fn jump_poly(c: u64, e: u64, charpoly: &[u64], out: &mut [u64]) {
     }
 }
 
+/// `out <- x^n mod charpoly`, where `n = jump[0] + jump[1] · 2^64 + …` is the
+/// little-endian integer held in the `N` words of `jump`. Square-and-multiply
+/// over the bits of `n`, from the most significant down. Requires
+/// `out.len() == charpoly.len()`.
+pub(crate) fn jump_poly_n<const N: usize>(jump: &[u64; N], charpoly: &[u64], out: &mut [u64]) {
+    let w = charpoly.len();
+    for o in out.iter_mut() {
+        *o = 0;
+    }
+    out[0] = 1; // out = 1
+    for k in (0..N * 64).rev() {
+        // out = out^2
+        let mut sq = [0; 8];
+        sq[..w].copy_from_slice(&out[..w]);
+        mul_mod(out, &sq[..w], charpoly);
+        if (jump[k >> 6] >> (k & 63)) & 1 != 0 {
+            mul_x(out, charpoly);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{jump_poly, mul_x};
+    use super::{jump_poly_ce, jump_poly_n, mul_x};
 
     // xoshiro256 characteristic polynomial.
     const P: [u64; 4] = [
@@ -101,51 +122,75 @@ mod tests {
     }
 
     #[test]
-    fn jump_poly_matches_repeated_mul_x_for_e0() {
+    fn jump_poly_ce_matches_repeated_mul_x_for_e0() {
         for &c in &[0, 1, 2, 3, 7, 64, 1000, 5000] {
             let mut out = [0; 4];
-            jump_poly(c, 0, &P, &mut out);
-            assert_eq!(out, x_pow(c), "jump_poly({c}, 0)");
+            jump_poly_ce(c, 0, &P, &mut out);
+            assert_eq!(out, x_pow(c), "jump_poly_ce({c}, 0)");
         }
     }
 
     #[test]
-    fn jump_poly_matches_repeated_mul_x_for_powers_of_two() {
-        // jump_poly(1, e) == x^(2^e); compare to 2^e applications of mul_x.
+    fn jump_poly_ce_matches_repeated_mul_x_for_powers_of_two() {
+        // jump_poly_ce(1, e) == x^(2^e); compare to 2^e applications of mul_x.
         for e in 0..=12 {
             let mut out = [0; 4];
-            jump_poly(1, e, &P, &mut out);
-            assert_eq!(out, x_pow(1 << e), "jump_poly(1, {e})");
+            jump_poly_ce(1, e, &P, &mut out);
+            assert_eq!(out, x_pow(1 << e), "jump_poly_ce(1, {e})");
         }
     }
 
     #[test]
     fn x_pow_zero_is_one() {
         let mut out = [0; 4];
-        jump_poly(0, 0, &P, &mut out);
+        jump_poly_ce(0, 0, &P, &mut out);
         assert_eq!(out, [1, 0, 0, 0]);
     }
 
     #[test]
-    fn jump_poly_consistency_under_current_build() {
+    fn jump_poly_ce_consistency_under_current_build() {
         // x^300 * x^45 == x^345.
         let mut g = [0; 4];
-        jump_poly(300, 0, &P, &mut g);
+        jump_poly_ce(300, 0, &P, &mut g);
         for _ in 0..45 {
             mul_x(&mut g, &P);
         }
         let mut expect = [0; 4];
-        jump_poly(345, 0, &P, &mut expect);
+        jump_poly_ce(345, 0, &P, &mut expect);
         assert_eq!(g, expect);
     }
 
     #[test]
-    fn jump_poly_c_and_e_combined() {
-        // jump_poly(c, e) == x^(c * 2^e); exercises the combined exponent path.
+    fn jump_poly_ce_c_and_e_combined() {
+        // jump_poly_ce(c, e) == x^(c * 2^e); exercises the combined exponent path.
         for &(c, e) in &[(3, 8), (5, 4), (7, 10)] {
             let mut out = [0; 4];
-            jump_poly(c, e, &P, &mut out);
-            assert_eq!(out, x_pow(c << e), "jump_poly({c}, {e})");
+            jump_poly_ce(c, e, &P, &mut out);
+            assert_eq!(out, x_pow(c << e), "jump_poly_ce({c}, {e})");
+        }
+    }
+
+    #[test]
+    fn jump_poly_n_matches_ce_single_word() {
+        // jump_poly_n(&[n]) == jump_poly_ce(n, 0) for a single-word distance.
+        for &n in &[0, 1, 2, 3, 7, 64, 1000, 5000] {
+            let mut got = [0; 4];
+            jump_poly_n(&[n], &P, &mut got);
+            let mut expect = [0; 4];
+            jump_poly_ce(n, 0, &P, &mut expect);
+            assert_eq!(got, expect, "jump_poly_n(&[{n}])");
+        }
+    }
+
+    #[test]
+    fn jump_poly_n_matches_ce_multi_word() {
+        // n = c * 2^64 is the two-word integer [0, c]; compare to ce(c, 64).
+        for &c in &[1, 3, 5000] {
+            let mut got = [0; 4];
+            jump_poly_n(&[0, c], &P, &mut got);
+            let mut expect = [0; 4];
+            jump_poly_ce(c, 64, &P, &mut expect);
+            assert_eq!(got, expect, "jump_poly_n(&[0, {c}])");
         }
     }
 }

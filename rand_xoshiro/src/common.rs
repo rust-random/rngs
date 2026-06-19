@@ -143,17 +143,16 @@ macro_rules! impl_jump {
     };
 }
 
-/// Implement an arbitrary-jump function (`jump_n`) for an RNG from the xoshiro
-/// family.
-macro_rules! impl_jump_n {
-    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, array4) => {
-        let mut poly = [0; 4];
-        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+/// Apply a precomputed jump polynomial `poly` (= x^n mod charpoly for the
+/// desired distance n) to the state, using the same accumulate-and-step loop as
+/// [`impl_jump`]. Shared by the `jump_ce` and `jump_n` methods.
+macro_rules! apply_jump_poly {
+    (u64, $self:expr, $poly:expr, array4) => {
         let mut s0 = 0;
         let mut s1 = 0;
         let mut s2 = 0;
         let mut s3 = 0;
-        for word in poly {
+        for word in $poly {
             for b in 0..64 {
                 if (word >> b) & 1 != 0 {
                     s0 ^= $self.s[0];
@@ -169,11 +168,9 @@ macro_rules! impl_jump_n {
         $self.s[2] = s2;
         $self.s[3] = s3;
     };
-    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, array8) => {
-        let mut poly = [0; 8];
-        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+    (u64, $self:expr, $poly:expr, array8) => {
         let mut s = [0; 8];
-        for word in poly {
+        for word in $poly {
             for b in 0..64 {
                 if (word >> b) & 1 != 0 {
                     s[0] ^= $self.s[0];
@@ -190,12 +187,10 @@ macro_rules! impl_jump_n {
         }
         $self.s = s;
     };
-    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, pair) => {
-        let mut poly = [0; 2];
-        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+    (u64, $self:expr, $poly:expr, pair) => {
         let mut s0 = 0;
         let mut s1 = 0;
-        for word in poly {
+        for word in $poly {
             for b in 0..64 {
                 if (word >> b) & 1 != 0 {
                     s0 ^= $self.s0;
@@ -207,15 +202,12 @@ macro_rules! impl_jump_n {
         $self.s0 = s0;
         $self.s1 = s1;
     };
-    (u32, $self:expr, $charpoly:expr, $c:expr, $e:expr, array4) => {
-        // 128 bits of state = 4 × u32 = 2 × u64 polynomial words.
-        let mut poly = [0; 2];
-        crate::f2x::jump_poly($c, $e, &$charpoly, &mut poly);
+    (u32, $self:expr, $poly:expr, array4) => {
         let mut s0 = 0;
         let mut s1 = 0;
         let mut s2 = 0;
         let mut s3 = 0;
-        for word in poly {
+        for word in $poly {
             for b in 0..64 {
                 if (word >> b) & 1 != 0 {
                     s0 ^= $self.s[0];
@@ -230,6 +222,53 @@ macro_rules! impl_jump_n {
         $self.s[1] = s1;
         $self.s[2] = s2;
         $self.s[3] = s3;
+    };
+}
+
+/// Number of `u64` polynomial words for a state-shape tag.
+macro_rules! poly_words {
+    (array8) => {
+        8
+    };
+    (array4) => {
+        4
+    };
+    // 128 bits of state = 2 × u64 polynomial words (4 × u32 or a `u64` pair).
+    (array4_u32) => {
+        2
+    };
+    (pair) => {
+        2
+    };
+}
+
+/// Implement the `c · 2^e` arbitrary-jump function (`jump_ce`) for an RNG from
+/// the xoshiro family.
+macro_rules! impl_jump_ce {
+    (u32, $self:expr, $charpoly:expr, $c:expr, $e:expr, array4) => {
+        let mut poly = [0; poly_words!(array4_u32)];
+        crate::f2x::jump_poly_ce($c, $e, &$charpoly, &mut poly);
+        apply_jump_poly!(u32, $self, poly, array4);
+    };
+    (u64, $self:expr, $charpoly:expr, $c:expr, $e:expr, $shape:tt) => {
+        let mut poly = [0; poly_words!($shape)];
+        crate::f2x::jump_poly_ce($c, $e, &$charpoly, &mut poly);
+        apply_jump_poly!(u64, $self, poly, $shape);
+    };
+}
+
+/// Implement the general arbitrary-jump function (`jump_n`) for an RNG from the
+/// xoshiro family. The distance is the little-endian integer held in `$jump`.
+macro_rules! impl_jump_n {
+    (u32, $self:expr, $charpoly:expr, $jump:expr, array4) => {
+        let mut poly = [0; poly_words!(array4_u32)];
+        crate::f2x::jump_poly_n($jump, &$charpoly, &mut poly);
+        apply_jump_poly!(u32, $self, poly, array4);
+    };
+    (u64, $self:expr, $charpoly:expr, $jump:expr, $shape:tt) => {
+        let mut poly = [0; poly_words!($shape)];
+        crate::f2x::jump_poly_n($jump, &$charpoly, &mut poly);
+        apply_jump_poly!(u64, $self, poly, $shape);
     };
 }
 
