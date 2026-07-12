@@ -173,14 +173,6 @@ mod tests {
         0, 0,
     ];
 
-    fn outputs(rng: &mut Xoshiro256PlusPlus) -> [u64; 16] {
-        let mut o = [0; 16];
-        for x in &mut o {
-            *x = rng.next_u64();
-        }
-        o
-    }
-
     #[test]
     fn jump_ce_small_distances_match_stepping() {
         for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
@@ -190,7 +182,7 @@ mod tests {
             }
             let mut b = Xoshiro256PlusPlus::from_seed(SEED);
             b.jump_ce(d, 0);
-            assert_eq!(outputs(&mut a), outputs(&mut b), "jump_ce({d}, 0)");
+            assert_eq!(a, b, "jump_ce({d}, 0)");
         }
         // c * 2^e with e > 0, small enough to step literally: 3 * 2^8 = 768.
         let mut a = Xoshiro256PlusPlus::from_seed(SEED);
@@ -199,7 +191,7 @@ mod tests {
         }
         let mut b = Xoshiro256PlusPlus::from_seed(SEED);
         b.jump_ce(3, 8);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_ce(3, 8)");
+        assert_eq!(a, b, "jump_ce(3, 8)");
     }
 
     #[test]
@@ -208,17 +200,13 @@ mod tests {
         a.jump();
         let mut b = Xoshiro256PlusPlus::from_seed(SEED);
         b.jump_ce(1, 128);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_ce(1,128) == jump()");
+        assert_eq!(a, b, "jump_ce(1,128) == jump()");
 
         let mut a = Xoshiro256PlusPlus::from_seed(SEED);
         a.long_jump();
         let mut b = Xoshiro256PlusPlus::from_seed(SEED);
         b.jump_ce(1, 192);
-        assert_eq!(
-            outputs(&mut a),
-            outputs(&mut b),
-            "jump_ce(1,192) == long_jump()"
-        );
+        assert_eq!(a, b, "jump_ce(1,192) == long_jump()");
     }
 
     #[test]
@@ -229,14 +217,14 @@ mod tests {
             a.jump_ce(d, 0);
             let mut b = Xoshiro256PlusPlus::from_seed(SEED);
             b.jump_n(&[d, 0, 0, 0]);
-            assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(&[{d}, …])");
+            assert_eq!(a, b, "jump_n(&[{d}, …])");
         }
         // A distance that needs a high limb: 2^128 == jump().
         let mut a = Xoshiro256PlusPlus::from_seed(SEED);
         a.jump();
         let mut b = Xoshiro256PlusPlus::from_seed(SEED);
         b.jump_n(&[0, 0, 1, 0]);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(2^128) == jump()");
+        assert_eq!(a, b, "jump_n(2^128) == jump()");
 
         // A distance jump_ce cannot express (odd part exceeds 64 bits):
         // 3 + 5 · 2^64, checked via x^(a + b) = x^a · x^b.
@@ -245,7 +233,7 @@ mod tests {
         a.jump_ce(5, 64);
         let mut b = Xoshiro256PlusPlus::from_seed(SEED);
         b.jump_n(&[3, 5, 0, 0]);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(3 + 5 · 2^64)");
+        assert_eq!(a, b, "jump_n(3 + 5 · 2^64)");
     }
 
     #[test]

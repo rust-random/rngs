@@ -142,14 +142,6 @@ mod tests {
         Xoshiro128PlusPlus::seed_from_u64(0x0123456789abcdef)
     }
 
-    fn outputs(rng: &mut Xoshiro128PlusPlus) -> [u32; 16] {
-        let mut o = [0u32; 16];
-        for x in &mut o {
-            *x = rng.next_u32();
-        }
-        o
-    }
-
     #[test]
     fn jump_ce_small_distances_match_stepping() {
         for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
@@ -159,7 +151,7 @@ mod tests {
             }
             let mut b = fresh();
             b.jump_ce(d, 0);
-            assert_eq!(outputs(&mut a), outputs(&mut b), "jump_ce({d}, 0)");
+            assert_eq!(a, b, "jump_ce({d}, 0)");
         }
         let mut a = fresh();
         for _ in 0..3 * 256 {
@@ -167,7 +159,7 @@ mod tests {
         }
         let mut b = fresh();
         b.jump_ce(3, 8);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_ce(3, 8)");
+        assert_eq!(a, b, "jump_ce(3, 8)");
     }
 
     #[test]
@@ -176,17 +168,13 @@ mod tests {
         a.jump();
         let mut b = fresh();
         b.jump_ce(1, 64);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_ce(1,64) == jump()");
+        assert_eq!(a, b, "jump_ce(1,64) == jump()");
 
         let mut a = fresh();
         a.long_jump();
         let mut b = fresh();
         b.jump_ce(1, 96);
-        assert_eq!(
-            outputs(&mut a),
-            outputs(&mut b),
-            "jump_ce(1,96) == long_jump()"
-        );
+        assert_eq!(a, b, "jump_ce(1,96) == long_jump()");
     }
 
     #[test]
@@ -197,14 +185,14 @@ mod tests {
             a.jump_ce(d, 0);
             let mut b = fresh();
             b.jump_n(&[d, 0]);
-            assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(&[{d}, 0])");
+            assert_eq!(a, b, "jump_n(&[{d}, 0])");
         }
         // A distance that needs a high limb: 2^64 == jump().
         let mut a = fresh();
         a.jump();
         let mut b = fresh();
         b.jump_n(&[0, 1]);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(2^64) == jump()");
+        assert_eq!(a, b, "jump_n(2^64) == jump()");
 
         // A distance jump_ce cannot express (odd part exceeds 64 bits):
         // 3 + 5 · 2^64, checked via x^(a + b) = x^a · x^b.
@@ -213,7 +201,7 @@ mod tests {
         a.jump_ce(5, 64);
         let mut b = fresh();
         b.jump_n(&[3, 5]);
-        assert_eq!(outputs(&mut a), outputs(&mut b), "jump_n(3 + 5 · 2^64)");
+        assert_eq!(a, b, "jump_n(3 + 5 · 2^64)");
     }
 
     #[test]
