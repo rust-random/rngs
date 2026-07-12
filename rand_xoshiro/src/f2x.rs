@@ -85,6 +85,7 @@ pub(crate) fn jump_poly_ce(c: u64, e: u32, charpoly: &[u64], out: &mut [u64]) {
 /// over the bits of `n`, from the most significant down. Requires
 /// `out.len() == charpoly.len()`.
 pub(crate) fn jump_poly_n<const N: usize>(jump: &[u64; N], charpoly: &[u64], out: &mut [u64]) {
+    debug_assert_eq!(out.len(), charpoly.len());
     let w = charpoly.len();
     for o in out.iter_mut() {
         *o = 0;
