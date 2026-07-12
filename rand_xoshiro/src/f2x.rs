@@ -23,6 +23,7 @@ fn bit(a: &[u64], k: usize) -> u64 {
 
 /// `a <- a · x mod charpoly`, in place. Requires `a.len() == charpoly.len()`.
 pub(crate) fn mul_x(a: &mut [u64], charpoly: &[u64]) {
+    debug_assert_eq!(a.len(), charpoly.len());
     let mut carry = 0;
     for word in a.iter_mut() {
         let next_carry = *word >> 63;
