@@ -92,6 +92,7 @@
 
 #[macro_use]
 mod common;
+mod f2x;
 mod splitmix64;
 mod xoroshiro128plus;
 mod xoroshiro128plusplus;

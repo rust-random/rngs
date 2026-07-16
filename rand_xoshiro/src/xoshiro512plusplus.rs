@@ -81,6 +81,62 @@ impl Xoshiro512PlusPlus {
             ]
         );
     }
+
+    /// Jump forward by c · 2^e calls to `next_u64()`.
+    ///
+    /// For example, `jump_ce(1, 256)` is equivalent to [`jump`](Self::jump)
+    /// and `jump_ce(1, 384)` is equivalent to [`long_jump`](Self::long_jump).
+    /// Expressing the distance as c · 2^e makes it possible to request both
+    /// ordinary counts (`jump_ce(k, 0)`) and very large power-of-two jumps
+    /// without multiple-precision integers. For the jump to be meaningful,
+    /// c · 2^e should be smaller than the period 2^512 − 1.
+    ///
+    /// See [`jump_n`](Self::jump_n) to jump by an arbitrary distance.
+    pub fn jump_ce(&mut self, c: u64, e: u32) {
+        impl_jump_ce!(
+            u64,
+            self,
+            [
+                0xcf3cff0c00000001,
+                0x7fdc78d886f00c63,
+                0xf05e63fca6d7b781,
+                0x7a67058e7bbab6f0,
+                0xf11eef832e32518f,
+                0x51ba7c47edc758ad,
+                0x8f2d27268ce4b20b,
+                0x0000500055d8b77f
+            ],
+            c,
+            e,
+            array8
+        );
+    }
+
+    /// Jump forward by an arbitrary number of calls to `next_u64()`.
+    ///
+    /// This is equivalent to *n* calls to `next_u64()`, where *n* = `jump[0]` +
+    /// `jump[1]` · 2^64 + … is the little-endian integer held in `jump`.
+    /// Unlike [`jump_ce`](Self::jump_ce), it can express any jump distance.
+    /// For the jump to be meaningful, *n* should be smaller than the period
+    /// 2^512 − 1.
+    pub fn jump_n(&mut self, jump: &[u64; 8]) {
+        impl_jump_n!(
+            u64,
+            self,
+            [
+                0xcf3cff0c00000001,
+                0x7fdc78d886f00c63,
+                0xf05e63fca6d7b781,
+                0x7a67058e7bbab6f0,
+                0xf11eef832e32518f,
+                0x51ba7c47edc758ad,
+                0x8f2d27268ce4b20b,
+                0x0000500055d8b77f
+            ],
+            jump,
+            array8
+        );
+    }
 }
 
 impl_state_seed512!(Xoshiro512PlusPlus);
@@ -129,6 +185,72 @@ impl TryRng for Xoshiro512PlusPlus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn fresh() -> Xoshiro512PlusPlus {
+        Xoshiro512PlusPlus::seed_from_u64(0x0123456789abcdef)
+    }
+
+    #[test]
+    fn jump_ce_small_distances_match_stepping() {
+        for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
+            let mut a = fresh();
+            for _ in 0..d {
+                a.next_u64();
+            }
+            let mut b = fresh();
+            b.jump_ce(d, 0);
+            assert_eq!(a, b, "jump_ce({d}, 0)");
+        }
+        let mut a = fresh();
+        for _ in 0..3 * 256 {
+            a.next_u64();
+        }
+        let mut b = fresh();
+        b.jump_ce(3, 8);
+        assert_eq!(a, b, "jump_ce(3, 8)");
+    }
+
+    #[test]
+    fn jump_ce_matches_predefined_jumps() {
+        let mut a = fresh();
+        a.jump();
+        let mut b = fresh();
+        b.jump_ce(1, 256);
+        assert_eq!(a, b, "jump_ce(1,256) == jump()");
+
+        let mut a = fresh();
+        a.long_jump();
+        let mut b = fresh();
+        b.jump_ce(1, 384);
+        assert_eq!(a, b, "jump_ce(1,384) == long_jump()");
+    }
+
+    #[test]
+    fn jump_n_matches_jump_ce() {
+        // jump_n(&[d, 0, …]) == jump_ce(d, 0) for a single-word distance.
+        for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
+            let mut a = fresh();
+            a.jump_ce(d, 0);
+            let mut b = fresh();
+            b.jump_n(&[d, 0, 0, 0, 0, 0, 0, 0]);
+            assert_eq!(a, b, "jump_n(&[{d}, …])");
+        }
+        // A distance that needs a high limb: 2^256 == jump().
+        let mut a = fresh();
+        a.jump();
+        let mut b = fresh();
+        b.jump_n(&[0, 0, 0, 0, 1, 0, 0, 0]);
+        assert_eq!(a, b, "jump_n(2^256) == jump()");
+
+        // A distance jump_ce cannot express (odd part exceeds 64 bits):
+        // 3 + 5 · 2^64, checked via x^(a + b) = x^a · x^b.
+        let mut a = fresh();
+        a.jump_ce(3, 0);
+        a.jump_ce(5, 64);
+        let mut b = fresh();
+        b.jump_n(&[3, 5, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(a, b, "jump_n(3 + 5 · 2^64)");
+    }
 
     #[test]
     fn reference() {
