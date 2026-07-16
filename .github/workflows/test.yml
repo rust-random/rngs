@@ -33,6 +33,12 @@ jobs:
           cargo doc --workspace --all-features -Zwarnings --config 'build.warnings="deny"'
           cargo deadlinks -- --workspace --all-features -Zwarnings --config 'build.warnings="deny"'
 
+  typos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: crate-ci/typos@v1
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
