@@ -146,6 +146,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
     fn jump_ce_small_distances_match_stepping() {
         for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
             let mut a = fresh();
@@ -181,6 +182,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
     fn jump_n_matches_jump_ce() {
         // jump_n(&[d, 0]) == jump_ce(d, 0) for a single-word distance.
         for &d in &[0, 1, 2, 3, 7, 64, 1000, 1_000_000] {
