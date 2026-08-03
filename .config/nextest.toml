@@ -1,0 +1,8 @@
+# Configuration for cargo-nextest. See https://nexte.st/docs/configuration/
+#
+# Note: nextest does not run doctests. Run `cargo test --doc` separately.
+
+[profile.default]
+fail-fast = false
+slow-timeout = { period = "10s", terminate-after = 6 }
+final-status-level = "slow"

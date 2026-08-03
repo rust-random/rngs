@@ -124,6 +124,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
     fn jump_poly_ce_matches_repeated_mul_x_for_e0() {
         for &c in &[0, 1, 2, 3, 7, 64, 1000, 5000] {
             let mut out = [0; 4];
@@ -133,6 +134,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
     fn jump_poly_ce_matches_repeated_mul_x_for_powers_of_two() {
         // jump_poly_ce(1, e) == x^(2^e); compare to 2^e applications of mul_x.
         for e in 0..=12 {
@@ -173,6 +175,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
     fn jump_poly_n_matches_ce_single_word() {
         // jump_poly_n(&[n]) == jump_poly_ce(n, 0) for a single-word distance.
         for &n in &[0, 1, 2, 3, 7, 64, 1000, 5000] {
@@ -185,6 +188,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
     fn jump_poly_n_matches_ce_multi_word() {
         // n = c * 2^64 is the two-word integer [0, c]; compare to ce(c, 64).
         for &c in &[1, 3, 5000] {
