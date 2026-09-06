@@ -3,7 +3,6 @@ name = "rand_chacha"
 version = "0.10.0"
 authors = ["The Rand Project Developers", "The Rust Project Developers", "The CryptoCorrosion Contributors"]
 license = "MIT OR Apache-2.0"
-readme = "README.md"
 repository = "https://github.com/rust-random/rngs"
 documentation = "https://docs.rs/rand_chacha"
 homepage = "https://rust-random.github.io/book"
