@@ -3,7 +3,6 @@ name = "rand_xoshiro"
 version = "0.8.1"
 authors = ["The Rand Project Developers"]
 license = "MIT OR Apache-2.0"
-readme = "README.md"
 repository = "https://github.com/rust-random/rngs"
 documentation = "https://docs.rs/rand_xoshiro"
 homepage = "https://rust-random.github.io/book"

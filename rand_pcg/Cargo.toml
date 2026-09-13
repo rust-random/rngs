@@ -3,7 +3,6 @@ name = "rand_pcg"
 version = "0.10.2"
 authors = ["The Rand Project Developers"]
 license = "MIT OR Apache-2.0"
-readme = "README.md"
 repository = "https://github.com/rust-random/rngs"
 documentation = "https://docs.rs/rand_pcg"
 homepage = "https://rust-random.github.io/book"
