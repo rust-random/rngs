@@ -38,6 +38,7 @@ dependencies = [
  "rand_chacha",
  "rand_core",
  "rand_hc",
+ "rand_mwcx",
  "rand_sfc",
  "rand_xorshift",
  "rand_xoshiro",
@@ -353,7 +354,14 @@ checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 
 [[package]]
 name = "rand_hc"
-version = "0.5.0"
+version = "0.5.1"
+dependencies = [
+ "rand_core",
+]
+
+[[package]]
+name = "rand_mwcx"
+version = "0.1.0"
 dependencies = [
  "rand_core",
 ]

@@ -236,6 +236,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand_mwcx"
+version = "0.1.0"
+dependencies = [
+ "postcard",
+ "rand_core",
+ "serde",
+]
+
+[[package]]
 name = "rand_pcg"
 version = "0.10.2"
 dependencies = [

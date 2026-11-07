@@ -20,6 +20,7 @@ use rand_core::{Rng, SeedableRng};
 
 use rand_chacha::{ChaCha8Rng, ChaCha12Rng, ChaCha20Rng};
 use rand_hc::Hc128Rng;
+use rand_mwcx::{Mwc64X32, Mwc128X, Mwc128X32, Mwc192X};
 use rand_sfc::{Sfc32, Sfc64};
 use rand_xorshift::XorShiftRng;
 use rand_xoshiro::{
@@ -85,6 +86,10 @@ fn gen_bytes(c: &mut Criterion<CyclesPerByte>) {
     gen_bytes!("hc128", Hc128Rng::from_rng(&mut master));
     gen_bytes!("sfc32", Sfc32::from_rng(&mut master));
     gen_bytes!("sfc64", Sfc64::from_rng(&mut master));
+    gen_bytes!("mwc128x", Mwc128X::from_rng(&mut master));
+    gen_bytes!("mwc192x", Mwc192X::from_rng(&mut master));
+    gen_bytes!("mwc64x32", Mwc64X32::from_rng(&mut master));
+    gen_bytes!("mwc128x32", Mwc128X32::from_rng(&mut master));
     gen_bytes!("chacha8", ChaCha8Rng::from_rng(&mut master));
     gen_bytes!("chacha12", ChaCha12Rng::from_rng(&mut master));
     gen_bytes!("chacha20", ChaCha20Rng::from_rng(&mut master));
@@ -196,6 +201,10 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         gen_uint!(g, "hc128", u32, Hc128Rng::from_rng(&mut master));
         gen_uint!(g, "sfc32", u32, Sfc32::from_rng(&mut master));
         gen_uint!(g, "sfc64", u32, Sfc64::from_rng(&mut master));
+        gen_uint!(g, "mwc128x", u32, Mwc128X::from_rng(&mut master));
+        gen_uint!(g, "mwc192x", u32, Mwc192X::from_rng(&mut master));
+        gen_uint!(g, "mwc64x32", u32, Mwc64X32::from_rng(&mut master));
+        gen_uint!(g, "mwc128x32", u32, Mwc128X32::from_rng(&mut master));
         gen_uint!(g, "chacha8", u32, ChaCha8Rng::from_rng(&mut master));
         gen_uint!(g, "chacha12", u32, ChaCha12Rng::from_rng(&mut master));
         gen_uint!(g, "chacha20", u32, ChaCha20Rng::from_rng(&mut master));
@@ -270,6 +279,10 @@ fn gen_uint(c: &mut Criterion<CyclesPerByte>) {
         gen_uint!(g, "hc128", u64, Hc128Rng::from_rng(&mut master));
         gen_uint!(g, "sfc32", u64, Sfc32::from_rng(&mut master));
         gen_uint!(g, "sfc64", u64, Sfc64::from_rng(&mut master));
+        gen_uint!(g, "mwc128x", u64, Mwc128X::from_rng(&mut master));
+        gen_uint!(g, "mwc192x", u64, Mwc192X::from_rng(&mut master));
+        gen_uint!(g, "mwc64x32", u64, Mwc64X32::from_rng(&mut master));
+        gen_uint!(g, "mwc128x32", u64, Mwc128X32::from_rng(&mut master));
         gen_uint!(g, "chacha8", u64, ChaCha8Rng::from_rng(&mut master));
         gen_uint!(g, "chacha12", u64, ChaCha12Rng::from_rng(&mut master));
         gen_uint!(g, "chacha20", u64, ChaCha20Rng::from_rng(&mut master));
@@ -304,6 +317,10 @@ fn init(c: &mut Criterion) {
     init_gen!("hc128", Hc128Rng);
     init_gen!("sfc32", Sfc32);
     init_gen!("sfc64", Sfc64);
+    init_gen!("mwc128x", Mwc128X);
+    init_gen!("mwc192x", Mwc192X);
+    init_gen!("mwc64x32", Mwc64X32);
+    init_gen!("mwc128x32", Mwc128X32);
     init_gen!("chacha8", ChaCha8Rng);
     init_gen!("chacha12", ChaCha12Rng);
     init_gen!("chacha20", ChaCha20Rng);
