@@ -56,6 +56,15 @@ impl Lcg64Xsh32 {
     ///
     /// Using this function is equivalent to calling `next_32()` `delta`
     /// number of times.
+    ///
+    /// # Warning
+    ///
+    /// Do not advance by a large power of two, such as `1 << 63` (half of the
+    /// period), to split a single stream into several. The state is an LCG
+    /// modulo `2^64`, whose lowest `e` bits repeat every `2^e` steps, so
+    /// advancing by `2^e` leaves them unchanged. After `advance(1 << 63)`, the
+    /// two states differ only in their top bit at every step, and each output
+    /// is the other with its 16-bit halves swapped and one bit flipped.
     #[inline]
     pub fn advance(&mut self, delta: u64) {
         let mut acc_mult: u64 = 1;
