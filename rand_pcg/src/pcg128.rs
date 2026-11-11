@@ -56,6 +56,15 @@ impl Lcg128Xsl64 {
     ///
     /// Using this function is equivalent to calling `next_64()` `delta`
     /// number of times.
+    ///
+    /// # Warning
+    ///
+    /// Do not advance by a large power of two, such as `1 << 127` (half of the
+    /// period), to split a single stream into several. The state is an LCG
+    /// modulo `2^128`, whose lowest `e` bits repeat every `2^e` steps, so
+    /// advancing by `2^e` leaves them unchanged. After `advance(1 << 127)`, the
+    /// two states differ only in their top bit at every step, and each output
+    /// is the other with its 32-bit halves swapped and one bit flipped.
     #[inline]
     pub fn advance(&mut self, delta: u128) {
         let mut acc_mult: u128 = 1;
@@ -190,6 +199,15 @@ impl Mcg128Xsl64 {
     ///
     /// Using this function is equivalent to calling `next_64()` `delta`
     /// number of times.
+    ///
+    /// # Warning
+    ///
+    /// Do not advance by a large power of two, such as `1 << 125` (half of the
+    /// period), to split a single stream into several. The state is an MCG
+    /// modulo `2^128`, whose lowest `e` bits repeat every `2^e` steps, so
+    /// advancing by `2^e` leaves them unchanged. After `advance(1 << 125)`, the
+    /// two states differ only in their top bit at every step, and each output
+    /// is the other with its 32-bit halves swapped and one bit flipped.
     #[inline]
     pub fn advance(&mut self, delta: u128) {
         let mut acc_mult: u128 = 1;

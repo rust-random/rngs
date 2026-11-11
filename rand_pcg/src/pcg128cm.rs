@@ -59,6 +59,16 @@ impl Lcg128CmDxsm64 {
     ///
     /// Using this function is equivalent to calling `next_64()` `delta`
     /// number of times.
+    ///
+    /// # Warning
+    ///
+    /// Do not advance by a large power of two, such as `1 << 127` (half of the
+    /// period), to split a single stream into several. The state is an LCG
+    /// modulo `2^128`, whose lowest `e` bits repeat every `2^e` steps, so
+    /// advancing by `2^e` leaves them unchanged. After `advance(1 << 127)`, the
+    /// two states differ only in their top bit at every step, and the relation
+    /// survives the DXSM output function: the two outputs are never congruent
+    /// modulo 4, so they never have the same last hexadecimal digit.
     #[inline]
     pub fn advance(&mut self, delta: u128) {
         let mut acc_mult: u128 = 1;
