@@ -5,6 +5,7 @@ members = [
     "rand_hc",
     "rand_isaac",
     "rand_jitter",
+    "rand_mwcx",
     "rand_pcg",
     "rand_sfc",
     "rand_xorshift",
