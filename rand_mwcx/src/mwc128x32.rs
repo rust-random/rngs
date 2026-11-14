@@ -20,6 +20,12 @@ const MOD: [u64; 2] = [u64::MAX, ((MWC_A3 - 1) as u64) << 32 | 0xffffffff];
 /// The multiplier 2⁻³² mod m = `MWC_A3` · 2⁶⁴ of the underlying generator.
 const BASE: [u64; 2] = [0, MWC_A3 as u64];
 
+/// `BASE`^(2⁶⁴) mod m, the multiplier used by `jump()`.
+const BASE_2_64: [u64; 2] = [0x3df51ad941ad5cca, 0xe67750f4f6c4e62f];
+
+/// `BASE`^(2⁹⁶) mod m, the multiplier used by `long_jump()`.
+const BASE_2_96: [u64; 2] = [0x8cfada360d80d5a5, 0xfef31f136713bbb4];
+
 /// An MWC128X/32 random number generator.
 ///
 /// MWC128X/32 is a Marsaglia multiply-with-carry generator with 32-bit digits,
@@ -93,7 +99,7 @@ impl Mwc128X32 {
     /// rng3.jump();
     /// ```
     pub fn jump(&mut self) {
-        self.jump_mul(&[0x3df51ad941ad5cca, 0xe67750f4f6c4e62f]);
+        self.jump_mul(&BASE_2_64);
     }
 
     /// Jump forward, equivalently to 2⁹⁶ calls to `next_u32()`.
@@ -102,7 +108,7 @@ impl Mwc128X32 {
     /// `jump()` will generate 2³² non-overlapping subsequences for parallel
     /// distributed computations.
     pub fn long_jump(&mut self) {
-        self.jump_mul(&[0x8cfada360d80d5a5, 0xfef31f136713bbb4]);
+        self.jump_mul(&BASE_2_96);
     }
 
     /// Jump forward by *c* · 2*ᵉ* calls to `next_u32()`.
@@ -321,6 +327,13 @@ mod tests {
         let mut b = Mwc128X32::from_seed(SEED);
         b.jump_ce(3, 8);
         assert_eq!(a, b, "jump_ce(3, 8)");
+    }
+
+    #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
+    fn jump_constants() {
+        assert_eq!(BASE_2_64, mp::pow_mod_ce(&BASE, 1, 64, &MOD));
+        assert_eq!(BASE_2_96, mp::pow_mod_ce(&BASE, 1, 96, &MOD));
     }
 
     #[test]

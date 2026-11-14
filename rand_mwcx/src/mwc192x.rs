@@ -20,6 +20,12 @@ const MOD: [u64; 3] = [u64::MAX, u64::MAX, MWC_A2 - 1];
 /// The multiplier 2⁻⁶⁴ mod m = `MWC_A2` · 2⁶⁴ of the underlying generator.
 const BASE: [u64; 3] = [0, MWC_A2, 0];
 
+/// `BASE`^(2⁹⁶) mod m, the multiplier used by `jump()`.
+const BASE_2_96: [u64; 3] = [0xd323a2a406f64957, 0x21239e0fbd1ccbb5, 0x702eb67f0959a76b];
+
+/// `BASE`^(2¹⁴⁴) mod m, the multiplier used by `long_jump()`.
+const BASE_2_144: [u64; 3] = [0x671d31e08a897fff, 0xbceb1c681d8e45f7, 0xd6c731b43ecad305];
+
 /// An MWC192X random number generator.
 ///
 /// MWC192X is a Marsaglia multiply-with-carry generator with 64-bit digits,
@@ -75,7 +81,7 @@ impl Mwc192X {
     /// rng3.jump();
     /// ```
     pub fn jump(&mut self) {
-        self.jump_mul(&[0xd323a2a406f64957, 0x21239e0fbd1ccbb5, 0x702eb67f0959a76b]);
+        self.jump_mul(&BASE_2_96);
     }
 
     /// Jump forward, equivalently to 2¹⁴⁴ calls to `next_u64()`.
@@ -84,7 +90,7 @@ impl Mwc192X {
     /// `jump()` will generate 2⁴⁸ non-overlapping subsequences for parallel
     /// distributed computations.
     pub fn long_jump(&mut self) {
-        self.jump_mul(&[0x671d31e08a897fff, 0xbceb1c681d8e45f7, 0xd6c731b43ecad305]);
+        self.jump_mul(&BASE_2_144);
     }
 
     /// Jump forward by *c* · 2*ᵉ* calls to `next_u64()`.
@@ -315,6 +321,13 @@ mod tests {
         let mut b = Mwc192X::from_seed(SEED);
         b.jump_ce(3, 8);
         assert_eq!(a, b, "jump_ce(3, 8)");
+    }
+
+    #[test]
+    #[cfg_attr(miri, ignore)] // Miri is too slow
+    fn jump_constants() {
+        assert_eq!(BASE_2_96, mp::pow_mod_ce(&BASE, 1, 96, &MOD));
+        assert_eq!(BASE_2_144, mp::pow_mod_ce(&BASE, 1, 144, &MOD));
     }
 
     #[test]
