@@ -12,14 +12,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lockfile:
-    name: Lockfile is up-to-date
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo check --workspace --locked
-
   check-doc:
     name: Check doc
     runs-on: ubuntu-latest
@@ -61,6 +53,7 @@ jobs:
             # Test both windows-gnu and windows-msvc; use beta rust on one
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            variant: MSRV
             toolchain: 1.85.0
           - os: ubuntu-latest
             deps: sudo apt-get update ; sudo apt install gcc-multilib
@@ -73,6 +66,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+      - name: Not MSRV
+        if: ${{ matrix.variant != 'MSRV' }}
+        run: cargo generate-lockfile --ignore-rust-version
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
         with:
