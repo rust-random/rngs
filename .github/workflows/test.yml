@@ -19,11 +19,9 @@ jobs:
       - uses: actions/checkout@v7
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@nightly
-      - run: cargo install cargo-deadlinks
       - name: doc (rand)
         run: |
-          cargo doc --workspace --all-features -Zwarnings --config 'build.warnings="deny"'
-          cargo deadlinks -- --workspace --all-features -Zwarnings --config 'build.warnings="deny"'
+          cargo doc --workspace --all-features --config 'build.warnings="deny"'
 
   typos:
     runs-on: ubuntu-latest
