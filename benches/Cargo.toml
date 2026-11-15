@@ -14,6 +14,7 @@ rand_xoshiro = { path = "../rand_xoshiro", version = "0.8.0-rc.0" }
 rand_xorshift = { path = "../rand_xorshift", version = "0.5.0-rc.0" }
 rand_hc = { path = "../rand_hc", version = "0.5.0-rc.0" }
 rand_sfc = { path = "../rand_sfc", version = "0.2.0-rc.0" }
+rand_mwcx = { path = "../rand_mwcx", version = "0.1.0" }
 
 [[bench]]
 name = "mod"
