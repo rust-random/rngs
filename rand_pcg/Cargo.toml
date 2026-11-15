@@ -1,6 +1,6 @@
 [package]
 name = "rand_pcg"
-version = "0.10.2"
+version = "0.10.3"
 authors = ["The Rand Project Developers"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-random/rngs"
